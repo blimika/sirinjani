@@ -25,7 +25,7 @@ class CreateUsersTable extends Migration
             $table->string('jabatan',20);
             $table->string('kodeunit',5)->nullable();
             $table->string('kodebps',4);
-            $table->string('satuankerja');
+            $table->string('satuankerja',254);
             $table->string('urlfoto');
             $table->boolean('jk')->unsigned();
             $table->string('nohp',25)->nullable();

@@ -1,4 +1,4 @@
-<form method="POST" name="kegiatan" action="{{route('kegiatan.simpan') }}">
+<form method="POST" name="kegiatan" id="keg_form" action="{{route('kegiatan.simpan') }}">
     @csrf
     <div class="form-group">
         <label for="keg_nama">Nama Kegiatan</label>

@@ -16,8 +16,6 @@ use Excel;
 use App\Kegiatan;
 use App\KegDetil;
 use App\KegJenis;
-use App\KegTarget;
-use App\KegSpj;
 
 class KegiatanController extends Controller
 {
@@ -27,7 +25,7 @@ class KegiatanController extends Controller
         $data_bulan = array(
             1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'
         );
-        $data_tahun = DB::table('kegiatan')
+        $data_tahun = DB::table('m_keg')
                     ->selectRaw('year(keg_start) as tahun')
                     ->groupBy('tahun')
                     ->orderBy('tahun','asc')
@@ -42,11 +40,11 @@ class KegiatanController extends Controller
             $tahun_filter = request('tahun');
         }
         $dataUnit = UnitKerja::where([['unit_jenis','=','1'],['unit_eselon','=','3']])->get();
-        $dataKegiatan = Kegiatan::leftJoin('t_unitkerja','kegiatan.keg_unitkerja','=','t_unitkerja.unit_kode')
+        $dataKegiatan = Kegiatan::leftJoin('t_unitkerja','m_keg.keg_unitkerja','=','t_unitkerja.unit_kode')
                         ->when(request('bulan'),function ($query){
                             return $query->whereMonth('keg_start','=',request('bulan'));
                         })
-                        ->orderBy('kegiatan.created_at','desc')->whereYear('keg_start','=',$tahun_filter)->get();
+                        ->orderBy('m_keg.created_at','desc')->whereYear('keg_start','=',$tahun_filter)->get();
         //dd($dataKegiatan);
         return view('kegiatan.index',['dataKeg'=>$dataKegiatan,'dataUnitkerja'=>$dataUnit,'bulan'=>request('bulan'),'tahun'=>$tahun_filter,'dataBulan'=>$data_bulan,'dataTahun'=>$data_tahun]);
     }
@@ -57,7 +55,7 @@ class KegiatanController extends Controller
             1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'
         );
         $data_bidang = 
-        $data_tahun = DB::table('kegiatan')
+        $data_tahun = DB::table('m_keg')
                     ->selectRaw('year(keg_start) as tahun')
                     ->groupBy('tahun')
                     ->orderBy('tahun','asc')
@@ -72,7 +70,7 @@ class KegiatanController extends Controller
             $tahun_filter = request('tahun');
         }
         $dataUnit = UnitKerja::where([['unit_jenis','=','1'],['unit_eselon','=','3']])->get();
-        $dataKegiatan = Kegiatan::leftJoin('t_unitkerja','kegiatan.keg_unitkerja','=','t_unitkerja.unit_kode')
+        $dataKegiatan = Kegiatan::leftJoin('t_unitkerja','m_keg.keg_unitkerja','=','t_unitkerja.unit_kode')
                         ->when(request('unit'),function ($query){
                             return $query->where('t_unitkerja.unit_parent','=',request('unit'));
                         })
@@ -80,8 +78,8 @@ class KegiatanController extends Controller
                             return $query->whereMonth('keg_start','=',request('bulan'));
                         })
                         ->whereYear('keg_start','=',$tahun_filter)
-                        ->orderBy('kegiatan.keg_unitkerja','asc')
-                        ->orderBy('kegiatan.keg_start','asc')
+                        ->orderBy('m_keg.keg_unitkerja','asc')
+                        ->orderBy('m_keg.keg_start','asc')
                         ->get();
         //dd($dataUnit);
         return view('kegiatan.bidang',['dataKeg'=>$dataKegiatan,'dataUnitkerja'=>$dataUnit,'bulan'=>request('bulan'),'tahun'=>$tahun_filter,'dataBulan'=>$data_bulan,'dataTahun'=>$data_tahun,'unit'=>request('unit')]);

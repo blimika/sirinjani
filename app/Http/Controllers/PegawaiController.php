@@ -172,7 +172,7 @@ class PegawaiController extends Controller
                                 }
                         }
                     }
-                    $pesan_error='Data pegawai sebanyak '.$tot.' sudah disync';
+                    $pesan_error='Data pegawai '.$wilayah->bps_nama.' sebanyak '.$tot.' sudah disync';
                     $pesan_warna='success';
                 }
                 else {
@@ -183,9 +183,83 @@ class PegawaiController extends Controller
             }
             else 
             {
-                //kabkota
-                $pesan_error="BERHASIL : data pegawai kabkota sudah disinkronisasi";
-                $pesan_warna='success';
+                //sync pegawai kabkota
+                $hasil = $h->get_list_pegawai_kabkot($request->wilayah);
+                $tot=0;
+                $unit_kode = $request->wilayah.'0';
+                //dd($hasil);
+                if ($hasil) 
+                {
+                    for ($i=0;$i<count($hasil);$i++)
+                    {
+                        $count_peg = User::where('nipbps','=',$hasil[$i]['nipbps'])->count();
+                        if ($hasil[$i]['satuankerja']=="BPS Kabupaten/Kota")
+                        {
+                            $jabatan = 'Kepala';
+                            $satuankerja = $hasil[$i]['alamatkantor'];
+                        }
+                        elseif ($hasil[$i]['satuankerja']=="KSK")
+                        {
+                            $jabatan = 'KSK';
+                            $satuankerja = $hasil[$i]['alamatkantor'];
+                        }
+                        else 
+                        {
+                            $jabatan = $hasil[$i]['jabatan'];
+                            $satuankerja = $hasil[$i]['satuankerja'];
+                        }
+
+                        if ($count_peg>0) {
+                            //jika sudah ada update isiannya nama, satuan, urlfoto
+                            $data = User::where('nipbps','=',$hasil[$i]['nipbps'])->first();
+                            $data->nama = $hasil[$i]['nama'];
+                            $data->satuankerja = $satuankerja;
+                            $data->urlfoto = $hasil[$i]['urlfoto'];
+                            $data->jabatan = $jabatan;
+                            $data->kodeunit = $unit_kode;
+                            $data->kodebps = $request->wilayah;
+                            $data->update();
+                            $tot++;
+                        }
+                        else {
+                            //belum ada
+                            /*
+                            'nama'=>$nama,
+                            'nipbps'=>$nipbps,
+                            'nippanjang'=>$nippanjang,
+                            'email'=>$email,
+                            'username'=>$username,
+                            'jabatan'=>$jabatan,
+                            'satuankerja'=>$satuankerja,
+                            'alamatkantor'=>$alamatkantor,
+                            'urlfoto'=>$urlfoto
+                            */
+                            $data = new User();
+                            $data->nama = $hasil[$i]['nama'];
+                            $data->nipbps = $hasil[$i]['nipbps'];
+                            $data->nipbaru = $hasil[$i]['nippanjang'];
+                            $data->email = $hasil[$i]['email'];
+                            $data->username = $hasil[$i]['username'];
+                            $data->jabatan = $jabatan;
+                            $data->satuankerja = $satuankerja;
+                            $data->urlfoto = $hasil[$i]['urlfoto'];
+                            $data->jk = substr($hasil[$i]['nippanjang'],-4,1);
+                            $data->level = '1';
+                            $data->kodeunit = $unit_kode;
+                            $data->kodebps = $request->wilayah;
+                            $data->password = bcrypt('null');
+                            $data->save();
+                            $tot++;
+                        }  
+                    }
+                    $pesan_error='BERHASIL: Data pegawai '.$wilayah->bps_nama.' sebanyak '.$tot.' pegawai sudah disinkronisasi';
+                    $pesan_warna = 'success';
+                }
+                else {
+                    $pesan_error='Data tidak tersedia';
+                    $pesan_warna = 'danger';
+                }
+                //batas sync peg kabkota
             }
             //batas true berhasil login
         }

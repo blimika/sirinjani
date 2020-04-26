@@ -18,8 +18,14 @@ Route::get('/', function () {
 
 Route::get('/kegiatan/list', 'KegiatanController@index')->name('kegiatan.list');
 Route::get('/kegiatan/bidang', 'KegiatanController@bidang')->name('kegiatan.bidang');
-Route::get('/kegiatan/tambah', 'KegiatanController@tambah')->name('kegiatan.tambah');
-Route::post('/kegiatan/simpan', 'KegiatanController@simpan')->name('kegiatan.simpan');
+
 Route::get('/pegawai/list', 'PegawaiController@index')->name('pegawai.list');
-Route::post('/pegawai/sync', 'PegawaiController@syncData')->name('pegawai.sync');
-Route::post('/cek/community', 'PegawaiController@cekCommunity')->name('cek.community');
+
+Route::group(['middleware' => ['auth']], function () {
+    Route::get('/kegiatan/tambah', 'KegiatanController@tambah')->name('kegiatan.tambah');
+    Route::post('/kegiatan/simpan', 'KegiatanController@simpan')->name('kegiatan.simpan'); 
+    Route::post('/pegawai/sync', 'PegawaiController@syncData')->name('pegawai.sync');
+    Route::post('/cek/community', 'PegawaiController@cekCommunity')->name('cek.community');
+
+});
+Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout')->name('logout');

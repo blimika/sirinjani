@@ -60,14 +60,14 @@
                                      @foreach ($unitTarget as $t)
                                          <tr>
                                              <td>{{$t->unit_nama}}</td>
-                                             <td><input type="text" name="keg_kabkota[{{$t->unit_kode}}]" id="keg_kabkota[{{$t->unit_kode}}]" class="form-control input-sm target_kabkota" placeholder="....." / required="required"></td>
-                                             <td><input type="text" name="spj_kabkota[{{$t->unit_kode}}]" id="spj_kabkota[{{$t->unit_kode}}]" class="form-control input-sm spj" placeholder="....." readonly="readonly" /></td>
+                                             <td><input type="number" name="keg_kabkota[{{$t->unit_kode}}]" id="keg_kabkota[{{$t->unit_kode}}]" class="form-control input-sm target_kabkota" placeholder="....." / required="required"></td>
+                                             <td><input type="number" name="spj_kabkota[{{$t->unit_kode}}]" id="spj_kabkota[{{$t->unit_kode}}]" class="form-control input-sm spj" placeholder="....." readonly="readonly" /></td>
                                          </tr>
                                      @endforeach
                                  </tbody>
                             </table>
                         </div>
-                        <button type="submit" class="btn btn-success mr-2" id="simpan" name="simpan">Simpan</button>
+                        <button type="button" class="btn btn-success mr-2" id="simpan" name="simpan">Simpan</button>
                         <button type="reset" class="btn btn-dark">Reset</button>
                     </form>
                     </div>
