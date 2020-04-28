@@ -25,6 +25,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/kegiatan/tambah', 'KegiatanController@tambah')->name('kegiatan.tambah');
     Route::post('/kegiatan/simpan', 'KegiatanController@simpan')->name('kegiatan.simpan'); 
     Route::post('/pegawai/sync', 'PegawaiController@syncData')->name('pegawai.sync');
+    Route::get('/pegawai/{nipbps}', 'PegawaiController@CariPegawai')->name('cari.pegawai');
     Route::post('/cek/community', 'PegawaiController@cekCommunity')->name('cek.community');
 
 });

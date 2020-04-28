@@ -52,7 +52,6 @@
                             <th>Username</th>
                             <th>Level</th>
                             <th>Status</th>
-                            <th>Lastlogin</th>
                             <th>Aksi</th>
                             </tr>
                             </thead>
@@ -60,14 +59,14 @@
                                 @foreach ($dataPegawai as $item)
                                     <tr>
                                         <td>{{$loop->iteration}}</td>
-                                        <td><img class="img-circle" src="{{$item->urlfoto}}" alt="User profile picture" height="50px" width="50px"></td>
+                                        <td><img class="img-circle" src="{{$item->urlfoto}}" alt="User profile picture" height="40px" width="40px"></td>
                                         <td>
                                             {{$item->nama}}
                                             <br />
                                             NIP : {{Generate::PecahNip($item->nipbaru)}}
                                             <br />
                                             <small>
-                                                {{$item->jabatan}} {{$item->satuankerja}}
+                                                {{$item->satuankerja}}
                                             </small>
                                         </td>
                                         <td>{{$item->username}}</td>
@@ -77,13 +76,9 @@
                                             @else 
                                             <span class="label label-rounded label-danger">Tidak aktif</span>
                                             @endif</td>
-                                        <td>
-                                            {{$item->lastip}} <br />
-                                            @if ($item->lastlogin)
-                                                {{\Carbon\Carbon::parse($item->lastlogin)->diffForHumans()}}
-                                            @endif
+                                       <td>
+                                           @include('pegawai.aksi')
                                         </td>
-                                        <td></td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -137,5 +132,5 @@
     </script>
     <!-- Sweet-Alert  -->
     <script src="{{asset('assets/node_modules/sweetalert2/dist/sweetalert2.all.min.js')}}"></script>
-    
+    @include('pegawai.js')
 @endsection

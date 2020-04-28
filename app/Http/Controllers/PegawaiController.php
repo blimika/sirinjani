@@ -13,6 +13,7 @@ use App\KodeWilayah;
 use App\KodeLevel;
 use App\UnitKerja;
 use Excel;
+use App\Helpers\Generate;
 
 class PegawaiController extends Controller
 {
@@ -51,7 +52,7 @@ class PegawaiController extends Controller
             $wilayah = KodeWilayah::where('bps_kode','=',$request->wilayah)->first();
             if ($wilayah->bps_jenis==1)
             {
-                //provinsi
+                //pegawai provinsi
                 $hasil = $h->get_list_pegawai_provinsi($request->wilayah);
                 $tot=0;
                 if ($hasil) {
@@ -66,7 +67,14 @@ class PegawaiController extends Controller
                                 $kode_unit = UnitKerja::where('unit_nama','=',$hasil[$i]['satuankerja'])->first();
                                 if ($kode_unit)
                                     {
-                                        $unit_kode = $kode_unit->unit_kode;
+                                        if ($kode_unit->unit_eselon < 4)
+                                        {    
+                                            $unit_kode = $kode_unit->unit_kode;
+                                        }
+                                        else 
+                                        {
+                                            $unit_kode = $kode_unit->unit_parent;
+                                        }
                                     }
                                     else 
                                     { 
@@ -80,6 +88,7 @@ class PegawaiController extends Controller
                                     $data->urlfoto = $hasil[$i]['urlfoto'];
                                     $data->level = '1';
                                     $data->kodeunit = $unit_kode;
+                                    $data->kodebps = $request->wilayah;
                                     $data->update();
                                     $tot++;
                                 }
@@ -123,7 +132,14 @@ class PegawaiController extends Controller
                                     $kode_unit = UnitKerja::where('unit_nama','=',$hasil[$i][$j]['satuankerja'])->first();
                                     if ($kode_unit)
                                     {
-                                        $unit_kode = $kode_unit->unit_kode;
+                                        if ($kode_unit->unit_eselon < 4)
+                                        {    
+                                            $unit_kode = $kode_unit->unit_kode;
+                                        }
+                                        else 
+                                        {
+                                            $unit_kode = $kode_unit->unit_parent;
+                                        }
                                     }
                                     else 
                                     { 
@@ -136,6 +152,7 @@ class PegawaiController extends Controller
                                         $data->satuankerja = $hasil[$i][$j]['satuankerja'];
                                         $data->urlfoto = $hasil[$i][$j]['urlfoto'];
                                         $data->kodeunit = $unit_kode;
+                                        $data->kodebps = $request->wilayah;
                                         $data->update();
                                         $tot++;
                                     }
@@ -201,7 +218,7 @@ class PegawaiController extends Controller
                         elseif ($hasil[$i]['satuankerja']=="KSK")
                         {
                             $jabatan = 'KSK';
-                            $satuankerja = $hasil[$i]['alamatkantor'];
+                            $satuankerja = 'KSK';
                         }
                         else 
                         {
@@ -271,5 +288,45 @@ class PegawaiController extends Controller
         Session::flash('message', $pesan_error);
         Session::flash('message_type', $pesan_warna);
         return redirect()->route('pegawai.list');
+    }
+    public function CariPegawai($nipbps)
+    {
+        $count = User::where('nipbps','=',$nipbps)->count();
+        $arr = array(
+            'status'=>false,
+            'hasil'=>'Data pegawai tidak tersedia'
+        );
+        if ($count > 0) 
+        {
+            //ada nip pegawai ini
+            $data = User::where('nipbps','=',$nipbps)->first();
+            
+            $arr = array(
+                'status'=>true,
+                'peg_id'=>$data->id,
+                'nama'=>$data->nama,
+                'nipbps'=>$data->nipbps,
+                'nipbaru'=>$data->nipbaru,
+                'nipbarupecah'=>Generate::PecahNip($data->nipbaru),
+                'email'=>$data->email,
+                'username'=>$data->username,
+                'kodeunit'=>$data->kodeunit,
+                'kodebps'=>$data->kodebps,
+                'satuankerja'=>$data->satuankerja,
+                'urlfoto'=>$data->urlfoto,
+                'jk'=>$data->jk,
+                'aktif'=>$data->aktif,
+                'level'=>$data->level,
+                'level_nama'=>$data->Level->level_nama,
+                'isLokal'=>$data->isLokal,
+                'lastip'=>$data->lastip,
+                'lastlogin'=>$data->lastlogin,
+                'lastlogin_nama'=>Carbon::parse($data->lastlogin)->isoFormat('dddd, D MMMM Y H:mm'),
+                'namaunit'=>$data->Unitkerja->unit_nama,
+                'tgl_dibuat'=>$data->created_at
+
+            );
+        }
+        return Response()->json($arr);
     }
 }

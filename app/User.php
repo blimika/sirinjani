@@ -39,4 +39,10 @@ class User extends Authenticatable
     public function Level(){
         return $this->hasOne('App\KodeLevel','level_id', 'level');
     }
+    public function Unitkerja(){
+        return $this->hasOne('App\UnitKerja','unit_kode', 'kodeunit');
+    }
+    public function NamaWilayah(){
+        return $this->hasOne('App\KodeWilayah','bps_kode', 'kodebps');
+    }
 }

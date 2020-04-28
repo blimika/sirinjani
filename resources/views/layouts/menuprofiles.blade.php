@@ -2,15 +2,15 @@
 <!-- User Profile -->
 <!-- ============================================================== -->
 <li class="nav-item dropdown u-pro">
-    <a class="nav-link dropdown-toggle waves-effect waves-dark profile-pic" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <a class="nav-link dropdown-toggle waves-effect waves-dark profil" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         @if (Auth::user())
-        <img src="{{Auth::user()->urlfoto}}" alt="user" class="img-circle">
+        <img src="{{Auth::user()->urlfoto}}" alt="user" class="img-circle" />
         @endif
         <span class="hidden-md-down">
             @if (Auth::user())
             {{Auth::user()->nama}}  
             @endif  
-        <i class="fa fa-angle-down"></i></span> </a>
+            &nbsp;<i class="fa fa-angle-down"></i></span> </a>
     <div class="dropdown-menu dropdown-menu-right animated flipInY">
          @if (Auth::user())
          <!-- text-->

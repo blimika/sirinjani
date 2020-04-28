@@ -87,7 +87,7 @@ class DatabaseSeeder extends Seeder
         DB::table('t_unitkerja')->delete();
          //insert some dummy records
          DB::table('t_unitkerja')->insert(array(
-         array('unit_kode'=>'52000', 'unit_nama'=>'BPS Propinsi', 'unit_parent'=>NULL, 'unit_jenis'=>'1', 'unit_eselon'=> '2'),
+         array('unit_kode'=>'52000', 'unit_nama'=>'BPS Provinsi Nusa Tenggara Barat', 'unit_parent'=>NULL, 'unit_jenis'=>'1', 'unit_eselon'=> '2'),
          array('unit_kode'=>'52510', 'unit_nama'=>'Bagian Tata Usaha', 'unit_parent'=>'52000', 'unit_jenis'=>'1','unit_eselon'=> '3'),
          array('unit_kode'=>'52511', 'unit_nama'=>'Subbagian Bina Program', 'unit_parent'=>'52510', 'unit_jenis'=>'1', 'unit_eselon'=>'4'),
          array('unit_kode'=>'52512', 'unit_nama'=>'Subbagian Kepegawaian & Hukum', 'unit_parent'=>'52510', 'unit_jenis'=>'1',  'unit_eselon'=>'4'),
