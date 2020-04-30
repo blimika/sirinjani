@@ -41,6 +41,7 @@
                     
                     </div>
                 </div>
+                @include('pegawai.filter')
                 <div class="row">
                     <div class="table-responsive">
                         <table id="pegawai" class="table table-bordered table-hover table-striped" cellspacing="0" width="100%">

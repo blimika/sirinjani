@@ -21,9 +21,11 @@ class PegawaiController extends Controller
     public function index()
     {
         $data_wilayah = KodeWilayah::all();
-        $dataPegawai = User::get();
+        $dataPegawai = User::when(request('wilayah'),function ($query){
+            return $query->where('kodebps','=',request('wilayah'));
+        })->get();
         $dataLevel = KodeLevel::where('level_id','<','9')->get();
-        return view('pegawai.index',['dataWilayah'=>$data_wilayah,'dataPegawai'=>$dataPegawai]);
+        return view('pegawai.index',['dataLevel'=>$dataLevel,'dataWilayah'=>$data_wilayah,'dataPegawai'=>$dataPegawai,'wilayah'=>request('wilayah')]);
     }
     public function cekCommunity(Request $request)
     {
@@ -300,7 +302,22 @@ class PegawaiController extends Controller
         {
             //ada nip pegawai ini
             $data = User::where('nipbps','=',$nipbps)->first();
-            
+            if ($data->lastlogin != "")
+            {
+                $lastlog_nama = Carbon::parse($data->lastlogin)->isoFormat('dddd, D MMMM Y H:mm');
+            }
+            else
+            {
+                $lastlog_nama = 'belum pernah login';
+            }
+            if ($data->lastip != "")
+            {
+                $lastip = $data->lastip;
+            }
+            else
+            {
+                $lastip = 'belum pernah login';
+            }
             $arr = array(
                 'status'=>true,
                 'peg_id'=>$data->id,
@@ -315,18 +332,72 @@ class PegawaiController extends Controller
                 'satuankerja'=>$data->satuankerja,
                 'urlfoto'=>$data->urlfoto,
                 'jk'=>$data->jk,
+                'nohp'=>$data->nohp,
                 'aktif'=>$data->aktif,
                 'level'=>$data->level,
                 'level_nama'=>$data->Level->level_nama,
                 'isLokal'=>$data->isLokal,
-                'lastip'=>$data->lastip,
+                'lastip'=>$lastip,
                 'lastlogin'=>$data->lastlogin,
-                'lastlogin_nama'=>Carbon::parse($data->lastlogin)->isoFormat('dddd, D MMMM Y H:mm'),
+                'lastlogin_nama'=>$lastlog_nama,
                 'namaunit'=>$data->Unitkerja->unit_nama,
                 'tgl_dibuat'=>$data->created_at
-
             );
         }
         return Response()->json($arr);
+    }
+    public function FlagPegawai(Request $request)
+    {
+        $count = User::where('id','=',$request->id)->count();
+        $arr = array(
+            'status'=>false,
+            'hasil'=>'Data pegawai tidak tersedia'
+        );
+        if ($count>0)
+        {
+            $data=User::where('id','=',$request->id)->first();
+            if ($request->flag==1)
+            {
+                $aktif = 0;
+            }
+            else 
+            {
+                $aktif = 1;
+            }
+            $data->aktif = $aktif;
+            $data->update();
+            $arr = array(
+                'status'=>true,
+                'hasil'=>'Flag Pegawai sudah diubah'
+            );
+        }
+        return Response()->json($arr);
+    }
+    public function UpdatePegawai(Request $request)
+    {
+        //dd($request->all());
+        $count = User::where('id','=',$request->peg_id)->count();
+        if ($count > 0) 
+        {
+            //pegawai ada
+            $data = User::where('id','=',$request->peg_id)->first();
+            $data->level = $request->peg_level;
+            $data->nohp = $request->peg_nohp;
+            $data->update();
+            $pesan_error='BERHASIL : Data Pegawai an. '.$request->peg_nama .' berhasil diupdate';
+            $pesan_warna='success';
+        }
+        else
+        {
+            $pesan_error="ERROR : NIPBPS Pegawai tidak tersedia!!";
+            $pesan_warna='danger';
+        }
+        Session::flash('message', $pesan_error);
+        Session::flash('message_type', $pesan_warna);
+        return redirect()->route('pegawai.list');
+    }
+    public function UpdateLokal(Request $request)
+    {
+        dd($request->all());
     }
 }
