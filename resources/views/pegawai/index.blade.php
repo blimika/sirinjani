@@ -14,7 +14,12 @@
                 <li class="breadcrumb-item"><a href="javascript:void(0)">Dashboard</a></li>
                 <li class="breadcrumb-item active">Pegawai List</li>
             </ol>
-            <button type="button" class="btn btn-info d-none d-lg-block m-l-15" data-toggle="modal" data-target="#SyncDataModal"><i class="fa fa-plus-circle"></i> Sync Data</button>
+            @if (Auth::user())
+                @if (Auth::user()->level > 3)
+                <button type="button" class="btn btn-info d-none d-lg-block m-l-15" data-toggle="modal" data-target="#SyncDataModal"><i class="fa fa-plus-circle"></i> Sync Data</button>
+                @endif
+            @endif
+            
         </div>
     </div>
 </div>
@@ -35,12 +40,15 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
-                <div class="row">
-                    <div class="col-lg-6 col-sm-12 col-xs-12">
-                    <button class="btn btn-info btn-rounded waves-effect waves-light m-b-20">Tambah</button> 
-                    
+                @if (Auth::user())
+                    @if (Auth::user()->level > 3)
+                    <div class="row">
+                        <div class="col-lg-6 col-sm-12 col-xs-12">
+                        <button class="btn btn-info btn-rounded waves-effect waves-light m-b-20" data-toggle="modal" data-target="#TambahOperator">Tambah</button> 
+                        </div>
                     </div>
-                </div>
+                    @endif
+                @endif
                 @include('pegawai.filter')
                 <div class="row">
                     <div class="table-responsive">
@@ -52,6 +60,7 @@
                             <th>Nama</th>
                             <th>Username</th>
                             <th>Level</th>
+                            <th>WhatsApp</th>
                             <th>Status</th>
                             <th>Aksi</th>
                             </tr>
@@ -72,13 +81,21 @@
                                         </td>
                                         <td>{{$item->username}}</td>
                                         <td>{{$item->Level->level_nama}}</td>
+                                        <td>
+                                            @if ($item->nohp)
+                                            <a href="http://wa.me/62{{substr($item->nohp,1)}}" target="_blank" class="btn waves-effect btn-success btn-xs waves-light"><i class="fab fa-whatsapp fa-2x"></i></a>
+                                            {{$item->nohp}}
+                                            @endif
+                                        </td>
                                         <td>@if ($item->aktif==1)
                                             <span class="label label-rounded label-info">Aktif</span>
                                             @else 
                                             <span class="label label-rounded label-danger">Tidak aktif</span>
                                             @endif</td>
                                        <td>
-                                           @include('pegawai.aksi')
+                                           @if ($item->level<9)
+                                                @include('pegawai.aksi')
+                                           @endif
                                         </td>
                                     </tr>
                                 @endforeach

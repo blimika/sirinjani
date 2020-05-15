@@ -12,4 +12,10 @@ class SpjRealisasi extends Model
     public function MasterKegiatan() {
         return $this->belongsTo('App\Kegiatan','keg_id', 'keg_id');
     }
+    public function Unitkerja(){
+        return $this->hasOne('App\UnitKerja','unit_kode', 'spj_r_unitkerja');
+    }
+    public function JenisRealisasi(){
+        return $this->hasOne('App\JenisRealisasi','rkeg_id', 'spj_r_jenis');
+    }
 }

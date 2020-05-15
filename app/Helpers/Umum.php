@@ -383,7 +383,51 @@ class Tanggal {
 	    $bln_indo=date("n",strtotime($tgl));
         $tanggal= $nama_hari_indo[$hari].', '. $tgl_ .' '.$bln_panjang[$bln_indo].' '.$tahun;
 	    return $tanggal;
-    }
+	}
+	public static function LengkapPanjang($tgl)
+	{
+		$bln_panjang = array(1=>"Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember");
+        $tahun=date("Y",strtotime($tgl));
+	    $tgl_=date("j",strtotime($tgl));
+		$bln_indo=date("n",strtotime($tgl));
+		$jam=date("H:i:s",strtotime($tgl));
+        $tanggal= $tgl_ .' '.$bln_panjang[$bln_indo].' '.$tahun.' '.$jam;
+        return $tanggal;
+	}
+	public static function LengkapPendek($tgl)
+	{
+		$bln_panjang = array(1=>"Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des");
+        $tahun=date("Y",strtotime($tgl));
+	    $tgl_=date("j",strtotime($tgl));
+		$bln_indo=date("n",strtotime($tgl));
+		$jam=date("H:i:s",strtotime($tgl));
+        $tanggal= $tgl_ .' '.$bln_panjang[$bln_indo].' '.$tahun.' '.$jam;
+        return $tanggal;
+	}
+	public static function LengkapHariPanjang($tgl)
+	{
+		$nama_hari_indo = array (0=> "Minggu", 1=> "Senin", 2=> "Selasa", 3=> "Rabu", 4=> "Kamis", 5=> "Jumat", 6=> "Sabtu");
+        $bln_panjang = array(1=>"Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember");
+        $tahun=date("Y",strtotime($tgl));
+	    $hari=date("w",strtotime($tgl));
+	    $tgl_=date("j",strtotime($tgl));
+		$bln_indo=date("n",strtotime($tgl));
+		$jam=date("H:i:s",strtotime($tgl));
+        $tanggal= $nama_hari_indo[$hari].', '. $tgl_ .' '.$bln_panjang[$bln_indo].' '.$tahun.' '.$jam;
+	    return $tanggal;
+	}
+	public static function LengkapHariPendek($tgl)
+	{
+		$nama_hari_indo = array (0=> "Min", 1=> "Sen", 2=> "Sel", 3=> "Rab", 4=> "Kam", 5=> "Jum", 6=> "Sab");
+        $bln_panjang = array(1=>"Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des");
+        $tahun=date("Y",strtotime($tgl));
+	    $hari=date("w",strtotime($tgl));
+	    $tgl_=date("j",strtotime($tgl));
+		$bln_indo=date("n",strtotime($tgl));
+		$jam=date("H:i:s",strtotime($tgl));
+        $tanggal= $nama_hari_indo[$hari].', '. $tgl_ .' '.$bln_panjang[$bln_indo].' '.$tahun.' '.$jam;
+	    return $tanggal;
+	}
 }
 Class Generate {
     public static function Kode($length) {
@@ -395,6 +439,20 @@ Class Generate {
             }
         return $code_gen;
 	}
+	public static function NipOperator($wilayah) {
+        
+		//nipbps 9 digit
+		//nipbaru 18 digit
+		$max = \App\User::where('kodebps','=',$wilayah)->count();
+		$idBaru = $max + 1;
+		$nipbps = $wilayah . sprintf("%05s", $idBaru);
+		$nipbaru = $wilayah . sprintf("%014s", $idBaru);
+		$arr = array(
+			'nipbps'=> $nipbps,
+			'nipbaru'=> $nipbaru
+		);
+		return $arr;
+	}
 	public static function PecahNip($nipbaru)
 	{
 		//nip 198203192004121002 19820319 200412 1 002
@@ -404,5 +462,130 @@ Class Generate {
 		$nip4 = substr($nipbaru,-3,3);
 		$nip = $nip1.' '.$nip2.' '.$nip3.' '.$nip4;
 		return $nip;
+	}
+	public static function NilaiKegRealiasi($kegId,$kabkota)
+	{
+		$count = \App\KegRealisasi::where([
+			['keg_id',$kegId],
+			['keg_r_unitkerja',$kabkota],
+			['keg_r_jenis','=','2']
+			])->count();
+		$keg_nilai = array(
+			'status'=>false,
+			'nilai_waktu'=>0,
+			'nilai_volume'=>0,
+			'nilai_total'=>0
+		);
+		if ($count > 0)
+		{
+			//ada penerimaan
+			$data = \App\KegRealisasi::where([
+				['keg_id',$kegId],
+				['keg_r_unitkerja',$kabkota],
+				['keg_r_jenis','=','2']
+				])->get();
+			$keg_nilai=0;
+			$nilai_waktu=0;
+			$nilai_volume=0;
+			$nilai_vol=0;
+			$nilai_wkt=0;
+			$target = \App\KegTarget::where([
+				['keg_id',$kegId],
+				['keg_t_unitkerja',$kabkota],
+			])->first();
+			foreach ($data as $item)
+			{
+				$nilai_vol += $item->keg_r_jumlah;
+				$target_waktu = new \DateTime($item->MasterKegiatan->keg_end);
+				$pengiriman = new \DateTime($item->keg_r_tgl);
+				$interval = $pengiriman->diff($target_waktu);
+				$int=$interval->format('%r%a');
+
+				if ($int>=1) $nilai_wkt=5;
+				elseif ($int>=0) $nilai_wkt=4;
+				elseif ($int>=-1) $nilai_wkt=3;
+				elseif ($int>=-2) $nilai_wkt=2;
+				elseif ($int>=-3) $nilai_wkt=1;
+				else $nilai_wkt=0;
+
+				$nilai_waktu+=$nilai_wkt;
+			}
+			$nilai_waktu=($nilai_waktu/$count);
+			$persen_vol=($nilai_vol/$target->keg_t_target)*100;
+			if ($persen_vol>94) $nilai_volume=5;
+			elseif ($persen_vol>89) $nilai_volume=3;
+			elseif ($persen_vol>85) $nilai_volume=1;
+			else $nilai_volume=0;
+			$nilai_total=($nilai_volume*0.70)+($nilai_waktu*0.30);
+			$keg_nilai = array(
+				'status'=>true,
+				'nilai_waktu'=>$nilai_waktu,
+				'nilai_volume'=>$nilai_volume,
+				'nilai_total'=>$nilai_total
+			);
+		}
+		return $keg_nilai;
+	}
+	public static function NilaiSpjRealisasi($kegId,$kabkota)
+	{
+		$count = \App\SpjRealisasi::where([
+			['keg_id',$kegId],
+			['spj_r_unitkerja',$kabkota],
+			['spj_r_jenis','=','2']
+			])->count();
+		$spj_nilai = array(
+			'status'=>false,
+			'nilai_waktu'=>0,
+			'nilai_volume'=>0,
+			'nilai_total'=>0
+		);
+		if ($count > 0)
+		{
+			//ada penerimaan spj
+			$data = \App\SpjRealisasi::where([
+				['keg_id',$kegId],
+				['spj_r_unitkerja',$kabkota],
+				['spj_r_jenis','=','2']
+				])->get();
+			$nilai_waktu=0;
+			$nilai_volume=0;
+			$nilai_vol=0;
+			$nilai_wkt=0;
+			$target = \App\SpjTarget::where([
+				['keg_id',$kegId],
+				['spj_t_unitkerja',$kabkota],
+			])->first();
+			foreach ($data as $item)
+			{
+				$nilai_vol += $item->spj_r_jumlah;
+				$target_waktu = new \DateTime($item->MasterKegiatan->keg_end);
+				$pengiriman = new \DateTime($item->spj_r_tgl);
+				$interval = $pengiriman->diff($target_waktu);
+				$int=$interval->format('%r%a');
+
+				if ($int>=1) $nilai_wkt=5;
+				elseif ($int>=0) $nilai_wkt=4;
+				elseif ($int>=-1) $nilai_wkt=3;
+				elseif ($int>=-2) $nilai_wkt=2;
+				elseif ($int>=-3) $nilai_wkt=1;
+				else $nilai_wkt=0;
+
+				$nilai_waktu+=$nilai_wkt;
+			}
+			$nilai_waktu=($nilai_waktu/$count);
+			$persen_vol=($nilai_vol/$target->spj_t_target)*100;
+			if ($persen_vol>94) $nilai_volume=5;
+			elseif ($persen_vol>89) $nilai_volume=3;
+			elseif ($persen_vol>85) $nilai_volume=1;
+			else $nilai_volume=0;
+			$nilai_total=($nilai_volume*0.70)+($nilai_waktu*0.30);
+			$spj_nilai = array(
+				'status'=>true,
+				'nilai_waktu'=>$nilai_waktu,
+				'nilai_volume'=>$nilai_volume,
+				'nilai_total'=>$nilai_total
+			);
+		}
+		return $spj_nilai;
 	}
 }

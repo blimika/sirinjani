@@ -15,4 +15,7 @@ class KegRealisasi extends Model
     public function MasterKegiatan() {
         return $this->belongsTo('App\Kegiatan','keg_id', 'keg_id');
     }
+    public function Unitkerja(){
+        return $this->hasOne('App\UnitKerja','unit_kode', 'keg_r_unitkerja');
+    }
 }

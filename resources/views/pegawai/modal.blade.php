@@ -45,7 +45,7 @@
 </div>
 <!-- /.sync -->
 
-<!-- modal sync -->
+<!-- modal detil -->
 <div id="DetilModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -171,3 +171,28 @@
     </div>
 </div>
 <!-- /.modal edit pegawai -->
+
+<!-- modal tambah operator -->
+<div id="TambahOperator" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Tambah Lokal Operator</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <!--isi modal-->
+                <form class="m-t-10" name="formTambahOperator" method="post" action="{{route('pegawai.simpan')}}">
+                 @csrf
+                 @include('pegawai.formopt')
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary waves-effect" data-dismiss="modal">CLOSE</button>
+                <button type="submit" class="btn btn-success waves-effect waves-light" >SIMPAN</button>
+            </div>
+        </form>
+        </div>
+    </div>
+</div>
+<!-- /.tambah operator -->

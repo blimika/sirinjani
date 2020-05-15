@@ -48,7 +48,7 @@ $('#EditPegModal').on('show.bs.modal', function (event) {
   var button = $(event.relatedTarget) // Button that triggered the modal
   var nipbps = button.data('nipbps')
   $.ajax({
-        url : '{{route("cari.pegawai","")}}/'+nipbps,
+        url : '{{route('cari.pegawai','')}}/'+nipbps,
         method : 'get',
         cache: false,
         dataType: 'json',
@@ -66,6 +66,68 @@ $('#EditPegModal').on('show.bs.modal', function (event) {
         }
 
     });
+});
+$(".hapuspegawai").click(function (e) {
+    e.preventDefault();
+    var id = $(this).data('id');
+    var nama = $(this).data('nama');    
+    Swal.fire({
+                title: 'Akan dihapus?',
+                text: "Data "+nama+" akan dihapus permanen",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Ubah'
+            }).then((result) => {
+                if (result.value) {
+                    //response ajax disini
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    });
+                    $.ajax({
+                        url : '{{route('pegawai.hapus')}}',
+                        method : 'post',
+                        data: {
+                            id: id
+                        },
+                        cache: false,
+                        dataType: 'json',
+                        success: function(data){
+                            if (data.status == true)
+                            {
+                                Swal.fire(
+                                    'Berhasil!',
+                                    ''+data.hasil+'',
+                                    'success'
+                                ).then(function() {
+                                    location.reload();
+                                });
+                            }
+                            else
+                            {
+                                Swal.fire(
+                                    'Error!',
+                                    ''+data.hasil+'',
+                                    'danger'
+                                ); 
+                            }
+                            
+                        },
+                        error: function(){
+                            Swal.fire(
+                                'Error',
+                                'Koneksi Error',
+                                'danger'
+                            );
+                        }
+
+                    });
+                   
+                }
+            })
 });
 $(".flagPegawai").click(function (e) {
     e.preventDefault();

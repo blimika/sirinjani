@@ -21,11 +21,12 @@ class PegawaiController extends Controller
     public function index()
     {
         $data_wilayah = KodeWilayah::all();
+        $data_bidang = Unitkerja::where([['unit_jenis','=','1'],['unit_eselon','=','3']])->get();
         $dataPegawai = User::when(request('wilayah'),function ($query){
             return $query->where('kodebps','=',request('wilayah'));
         })->get();
         $dataLevel = KodeLevel::where('level_id','<','9')->get();
-        return view('pegawai.index',['dataLevel'=>$dataLevel,'dataWilayah'=>$data_wilayah,'dataPegawai'=>$dataPegawai,'wilayah'=>request('wilayah')]);
+        return view('pegawai.index',['dataBidang'=>$data_bidang,'dataLevel'=>$dataLevel,'dataWilayah'=>$data_wilayah,'dataPegawai'=>$dataPegawai,'wilayah'=>request('wilayah')]);
     }
     public function cekCommunity(Request $request)
     {
@@ -373,6 +374,25 @@ class PegawaiController extends Controller
         }
         return Response()->json($arr);
     }
+    public function HapusPegawai(Request $request)
+    {
+        $count = User::where('id','=',$request->id)->count();
+        $arr = array(
+            'status'=>false,
+            'hasil'=>'Data operator tidak tersedia'
+        );
+        if ($count>0)
+        {
+            $data = User::where('id','=',$request->id)->first();
+            $nama = $data->nama;
+            $data->delete();
+            $arr = array(
+                'status'=>true,
+                'hasil'=>'Data '.$nama.' berhasil dihapus'
+            );
+        }
+        return Response()->json($arr);
+    }
     public function UpdatePegawai(Request $request)
     {
         //dd($request->all());
@@ -399,5 +419,61 @@ class PegawaiController extends Controller
     public function UpdateLokal(Request $request)
     {
         dd($request->all());
+    }
+    public function SimpanPegawai(Request $request)
+    {
+        $data = Generate::NipOperator($request->wilayah);
+        $nipbps = $data['nipbps'];
+        $nipbaru = $data['nipbaru'];
+        //dd($nipbps);
+        //dd($request->all());
+        $count = User::where('nipbps','=',$nipbps)->orWhere('username','=',$request->peg_username)->count();
+        if ($count > 0) 
+        {
+            $pesan_error="ERROR : NIPBPS/USERNAME sudah digunakan!!";
+            $pesan_warna='danger';
+        }
+        else
+        {
+            //pegawai tidak ada
+            //operator kabkota langsung tambahkan kodeunit 0 dibelakang
+            //kalo provinsi apakah admin / operator bidang/bagian
+            /*
+            "wilayah" => "5200"
+            "peg_nama" => "admin provinsi"
+            "peg_username" => "admin5200"
+            "peg_password" => "admin"
+            "peg_ulangi_password" => "admin"
+            "peg_level" => "4"
+            "peg_email" => "admin@bpsntb.id"
+            "peg_nohp" => "081273128"
+            */
+            $wil = KodeWilayah::where('bps_kode','=',$request->wilayah)->first();
+            $data = new User();
+            $data->nama = $request->peg_nama;
+            $data->username = $request->peg_username;
+            $data->password = bcrypt($request->peg_password);
+            $data->nipbps = trim($nipbps);
+            $data->nipbaru = trim($nipbaru);
+            $data->email = $request->peg_email;
+            $data->aktif = 1;
+            $data->level = $request->peg_level;
+            $data->isLokal = 1;
+            $data->jk = 1;
+            $data->nohp = trim($request->peg_nohp);
+            $data->satuankerja = $wil->bps_nama;
+            $data->kodeunit=$request->wilayah.'0';
+            $data->jabatan = 'Operator';
+            $data->kodebps = $request->wilayah;
+            $data->urlfoto ='https://via.placeholder.com/100x100';
+            $data->save();
+            $pesan_error='BERHASIL : Data Operator an. '.$request->peg_nama .' berhasil simpan';
+            $pesan_warna='success';
+        }
+        
+        
+        Session::flash('message', $pesan_error);
+        Session::flash('message_type', $pesan_warna);
+        return redirect()->route('pegawai.list');
     }
 }

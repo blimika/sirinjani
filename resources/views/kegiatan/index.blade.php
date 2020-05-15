@@ -14,7 +14,6 @@
                 <li class="breadcrumb-item"><a href="javascript:void(0)">Dashboard</a></li>
                 <li class="breadcrumb-item active">Kegiatan List</li>
             </ol>
-            <button type="button" class="btn btn-info d-none d-lg-block m-l-15" data-toggle="modal" data-target="#SyncDataModal"><i class="fa fa-plus-circle"></i> Sync Data</button>
         </div>
     </div>
 </div>
@@ -59,7 +58,7 @@
                             <th>Target</th>
                             <th>Satuan</th>
                             <th>SPJ</th>
-                            <th>Aksi</th>
+                            <th width="65px">Aksi</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -67,9 +66,23 @@
                                    <tr>
                                        <td>{{$loop->iteration}}</td>
                                        <td>
-                                           {{$item->keg_nama}}
+                                           <span class="text-info">{{$item->keg_nama}}</span>
                                            <br />
-                                           <small class="label label-success">{{$item->JenisKeg->jkeg_nama}}</small>
+                                           <a href="{{route('kegiatan.detil',$item->keg_id)}}" class="btn btn-xs btn-rounded btn-warning waves-light waves-effect"><i class="fas fa-search"></i></a> 
+                                           <small class="badge badge-success">{{$item->JenisKeg->jkeg_nama}}</small>
+                                           <div class="progress m-t-10">
+                                               <div class="progress-bar 
+                                               @if (($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100 > 85)
+                                               bg-success 
+                                               @elseif (($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100 > 68)
+                                               bg-warning 
+                                               @else
+                                               bg-danger 
+                                               @endif
+                                                wow animated progress-animated" style="width: {{number_format(($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100,2,".",",")}}%; height:7px;" role="progressbar"> 
+                                                <span class="sr-only">{{number_format(($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100,2,".",",")}} Terkirim</span> 
+                                                </div>
+                                            </div>
                                        </td>
                                        <td>{{$item->unit_nama}}</td>
                                        <td>{{Tanggal::Panjang($item->keg_start)}}</td>
@@ -77,7 +90,9 @@
                                        <td>{{$item->keg_total_target}}</td>
                                        <td>{{$item->keg_target_satuan}}</td>
                                        <td>@include('kegiatan.spj')</td>
-                                       <td></td>
+                                       <td>
+                                           @include('kegiatan.aksi')
+                                       </td>
                                    </tr>
                                @endforeach
                             </tbody>
@@ -99,6 +114,7 @@
 <link href="{{asset('assets/node_modules/sweetalert2/dist/sweetalert2.min.css')}}" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="{{asset('assets/node_modules/datatables.net-bs4/css/dataTables.bootstrap4.css')}}">
 <link rel="stylesheet" type="text/css" href="{{asset('assets/node_modules/datatables.net-bs4/css/responsive.dataTables.min.css')}}">
+<link href="{{asset('dist/css/pages/progressbar-page.css')}}" rel="stylesheet">
 @endsection
 
 @section('js')
@@ -122,6 +138,7 @@
                     'copy', 'excel', 'pdf', 'print'
                 ],
                 "displayLength": 30,
+                responsive: true
                 
             });
             $('.buttons-copy, .buttons-csv, .buttons-print, .buttons-pdf, .buttons-excel').addClass('btn btn-primary mr-1');
@@ -130,5 +147,5 @@
     </script>
     <!-- Sweet-Alert  -->
     <script src="{{asset('assets/node_modules/sweetalert2/dist/sweetalert2.all.min.js')}}"></script>
-    
+    @include('kegiatan.jshapus')
 @endsection
