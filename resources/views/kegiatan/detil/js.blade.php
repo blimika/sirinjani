@@ -373,4 +373,35 @@ $(".tglterima").datepicker({
     event.stopPropagation();
 });
 });
+
+$('#EditInfoLanjutanModal').on('show.bs.modal', function (event) {
+  var button = $(event.relatedTarget) // Button that triggered the modal
+  var kegid = button.data('kegid')
+  var keg_nama = button.data('kegnama')
+  $.ajax({
+        url : '{{route('kegiatan.cari','')}}/'+kegid,
+        method : 'get',
+        cache: false,
+        dataType: 'json',
+        success: function(data){
+           if (data.status == true)
+           {
+            $('#EditInfoLanjutanModal .modal-body #keg_nama').text(data.keg_nama)
+            $('#EditInfoLanjutanModal .modal-body #sm').text(data.keg_unitkerja_nama)
+            $('#EditInfoLanjutanModal .modal-body #keg_start').text(data.keg_start_nama)
+            $('#EditInfoLanjutanModal .modal-body #keg_end').text(data.keg_end_nama)
+            $('#EditInfoLanjutanModal .modal-body #keg_target').text(data.keg_target+" "+data.keg_satuan)
+            $('#EditInfoLanjutanModal .modal-body #keg_id').val(kegid)
+           }
+           else
+           {
+             alert(data.hasil);
+           }
+        },
+        error: function(){
+            alert("error: koneksi");
+        }
+
+    });
+});
 </script>

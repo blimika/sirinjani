@@ -37,6 +37,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/kegiatan/pengiriman', 'KegiatanController@kirimKegiatan')->name('kegiatan.pengiriman'); 
     Route::post('/kegiatan/updatepengiriman', 'KegiatanController@UpdatePengiriman')->name('pengiriman.update');
     Route::post('/kegiatan/hapuspengiriman', 'KegiatanController@HapusPengiriman')->name('pengiriman.hapus'); 
+    Route::post('/kegiatan/updateinfo', 'KegiatanController@UpdateInfo')->name('info.update');
     Route::get('/kegiatan/edit/{kegId}', 'KegiatanController@editKegiatan')->name('kegiatan.edit');
     Route::post('/spj/pengiriman', 'SpjController@kirimSpj')->name('spj.pengiriman');
     Route::post('/spj/updatepengiriman', 'SpjController@UpdatekirimSpj')->name('spj.updatepengiriman');
