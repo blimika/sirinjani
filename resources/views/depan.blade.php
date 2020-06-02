@@ -24,6 +24,7 @@
 <!-- Start Page Content -->
 <!-- ============================================================== -->
 @include('dashboard.baris1')
+@include('dashboard.baris2')
 <div class="row">
     <div class="col-12">
         <div class="card">
@@ -36,4 +37,21 @@
 <!-- ============================================================== -->
 <!-- End PAge Content -->
 <!-- ============================================================== -->
+@endsection
+
+@section('css')
+<!--highcharts-->
+<link href="{{asset('dist/grafik/highcharts.css')}}" rel="stylesheet">
+@endsection
+
+@section('js')
+    <!-- This is data table -->
+    <script src="{{asset('dist/grafik/highcharts.js')}}"></script>
+    <script src="{{asset('dist/grafik/exporting.js')}}"></script>
+    <script src="{{asset('dist/grafik/offline-exporting.js')}}"></script>
+    <script src="{{asset('dist/grafik/export-data.js')}}"></script>
+    <script src="{{asset('dist/grafik/series-label.js')}}"></script>
+    <script src="{{asset('dist/grafik/accessibility.js')}}"></script>
+    @include('dashboard.GrafikNilai')
+    @include('dashboard.GrafikNilaiTahunan')
 @endsection

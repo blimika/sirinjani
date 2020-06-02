@@ -120,13 +120,18 @@
         <td>Diupdate tanggal</td>
         <td>{{Tanggal::LengkapPanjang($dataKegiatan->updated_at)}}</td>
     </tr>
-    <tr>
-        <td colspan="2">
-            <div class="text-right">
-                <button class="btn btn-warning" data-toggle="modal" data-target="#EditInfoLanjutanModal" data-kegid="{{$dataKegiatan->keg_id}}" data-kegnama="{{$dataKegiatan->keg_nama}}"><span data-toggle="tooltip" title="Edit info lanjutan untuk kegiatan {{$dataKegiatan->keg_nama}}"><i class="fas fa-pencil-alt"></i> Info Lanjutan</span></button>
-                <a href="{{route('kegiatan.edit',$dataKegiatan->keg_id)}}" class="btn btn-success"><i class="fas fa-pencil-alt"></i></a>
-                <button class="btn btn-danger hapuskegiatan" data-kegid="{{$dataKegiatan->keg_id}}" data-kegnama="{{$dataKegiatan->keg_nama}}"><i class="fas fa-trash"></i></button>
-            </div>
-        </td>
-    </tr>
+    @if (Auth::user()->level > 4 or Auth::user()->level==3)
+        @if (Auth::user()->level > 4 or $dataKegiatan->Unitkerja->unit_parent == Auth::user()->kodeunit)
+        <tr>
+            <td colspan="2">
+                <div class="text-right">
+                    <button class="btn btn-warning" data-toggle="modal" data-target="#EditInfoLanjutanModal" data-kegid="{{$dataKegiatan->keg_id}}" data-kegnama="{{$dataKegiatan->keg_nama}}"><span data-toggle="tooltip" title="Edit info lanjutan untuk kegiatan {{$dataKegiatan->keg_nama}}"><i class="fas fa-pencil-alt"></i> Info Lanjutan</span></button>
+                    <a href="{{route('kegiatan.edit',$dataKegiatan->keg_id)}}" class="btn btn-success"><i class="fas fa-pencil-alt"></i></a>
+                    <button class="btn btn-danger hapuskegiatan" data-kegid="{{$dataKegiatan->keg_id}}" data-kegnama="{{$dataKegiatan->keg_nama}}"><i class="fas fa-trash"></i></button>
+                </div>
+            </td>
+        </tr>    
+        @endif
+    @endif
+    
 </table>

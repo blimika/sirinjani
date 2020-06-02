@@ -22,11 +22,24 @@ class PegawaiController extends Controller
     {
         $data_wilayah = KodeWilayah::all();
         $data_bidang = Unitkerja::where([['unit_jenis','=','1'],['unit_eselon','=','3']])->get();
-        $dataPegawai = User::when(request('wilayah'),function ($query){
-            return $query->where('kodebps','=',request('wilayah'));
-        })->get();
-        $dataLevel = KodeLevel::where('level_id','<','9')->get();
-        return view('pegawai.index',['dataBidang'=>$data_bidang,'dataLevel'=>$dataLevel,'dataWilayah'=>$data_wilayah,'dataPegawai'=>$dataPegawai,'wilayah'=>request('wilayah')]);
+        //level
+        // 1=pemantau, operator kab, 3=oper prov, 4=admin kabkota, 5=adminprov
+        if (Auth::user()->level > 5)
+        {
+            //superadmin
+            $dataPegawai = User::when(request('wilayah'),function ($query){
+                return $query->where('kodebps','=',request('wilayah'));
+            })->get();
+            $dataLevel = KodeLevel::where('level_id','<','9')->get();
+        }
+        else 
+        {
+            //selain superadmin
+            $dataPegawai = User::where('kodebps','=',Auth::user()->kodebps)->get();
+            $dataLevel = KodeLevel::where('level_id','<','9')->whereIn('level_jenis', array(Auth::user()->NamaWilayah->bps_jenis, 3))->get();
+        }
+        $dataUnitkerja = UnitKerja::where([['unit_eselon','=','3'],['unit_jenis','=','1']])->get();
+        return view('pegawai.index',['dataBidang'=>$data_bidang,'dataLevel'=>$dataLevel,'dataWilayah'=>$data_wilayah,'dataPegawai'=>$dataPegawai,'wilayah'=>request('wilayah'),'dataUnitkerja'=>$dataUnitkerja]);
     }
     public function cekCommunity(Request $request)
     {
@@ -319,6 +332,7 @@ class PegawaiController extends Controller
             {
                 $lastip = 'belum pernah login';
             }
+            $dLevel = KodeLevel::where('level_id','<','9')->whereIn('level_jenis', array($data->NamaWilayah->bps_jenis, 3))->get();
             $arr = array(
                 'status'=>true,
                 'peg_id'=>$data->id,
@@ -330,6 +344,7 @@ class PegawaiController extends Controller
                 'username'=>$data->username,
                 'kodeunit'=>$data->kodeunit,
                 'kodebps'=>$data->kodebps,
+                'kodebps_nama'=>$data->NamaWilayah->bps_nama,
                 'satuankerja'=>$data->satuankerja,
                 'urlfoto'=>$data->urlfoto,
                 'jk'=>$data->jk,
@@ -342,7 +357,9 @@ class PegawaiController extends Controller
                 'lastlogin'=>$data->lastlogin,
                 'lastlogin_nama'=>$lastlog_nama,
                 'namaunit'=>$data->Unitkerja->unit_nama,
-                'tgl_dibuat'=>$data->created_at
+                'tgl_dibuat'=>$data->created_at,
+                'data_level_jumlah'=>$dLevel->count(),
+                'data_level'=>$dLevel
             );
         }
         return Response()->json($arr);
@@ -418,10 +435,34 @@ class PegawaiController extends Controller
     }
     public function UpdateLokal(Request $request)
     {
-        dd($request->all());
+        //dd($request->all());
+        //pegawai lokal yang di ubah
+        //nama lengkap, level, email, nohp
+        $count = User::where('id','=',$request->peg_id)->count();
+        if ($count > 0) 
+        {
+            //pegawai ada
+            $data = User::where('id','=',$request->peg_id)->first();
+            $data->level = $request->peg_level;
+            $data->nohp = $request->peg_nohp;
+            $data->nama = $request->peg_nama;
+            $data->email = $request->peg_email;
+            $data->update();
+            $pesan_error='BERHASIL : Data Pegawai an. '.$request->peg_nama .' berhasil diupdate';
+            $pesan_warna='success';
+        }
+        else
+        {
+            $pesan_error="ERROR : NIPBPS Pegawai tidak tersedia!!";
+            $pesan_warna='danger';
+        }
+        Session::flash('message', $pesan_error);
+        Session::flash('message_type', $pesan_warna);
+        return redirect()->route('pegawai.list');
     }
     public function SimpanPegawai(Request $request)
     {
+        //dd($request->all());
         $data = Generate::NipOperator($request->wilayah);
         $nipbps = $data['nipbps'];
         $nipbaru = $data['nipbaru'];
@@ -449,6 +490,17 @@ class PegawaiController extends Controller
             "peg_nohp" => "081273128"
             */
             $wil = KodeWilayah::where('bps_kode','=',$request->wilayah)->first();
+            if ($wil->bps_jenis==1)
+            {
+                $namaunit = UnitKerja::where('unit_kode','=',$request->peg_kodeunit)->first();
+                $kodeunit = $request->peg_kodeunit;
+                $satuankerja = $namaunit->unit_nama;
+            }
+            else 
+            {
+                $kodeunit = $request->wilayah.'0';
+                $satuankerja = $wil->bps_nama;
+            }
             $data = new User();
             $data->nama = $request->peg_nama;
             $data->username = $request->peg_username;
@@ -461,8 +513,8 @@ class PegawaiController extends Controller
             $data->isLokal = 1;
             $data->jk = 1;
             $data->nohp = trim($request->peg_nohp);
-            $data->satuankerja = $wil->bps_nama;
-            $data->kodeunit=$request->wilayah.'0';
+            $data->satuankerja = $satuankerja;
+            $data->kodeunit= $kodeunit;
             $data->jabatan = 'Operator';
             $data->kodebps = $request->wilayah;
             $data->urlfoto ='https://via.placeholder.com/100x100';
@@ -472,6 +524,36 @@ class PegawaiController extends Controller
         }
         
         
+        Session::flash('message', $pesan_error);
+        Session::flash('message_type', $pesan_warna);
+        return redirect()->route('pegawai.list');
+    }
+    public function GantiPassword(Request $request)
+    {
+        //dd($request->all());
+        $count = User::where('id','=',$request->peg_id)->count();
+        if ($count > 0) 
+        {
+            //pegawai ada
+            if ($request->peg_password_baru != $request->peg_password_baru_ulangi)
+            {
+                $pesan_error="ERROR : Password baru dengan ulangi password baru tidak sama !!";
+                $pesan_warna='danger';
+            }
+            else
+            {
+                $data = User::where('id','=',$request->peg_id)->first();
+                $data->password = bcrypt($request->peg_password_baru);
+                $data->update();
+                $pesan_error='BERHASIL : Password Pegawai an. '.$request->peg_nama .' berhasil diganti';
+                $pesan_warna='success';
+            }
+        }
+        else
+        {
+            $pesan_error="ERROR : NIPBPS Pegawai tidak tersedia!!";
+            $pesan_warna='danger';
+        }
         Session::flash('message', $pesan_error);
         Session::flash('message_type', $pesan_warna);
         return redirect()->route('pegawai.list');

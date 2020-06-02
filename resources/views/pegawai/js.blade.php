@@ -55,11 +55,28 @@ $('#EditPegModal').on('show.bs.modal', function (event) {
         success: function(data) 
         {
             $('#EditPegModal .modal-body #peg_nama').val(data.nama)
-            $('#EditPegModal .modal-body #peg_level').val(data.level)
             $('#EditPegModal .modal-body #peg_unitkerja').val(data.namaunit)
             $('#EditPegModal .modal-body #peg_nipbps').val(data.nipbps)
             $('#EditPegModal .modal-body #peg_nohp').val(data.nohp)
             $('#EditPegModal .modal-body #peg_id').val(data.peg_id)
+            if (data.data_level_jumlah > 0)
+            {
+                    var jumlah = data.data_level_jumlah;
+                    $('#EditPegModal .modal-body #peg_level').html("");
+                    $('#EditPegModal .modal-body #peg_level').append('<option value="">Pilih Level Akses</option>');
+                    for (i = 0; i < jumlah; i++) {
+                        if (data.data_level[i].level_id == data.level)
+                        { 
+                            $('#EditPegModal .modal-body #peg_level').append('<option value="'+ data.data_level[i].level_id +'" selected>'+ data.data_level[i].level_nama +'</option>');
+                        }
+                        else 
+                        {
+                            $('#EditPegModal .modal-body #peg_level').append('<option value="'+ data.data_level[i].level_id +'">'+ data.data_level[i].level_nama +'</option>');
+                        }
+                        
+                    }
+
+            }
         },
         error: function(){
             alert(data.hasil);
@@ -200,5 +217,112 @@ $(".flagPegawai").click(function (e) {
                    
                 }
             })
+});
+
+$('#EditLokalModal').on('show.bs.modal', function (event) {
+  var button = $(event.relatedTarget) // Button that triggered the modal
+  var nipbps = button.data('nipbps')
+  var unitjenis = button.data('unitjenis')
+  $.ajax({
+        url : '{{route('cari.pegawai','')}}/'+nipbps,
+        method : 'get',
+        cache: false,
+        dataType: 'json',
+        success: function(data) 
+        {
+            $('#EditLokalModal .modal-body #peg_nama').val(data.nama)
+            $('#EditLokalModal .modal-body #peg_level').val(data.level)
+            $('#EditLokalModal .modal-body #peg_unitkerja').val(data.namaunit)
+            $('#EditLokalModal .modal-body #peg_nipbps').val(data.nipbps)
+            $('#EditLokalModal .modal-body #peg_nohp').val(data.nohp)
+            $('#EditLokalModal .modal-body #peg_id').val(data.peg_id)
+            $('#EditLokalModal .modal-body #peg_username').val(data.username)
+            $('#EditLokalModal .modal-body #wilayah_nama').val(data.kodebps_nama)
+            $('#EditLokalModal .modal-body #peg_email').val(data.email)
+            $('#EditLokalModal .modal-body #peg_nohp').val(data.nohp)
+            if (unitjenis == 1)
+            {
+                $('#EditLokalModal .modal-body #peg_kodeunit').val(data.kodeunit)
+            }
+            if (data.data_level_jumlah > 0)
+            {
+                    var jumlah = data.data_level_jumlah;
+                    $('#EditLokalModal .modal-body #peg_level').html("");
+                    $('#EditLokalModal .modal-body #peg_level').append('<option value="">Pilih Level Akses</option>');
+                    for (i = 0; i < jumlah; i++) {
+                        if (data.data_level[i].level_id == data.level)
+                        { 
+                            $('#EditLokalModal .modal-body #peg_level').append('<option value="'+ data.data_level[i].level_id +'" selected>'+ data.data_level[i].level_nama +'</option>');
+                        }
+                        else 
+                        {
+                            $('#EditLokalModal .modal-body #peg_level').append('<option value="'+ data.data_level[i].level_id +'">'+ data.data_level[i].level_nama +'</option>');
+                        }
+                        
+                    }
+
+            }
+        },
+        error: function(){
+            alert(data.hasil);
+        }
+
+    });
+});
+
+$('#TambahOperator').on('show.bs.modal', function (event) {
+  var button = $(event.relatedTarget) // Button that triggered the modal
+  var nipbps = button.data('nipbps')
+  
+});
+
+$('#GantiPasswordModal').on('show.bs.modal', function (event) {
+  var button = $(event.relatedTarget) // Button that triggered the modal
+  var nipbps = button.data('nipbps')
+  $.ajax({
+        url : '{{route('cari.pegawai','')}}/'+nipbps,
+        method : 'get',
+        cache: false,
+        dataType: 'json',
+        success: function(data) 
+        {
+            $('#GantiPasswordModal .modal-body #peg_nama').val(data.nama)
+            $('#GantiPasswordModal .modal-body #peg_id').val(data.peg_id)
+        },
+        error: function(){
+            alert(data.hasil);
+        }
+
+    });
+    $('#GantiPasswordModal .modal-footer #btn_gantipasswd').prop('disabled',true)
+    $('#peg_password_baru').on('change paste keyup',function(e){
+        var passwd_baru =  e.target.value;
+        var passwd_ulangi = $('#GantiPasswordModal .modal-body #peg_password_baru_ulangi').val()
+        if (passwd_baru != passwd_ulangi)
+        {
+            $('#GantiPasswordModal .modal-body #pesan_error').text("Password baru dengan ulangi password tidak sama")
+            $('#GantiPasswordModal .modal-footer #btn_gantipasswd').prop('disabled',true)
+        }
+        else 
+        {
+            $('#GantiPasswordModal .modal-body #pesan_error').text("Password sama")
+            $('#GantiPasswordModal .modal-footer #btn_gantipasswd').prop('disabled',false)
+        }
+    });
+
+    $('#peg_password_baru_ulangi').on('change paste keyup',function(e){
+        var passwd_ulangi =  e.target.value;
+        var passwd_baru = $('#GantiPasswordModal .modal-body #peg_password_baru').val()
+        if (passwd_baru != passwd_ulangi)
+        {
+            $('#GantiPasswordModal .modal-body #pesan_error').text("Ulangi password baru dengan password baru tidak sama")
+            $('#GantiPasswordModal .modal-footer #btn_gantipasswd').prop('disabled',true)
+        }
+        else 
+        {
+            $('#GantiPasswordModal .modal-body #pesan_error').text("Password sama")
+            $('#GantiPasswordModal .modal-footer #btn_gantipasswd').prop('disabled',false)
+        }
+    });
 });
 </script>

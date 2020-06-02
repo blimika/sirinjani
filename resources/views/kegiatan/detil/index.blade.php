@@ -54,7 +54,6 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <!--alerts CSS -->
 <link href="{{asset('assets/node_modules/sweetalert2/dist/sweetalert2.min.css')}}" rel="stylesheet">
-<link href="{{asset('dist/css/pages/progressbar-page.css')}}" rel="stylesheet">
 <!-- Date picker plugins css -->
 <link href="{{asset('assets/node_modules/bootstrap-datepicker/bootstrap-datepicker.min.css')}}" rel="stylesheet" type="text/css" />
 @endsection

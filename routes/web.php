@@ -22,9 +22,6 @@ Route::get('/kegiatan/cari/{kegId}', 'KegiatanController@cariKegiatan')->name('k
 Route::get('/realisasi/cari/{kegrid}', 'KegiatanController@CariRealisasi')->name('realisasi.cari');
 Route::get('/spj/realisasi/cari/{spjrid}', 'SpjController@CariSpj')->name('spjrealisasi.cari');
 
-Route::get('/pegawai/list', 'PegawaiController@index')->name('pegawai.list');
-Route::get('/pegawai/{nipbps}', 'PegawaiController@CariPegawai')->name('cari.pegawai');
-
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/kegiatan/tambah', 'KegiatanController@tambah')->name('kegiatan.tambah');
     Route::get('/kegiatan/detil/{kegId}', 'KegiatanController@DetilKegiatan')->name('kegiatan.detil');
@@ -53,6 +50,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/pegawai/updatelokal', 'PegawaiController@UpdateLokal')->name('pegawai.updatelokal');
     Route::get('/unitkerja/{jenis}/{eselon}', 'UnitkerjaController@CariUnitkerja')->name('cari.unitkerja');
     Route::post('/cek/community', 'PegawaiController@cekCommunity')->name('cek.community');
-
+    Route::get('/pegawai/list', 'PegawaiController@index')->name('pegawai.list');
+    Route::get('/pegawai/{nipbps}', 'PegawaiController@CariPegawai')->name('cari.pegawai');
+    Route::post('/pegawai/gantipasswd', 'PegawaiController@GantiPassword')->name('pegawai.gantipasswd');
 });
 Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout')->name('logout');

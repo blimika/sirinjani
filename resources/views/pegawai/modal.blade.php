@@ -151,7 +151,7 @@
 </div>
 <!-- /.modal edit pegawai -->
 
-<!-- modal edit pegawai -->
+<!-- modal edit operator lokal -->
 <div id="EditLokalModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -161,12 +161,17 @@
             </div>
             <div class="modal-body">
                 <!--isi modal-->
-                
+                <form class="m-t-10" name="formEditLokal" method="post" action="{{route('pegawai.updatelokal')}}">
+                @csrf
+                <input type="hidden" name="peg_id" id="peg_id" value="" />
+                @include('pegawai.formedit')
                 
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary waves-effect" data-dismiss="modal">CLOSE</button>
+                <button type="submit" class="btn btn-success waves-effect waves-light">UPDATE</button>
             </div>
+        </form>
         </div>
     </div>
 </div>
@@ -190,6 +195,51 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary waves-effect" data-dismiss="modal">CLOSE</button>
                 <button type="submit" class="btn btn-success waves-effect waves-light" >SIMPAN</button>
+            </div>
+        </form>
+        </div>
+    </div>
+</div>
+<!-- /.tambah operator -->
+
+<!-- modal tambah operator -->
+<div id="GantiPasswordModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Ganti Password Operator Lokal</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <!--isi modal-->
+                <form class="m-t-10" name="formGantiPassword" method="post" action="{{route('pegawai.gantipasswd')}}">
+                 @csrf
+                 <input type="hidden" name="peg_id" id="peg_id" value="" />
+                 <div class="form-group">
+                    <label for="peg_nama">Nama</label>
+                    <div class="controls">
+                    <input type="text" class="form-control" id="peg_nama" name="peg_nama" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="peg_password">Password Baru</label>
+                    <div class="controls">
+                    <input type="password" class="form-control" id="peg_password_baru" name="peg_password_baru" placeholder="Password" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="peg_password_ulangi">Ulangi Password Baru</label>
+                    <div class="controls">
+                    <input type="password" class="form-control" id="peg_password_baru_ulangi" name="peg_password_baru_ulangi" placeholder="Ulangi Password" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                   <span id="pesan_error"></span>
+                </div>
+            </span>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary waves-effect" data-dismiss="modal">CLOSE</button>
+                <button type="submit" class="btn btn-success waves-effect waves-light" id="btn_gantipasswd">GANTI PASSWORD</button>
             </div>
         </form>
         </div>

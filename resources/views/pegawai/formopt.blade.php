@@ -1,5 +1,5 @@
 @if (Auth::user())
-    @if (Auth::user()->level > 4)
+    @if (Auth::user()->level > 5)
     <div class="form-group">
         <label for="wilayah">Wilayah</label>
         <div class="controls">
@@ -21,7 +21,30 @@
     <input type="hidden" name="wilayah" id="wilayah" value="{{Auth::user()->kodebps}}" />
     @endif
 @endif
-
+<div class="form-group">
+    <label for="level">Level</label>
+    <div class="controls">
+    <select class="form-control" name="peg_level" id="peg_level" required>
+        <option value="">Pilih Level Akses</option>
+        @foreach ($dataLevel as $l)
+            <option value="{{$l->level_id}}">{{$l->level_nama}}</option>
+        @endforeach
+    </select>
+    </div>
+</div>
+@if (Auth::user()->NamaWilayah->bps_jenis==1)
+<div class="form-group">
+    <label for="peg_kodeunit">Unitkerja</label>
+    <div class="controls">
+    <select class="form-control" name="peg_kodeunit" id="peg_kodeunit">
+        <option value="">Pilih Unitkerja</option>
+        @foreach ($dataUnitkerja as $item)
+            <option value="{{$item->unit_kode}}">{{$item->unit_nama}}</option>
+        @endforeach
+    </select>
+    </div>
+</div>
+@endif
 <div class="form-group">
     <label for="peg_nama">Nama Lengkap</label>
     <div class="controls">
@@ -44,17 +67,6 @@
     <label for="peg_ulangi_password">Ulangi Password</label>
     <div class="controls">
     <input type="password" class="form-control" id="peg_ulangi_password" name="peg_ulangi_password" placeholder="Ulangi Password" required>
-    </div>
-</div>
-<div class="form-group">
-    <label for="level">Level</label>
-    <div class="controls">
-    <select class="form-control" name="peg_level" id="peg_level" required>
-        <option value="">Pilih Level</option>
-        @foreach ($dataLevel as $l)
-            <option value="{{$l->level_id}}">{{$l->level_nama}}</option>
-        @endforeach
-    </select>
     </div>
 </div>
 <div class="form-group">

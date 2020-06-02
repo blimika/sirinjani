@@ -15,18 +15,19 @@ class DatabaseSeeder extends Seeder
         DB::table('t_level')->delete();
         //insert some dummy records
         DB::table('t_level')->insert(array(
-        array('level_id'=>'1', 'level_nama'=>'Pemantau'),
-        array('level_id'=>'2', 'level_nama'=>'Operator Kabkota'),
-        array('level_id'=>'3', 'level_nama'=>'Operator Provinsi'),
-        array('level_id'=>'4', 'level_nama'=>'Admin Kabkota'),
-        array('level_id'=>'5', 'level_nama'=>'Admin Provinsi'),
-        array('level_id'=>'9', 'level_nama'=>'Superadmin'),
+        array('level_id'=>'1', 'level_nama'=>'Pemantau','level_jenis'=>'3'),
+        array('level_id'=>'2', 'level_nama'=>'Operator Kabkota','level_jenis'=>'3'),
+        array('level_id'=>'3', 'level_nama'=>'Operator Provinsi','level_jenis'=>'1'),
+        array('level_id'=>'4', 'level_nama'=>'Admin Kabkota','level_jenis'=>'2'),
+        array('level_id'=>'5', 'level_nama'=>'Admin Provinsi','level_jenis'=>'1'),
+        array('level_id'=>'9', 'level_nama'=>'Superadmin','level_jenis'=>'3'),
          ));
         DB::table('t_jenis')->delete();
         //insert some dummy records
         DB::table('t_jenis')->insert(array(
         array('jenis_kode'=>'1', 'jenis_nama'=>'Provinsi'),
         array('jenis_kode'=>'2', 'jenis_nama'=>'Kabkota'),
+        array('jenis_kode'=>'3', 'jenis_nama'=>'Semua'),
          ));
          DB::table('t_realisasi')->delete();
         //insert some dummy records

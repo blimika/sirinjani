@@ -17,6 +17,7 @@ class UserLevel extends Migration
             $table->increments('id');
             $table->tinyInteger('level_id')->unsigned();
             $table->string('level_nama');
+            $table->boolean('level_jenis')->unsigned();
         });
     }
 

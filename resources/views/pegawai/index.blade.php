@@ -41,7 +41,7 @@
         <div class="card">
             <div class="card-body">
                 @if (Auth::user())
-                    @if (Auth::user()->level > 3)
+                    @if (Auth::user()->level > 3 )
                     <div class="row">
                         <div class="col-lg-6 col-sm-12 col-xs-12">
                         <button class="btn btn-info btn-rounded waves-effect waves-light m-b-20" data-toggle="modal" data-target="#TambahOperator">Tambah</button> 
@@ -49,7 +49,9 @@
                     </div>
                     @endif
                 @endif
+                @if (Auth::user()->level > 5)
                 @include('pegawai.filter')
+                @endif
                 <div class="row">
                     <div class="table-responsive">
                         <table id="pegawai" class="table table-bordered table-hover table-striped" cellspacing="0" width="100%">
@@ -61,8 +63,10 @@
                             <th>Username</th>
                             <th>Level</th>
                             <th>WhatsApp</th>
-                            <th>Status</th>
+                            <th>Status</th> 
+                            @if (Auth::user()->level > 3)
                             <th>Aksi</th>
+                            @endif
                             </tr>
                             </thead>
                             <tbody>
@@ -75,7 +79,8 @@
                                             <br />
                                             NIP : {{Generate::PecahNip($item->nipbaru)}}
                                             <br />
-                                            <small>
+                                            <button class="btn btn-rounded btn-xs btn-success waves-light waves-effect" data-toggle="modal" data-target="#DetilModal" data-nipbps="{{$item->nipbps}}"><i class="fas fa-search" data-toggle="tooltip" title="View Pegawai/Operator"></i></button> 
+                                            <small class="badge badge-dark">
                                                 {{$item->satuankerja}}
                                             </small>
                                         </td>
@@ -91,12 +96,18 @@
                                             <span class="label label-rounded label-info">Aktif</span>
                                             @else 
                                             <span class="label label-rounded label-danger">Tidak aktif</span>
-                                            @endif</td>
-                                       <td>
-                                           @if ($item->level<9)
-                                                @include('pegawai.aksi')
-                                           @endif
+                                            @endif
                                         </td>
+                                        @if (Auth::user()->level > 3)
+                                        <td>
+                                            @if ($item->level<9)
+                                                 @if ($item->level < 4 or ($item->level > 3 and Auth::user()->username != $item->username))
+                                                     @include('pegawai.aksi')
+                                                 @endif
+                                            @endif
+                                         </td>
+                                        @endif
+                                       
                                     </tr>
                                 @endforeach
                             </tbody>

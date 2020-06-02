@@ -6,13 +6,13 @@
 <!-- ============================================================== -->
 <div class="row page-titles">
     <div class="col-md-5 align-self-center">
-        <h4 class="text-themecolor">Kegiatan Bidang</h4>
+        <h4 class="text-themecolor">Kegiatan Menurut Bidang/Bagian</h4>
     </div>
     <div class="col-md-7 align-self-center text-right">
         <div class="d-flex justify-content-end align-items-center">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="javascript:void(0)">Dashboard</a></li>
-                <li class="breadcrumb-item active">Kegiatan Bidang List</li>
+                <li class="breadcrumb-item active">Kegiatan List</li>
             </ol>
         </div>
     </div>
@@ -34,12 +34,17 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
-                <div class="row">
-                    <div class="col-lg-6 col-sm-12 col-xs-12">
-                    <a href="{{route('kegiatan.tambah')}}" class="btn btn-info btn-rounded waves-effect waves-light m-b-20">Tambah</a> 
-                    
+                @if (Auth::user())
+                    @if (Auth::user()->level == 3 or Auth::user()->level > 4)
+                    <div class="row">
+                        <div class="col-lg-6 col-sm-12 col-xs-12">
+                        <a href="{{route('kegiatan.tambah')}}" class="btn btn-info btn-rounded waves-effect waves-light m-b-20">Tambah</a> 
+                        
+                        </div>
                     </div>
-                </div>
+                    @endif
+                @endif
+                
                 <div class="row">
                     <div class="col-lg-12 col-sm-12 col-xs-12">
                         @include('kegiatan.filterbidang')
@@ -58,7 +63,11 @@
                             <th>Target</th>
                             <th>Satuan</th>
                             <th>SPJ</th>
-                            <th>Aksi</th>
+                            @if (Auth::user())
+                                @if (Auth::user()->level > 4 or Auth::user()->level == 3)
+                                    <th width="65px">Aksi</th>
+                                @endif
+                            @endif
                             </tr>
                             </thead>
                             <tbody>
@@ -66,9 +75,23 @@
                                    <tr>
                                        <td>{{$loop->iteration}}</td>
                                        <td>
-                                           {{$item->keg_nama}}
+                                           <span class="text-info">{{$item->keg_nama}}</span>
                                            <br />
-                                           <small class="label label-success label-rounded">{{$item->JenisKeg->jkeg_nama}}</small>
+                                           <a href="{{route('kegiatan.detil',$item->keg_id)}}" class="btn btn-xs btn-rounded btn-warning waves-light waves-effect"><i class="fas fa-search"></i></a> 
+                                           <small class="badge badge-success">{{$item->JenisKeg->jkeg_nama}}</small>
+                                           <div class="progress m-t-10">
+                                               <div class="progress-bar 
+                                               @if (($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100 > 85)
+                                               bg-success 
+                                               @elseif (($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100 > 68)
+                                               bg-warning 
+                                               @else
+                                               bg-danger 
+                                               @endif
+                                                wow animated progress-animated" style="width: {{number_format(($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100,2,".",",")}}%; height:7px;" role="progressbar"> 
+                                                <span class="sr-only">{{number_format(($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100,2,".",",")}} Terkirim</span> 
+                                                </div>
+                                            </div>
                                        </td>
                                        <td>{{$item->unit_nama}}</td>
                                        <td>{{Tanggal::Panjang($item->keg_start)}}</td>
@@ -76,7 +99,13 @@
                                        <td>{{$item->keg_total_target}}</td>
                                        <td>{{$item->keg_target_satuan}}</td>
                                        <td>@include('kegiatan.spj')</td>
-                                       <td></td>
+                                       @if (Auth::user())
+                                        @if (Auth::user()->level > 4 or Auth::user()->level == 3)
+                                            <td>
+                                                @include('kegiatan.aksi')
+                                            </td>
+                                        @endif
+                                       @endif
                                    </tr>
                                @endforeach
                             </tbody>
@@ -98,6 +127,7 @@
 <link href="{{asset('assets/node_modules/sweetalert2/dist/sweetalert2.min.css')}}" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="{{asset('assets/node_modules/datatables.net-bs4/css/dataTables.bootstrap4.css')}}">
 <link rel="stylesheet" type="text/css" href="{{asset('assets/node_modules/datatables.net-bs4/css/responsive.dataTables.min.css')}}">
+<link href="{{asset('dist/css/pages/progressbar-page.css')}}" rel="stylesheet">
 @endsection
 
 @section('js')
@@ -121,6 +151,7 @@
                     'copy', 'excel', 'pdf', 'print'
                 ],
                 "displayLength": 30,
+                responsive: true
                 
             });
             $('.buttons-copy, .buttons-csv, .buttons-print, .buttons-pdf, .buttons-excel').addClass('btn btn-primary mr-1');
@@ -129,5 +160,5 @@
     </script>
     <!-- Sweet-Alert  -->
     <script src="{{asset('assets/node_modules/sweetalert2/dist/sweetalert2.all.min.js')}}"></script>
-    
+    @include('kegiatan.jshapus')
 @endsection

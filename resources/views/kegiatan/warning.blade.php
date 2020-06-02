@@ -28,6 +28,12 @@
         <div class="card">
             <div class="card-body">
                 <h1 class="text-center">Error : tidak dapat mengakses halaman ini</h1>
+                @if ($keg_id > 0)
+                    <center><a href="{{route('kegiatan.detil',$keg_id)}}" class="btn btn-success m-t-20"><i class="fas fa-arrow-left"></i> KEMBALI</a></center>
+                @else
+                <center><a href="{{route('kegiatan.list')}}" class="btn btn-success m-t-20"><i class="fas fa-arrow-left"></i> KEMBALI</a></center>
+                @endif
+                
             </div>
         </div>
     </div>

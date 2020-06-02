@@ -588,4 +588,127 @@ Class Generate {
 		}
 		return $spj_nilai;
 	}
+	public static function TotalKegiatan($tahun)
+	{
+		if ($tahun==0)
+		{
+			//semua tahun
+			$data = \App\Kegiatan::count();
+		}
+		else
+		{
+			//sesuai kodebps
+			$data = \App\Kegiatan::whereYear('keg_start','=',$tahun)->count();
+		}
+		return $data;
+	}
+	public static function TotalTargetKegiatan($tahun)
+	{
+		if ($tahun==0)
+		{
+			//semua tahun
+			$data = \App\Kegiatan::sum('keg_total_target');
+		}
+		else
+		{
+			//sesuai kodebps
+			$data = \App\Kegiatan::whereYear('keg_start','=',$tahun)->sum('keg_total_target');
+		}
+		return $data;
+	}
+	public static function TotalPengiriman($tahun)
+	{
+		if ($tahun==0)
+		{
+			//semua tahun
+			$data = \App\KegRealisasi::where('keg_r_jenis',1)->sum('keg_r_jumlah');
+		}
+		else
+		{
+			//sesuai kodebps
+			$data = \App\KegRealisasi::where('keg_r_jenis',1)->whereYear('keg_r_tgl','=',$tahun)->sum('keg_r_jumlah');
+		}
+		return $data;
+	}
+	public static function TotalPenerimaan($tahun)
+	{
+		if ($tahun==0)
+		{
+			//semua tahun
+			$data = \App\KegRealisasi::where('keg_r_jenis',1)->sum('keg_r_jumlah');
+		}
+		else
+		{
+			//sesuai kodebps
+			$data = \App\KegRealisasi::where('keg_r_jenis',2)->whereYear('keg_r_tgl','=',$tahun)->sum('keg_r_jumlah');
+		}
+		return $data;
+	}
+	public static function KegiatanTerbanyak($tahun)
+	{
+		if ($tahun==0)
+		{
+			//semua tahun
+			$data = \App\Kegiatan::select('keg_unitkerja', \DB::raw('count(*) as total'))->groupBy('keg_unitkerja')->orderBy('total','desc')->first();
+		}
+		else
+		{
+			//sesuai kodebps
+			$data = \App\Kegiatan::whereYear('keg_start','=',$tahun)->select('keg_unitkerja', \DB::raw('count(*) as total'))->groupBy('keg_unitkerja')->orderBy('total','desc')->first();
+		}
+		$nama_seksi = $data->Unitkerja->unit_nama;
+		$total_keg = $data->total;
+		$arr = array(
+			'nama_unit'=>$nama_seksi,
+			'total_keg'=>$total_keg
+		);
+		return $arr;
+	}
+	public static function KegiatanDeadline()
+	{
+		$data = \App\Kegiatan::whereBetween('keg_end',array(\Carbon\Carbon::now()->subDays(1)->format('Y-m-d'), \Carbon\Carbon::now()->addWeek()->format('Y-m-d')))->orderBy('keg_end')->get();
+		return $data;
+	}
+	public static function ChartNilaiBulan($bulan,$tahun)
+	{
+		/*
+		select keg_t_unitkerja, count(*) as keg_jml, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_jumlah, sum(m_keg_target.keg_t_point) as point_total, avg(m_keg_target.keg_t_point) as point_rata from m_keg_target,m_keg where m_keg.keg_id=m_keg_target.keg_id and month(m_keg.keg_end)='5' and year(m_keg.keg_end)='2020' and m_keg_target.keg_t_target>0 group by keg_t_unitkerja order by point_rata desc, point_total desc
+		*/
+		$data = \DB::table('m_keg')
+				->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
+				->leftJoin('t_unitkerja','m_keg_target.keg_t_unitkerja','=','t_unitkerja.unit_kode')
+				->whereMonth('m_keg.keg_end','=',$bulan)->whereYear('m_keg.keg_end','=',$tahun)
+				->where('m_keg_target.keg_t_target','>','0')
+				->select(\DB::raw("m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_jumlah, sum(m_keg_target.keg_t_point) as point_total, avg(m_keg_target.keg_t_point) as point_rata, count(*) as keg_jml"))
+				->groupBy('m_keg_target.keg_t_unitkerja')
+				->orderBy('point_rata','desc')
+				->get();
+		//return $data; number_format($k->point_rata,4,".",",");
+		//dd($data);
+		foreach ($data as $item) {
+			$unit_nama[]=$item->unit_nama;
+			$unit_kode[]=$item->keg_t_unitkerja;
+			$keg_jml[]=$item->keg_jml;
+			$keg_jml_target[]=$item->keg_jml_target;
+			$point_waktu[]=$item->point_waktu;
+			$point_jumlah[]=$item->point_jumlah;
+			$point_total[]=$item->point_total;
+			$point_rata[]=number_format($item->point_rata,4,".",",");
+		}
+		$arr = array(
+			'unit_nama'=>$unit_nama,
+			'unit_kode'=>$unit_kode,
+			'keg_jml'=>$keg_jml,
+			'keg_jml_target'=>$keg_jml_target,
+			'point_waktu'=>$point_waktu,
+			'point_jumlah'=>$point_jumlah,
+			'point_total'=>$point_total,
+			'point_rata'=>$point_rata
+		);
+		//dd(json_encode($arr));
+		return $arr;
+	}
+	public static function ChartNilaiTahunan($kabkota,$tahun)
+	{
+	}
 }

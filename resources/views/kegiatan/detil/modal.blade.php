@@ -235,7 +235,7 @@
                     <dd class="col-sm-8"><span id="keg_nama"></span></dd>
                     <dt class="col-sm-4">SM</dt>
                     <dd class="col-sm-8"><span id="sm"></span></dd>
-                    <dt class="col-sm-4">Mulai Keg</dt>
+                    <dt class="col-sm-4">Tanggal Mulai</dt>
                     <dd class="col-sm-8"><span id="keg_start"></span></dd>
                     <dt class="col-sm-4">Batas waktu</dt>
                     <dd class="col-sm-8"><span id="keg_end"></span></dd>
@@ -244,7 +244,6 @@
                 </dl>
                 <form class="m-t-10" name="formInfoLanjutan" method="post" action="{{route('info.update')}}">
                  @csrf
-                 <input type="hidden" name="keg_r_id" id="keg_r_id" value="" />
                  <input type="hidden" name="keg_id" id="keg_id" value="" />
                 <div class="form-group">
                     <label for="keg_r_tgl">Informasi</label>

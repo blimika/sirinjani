@@ -99,7 +99,7 @@ class KegiatanController extends Controller
             {
                 //cek admin kabkota
                 //peringatan tidak bisa mengakses halaman ini
-                return view('kegiatan.warning');
+                return view('kegiatan.warning',['keg_id'=>0]);
             }
             else 
             {
@@ -127,7 +127,7 @@ class KegiatanController extends Controller
         {
             //operator kabkota dan pemantau tidak bisa mengakses ini
             //beri info warning
-            return view('kegiatan.warning');
+            return view('kegiatan.warning',['keg_id'=>0]);
         }
     }
     public function simpan(Request $request)
@@ -352,26 +352,41 @@ class KegiatanController extends Controller
         );
         if ($count>0)
         {
-            $data = Kegiatan::where('keg_id',$request->keg_id)->first();
-            $nama = $data->keg_nama;
-            $unit_nama = $data->Unitkerja->unit_nama;
-            $keg_spj = $data->keg_spj;
-            $data->delete();
-            $target = KegTarget::where('keg_id',$request->keg_id)->delete();
-            $realisasi = KegRealisasi::where('keg_id',$request->keg_id)->delete();
-            if ($keg_spj==1)
+            if (Auth::user()->level > 4 or Auth::user()->level ==3)
             {
-                $spj = SpjTarget::where('keg_id',$request->keg_id)->delete();
-                $spjrealisasi = SpjRealisasi::where('keg_id',$request->keg_id)->delete();
+                //user admin atau operator provinsi
+                $data = Kegiatan::where('keg_id',$request->keg_id)->first();
+                if (Auth::user()->level > 4 or $data->Unitkerja->unit_parent == Auth::user()->kodeunit)
+                {
+                    //admin atau operator provinsi sesuai unitkodenya
+                    $nama = $data->keg_nama;
+                    $unit_nama = $data->Unitkerja->unit_nama;
+                    $keg_spj = $data->keg_spj;
+                    $data->delete();
+                    $target = KegTarget::where('keg_id',$request->keg_id)->delete();
+                    $realisasi = KegRealisasi::where('keg_id',$request->keg_id)->delete();
+                    if ($keg_spj==1)
+                    {
+                        $spj = SpjTarget::where('keg_id',$request->keg_id)->delete();
+                        $spjrealisasi = SpjRealisasi::where('keg_id',$request->keg_id)->delete();
+                    }
+                    $arr = array(
+                        'status'=>true,
+                        'hasil'=>'Data kegiatan '.$nama.' dari '.$unit_nama.' berhasil dihapus beserta target dan realisasinya'
+                    );
+                }
+                else 
+                {
+                    //error selain unitkode yg beda
+                    $arr = array(
+                        'status'=>false,
+                        'hasil'=>'Operator Provinsi ('.Auth::user()->nama.') tidak mempunyai hak untuk menghapus kegiatan '.$data->keg_nama
+                    );
+                }
             }
-            $arr = array(
-                'status'=>true,
-                'hasil'=>'Data kegiatan '.$nama.' dari '.$unit_nama.' berhasil dihapus beserta target dan realisasinya'
-            );
+            
+            
         }
-        return Response()->json($arr);
-        
-        
         return Response()->json($arr);
     }
     public function DetilKegiatan($kegId)
@@ -404,7 +419,7 @@ class KegiatanController extends Controller
             {
                 //cek admin kabkota
                 //peringatan tidak bisa mengakses halaman ini
-                return view('kegiatan.warning');
+                return view('kegiatan.warning',['keg_id'=>$kegId]);
             }
             else 
             {
@@ -415,7 +430,7 @@ class KegiatanController extends Controller
                     if ($dataKegiatan->Unitkerja->unit_parent != Auth::user()->kodeunit)
                     {
                          //peringatan tidak bisa mengedit kegiatan ini
-                        return view('kegiatan.warning');
+                         return view('kegiatan.warning',['keg_id'=>$kegId]);
                     }
                     $unitProv = UnitKerja::where([['unit_jenis','=','1'],['unit_eselon','=','4'],['unit_parent','=',Auth::user()->kodeunit]])->get();
                 }
@@ -439,7 +454,7 @@ class KegiatanController extends Controller
         {
             //operator kabkota dan pemantau tidak bisa mengakses ini
             //beri info warning
-            return view('kegiatan.warning');
+            return view('kegiatan.warning',['keg_id'=>$kegId]);
         }
     }
     public function cariKegiatan($kegId)
@@ -477,6 +492,7 @@ class KegiatanController extends Controller
                 'keg_jenis_nama'=>$data->JenisKeg->jkeg_nama,
                 'keg_spj'=>$data->keg_spj,  
                 'keg_spj_nama'=>$spj,
+                'keg_info'=>$data->keg_info,
                 'keg_dibuat_oleh'=>$data->keg_dibuat_oleh,
                 'keg_diupdate_oleh'=>$data->keg_diupdate_oleh,
                 'created_at'=>$data->created_at,
@@ -735,6 +751,31 @@ class KegiatanController extends Controller
             $pesan_error="Realisasi konfirmasi penerimaan tidak ada";
             $pesan_warna="danger";
         }
+        Session::flash('message', $pesan_error);
+        Session::flash('message_type', $pesan_warna);
+        return redirect()->route('kegiatan.detil',$request->keg_id);
+    }
+    public function UpdateInfo(Request $request)
+    {
+        //dd($request->all());
+        $count = Kegiatan::where('keg_id',$request->keg_id)->count();
+        if ($count > 0)
+        {
+            $data = Kegiatan::where('keg_id',$request->keg_id)->first();
+            $data->keg_info = trim($request->keg_info);
+            $data->keg_diupdate_oleh = Auth::user()->username;
+            $data->update();
+
+            $pesan_error='Info lanjutan kegiatan ('.$data->keg_nama.') pada '.$data->Unitkerja->unit_nama.' sudah di update';
+            $pesan_warna='success';
+        }
+        else
+        {
+            //kegiatan ada di update
+            $pesan_error='Nama kegiatan (ini) tidak ada';
+            $pesan_warna='danger';
+        }
+        
         Session::flash('message', $pesan_error);
         Session::flash('message_type', $pesan_warna);
         return redirect()->route('kegiatan.detil',$request->keg_id);

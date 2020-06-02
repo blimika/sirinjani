@@ -34,12 +34,17 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
-                <div class="row">
-                    <div class="col-lg-6 col-sm-12 col-xs-12">
-                    <a href="{{route('kegiatan.tambah')}}" class="btn btn-info btn-rounded waves-effect waves-light m-b-20">Tambah</a> 
-                    
+                @if (Auth::user())
+                    @if (Auth::user()->level == 3 or Auth::user()->level > 4)
+                    <div class="row">
+                        <div class="col-lg-6 col-sm-12 col-xs-12">
+                        <a href="{{route('kegiatan.tambah')}}" class="btn btn-info btn-rounded waves-effect waves-light m-b-20">Tambah</a> 
+                        
+                        </div>
                     </div>
-                </div>
+                    @endif
+                @endif
+                
                 <div class="row">
                     <div class="col-lg-12 col-sm-12 col-xs-12">
                         @include('kegiatan.filter')
@@ -58,7 +63,11 @@
                             <th>Target</th>
                             <th>Satuan</th>
                             <th>SPJ</th>
-                            <th width="65px">Aksi</th>
+                            @if (Auth::user())
+                                @if (Auth::user()->level > 4 or Auth::user()->level == 3)
+                                    <th width="65px">Aksi</th>
+                                @endif
+                            @endif
                             </tr>
                             </thead>
                             <tbody>
@@ -90,9 +99,13 @@
                                        <td>{{$item->keg_total_target}}</td>
                                        <td>{{$item->keg_target_satuan}}</td>
                                        <td>@include('kegiatan.spj')</td>
-                                       <td>
-                                           @include('kegiatan.aksi')
-                                       </td>
+                                       @if (Auth::user())
+                                        @if (Auth::user()->level > 4 or Auth::user()->level == 3)
+                                            <td>
+                                                @include('kegiatan.aksi')
+                                            </td>
+                                        @endif
+                                       @endif
                                    </tr>
                                @endforeach
                             </tbody>
@@ -114,7 +127,6 @@
 <link href="{{asset('assets/node_modules/sweetalert2/dist/sweetalert2.min.css')}}" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="{{asset('assets/node_modules/datatables.net-bs4/css/dataTables.bootstrap4.css')}}">
 <link rel="stylesheet" type="text/css" href="{{asset('assets/node_modules/datatables.net-bs4/css/responsive.dataTables.min.css')}}">
-<link href="{{asset('dist/css/pages/progressbar-page.css')}}" rel="stylesheet">
 @endsection
 
 @section('js')
