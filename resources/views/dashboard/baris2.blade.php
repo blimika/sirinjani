@@ -73,14 +73,26 @@
     <div class="col-lg-6 col-md-6">
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title">Grafik Nilai Bulan</h4>
-                <div id="nilai_bulanan"></div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <h4 class="card-title">Grafik Nilai Tahunan</h4>
-                <div id="nilai_tahunan"></div>
+                <h4 class="card-title">Grafik Nilai</h4>
+                 <!-- Nav tabs -->
+                 <ul class="nav nav-tabs customtab2" role="tablist">
+                    <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#bulanan" role="tab"><span class="hidden-sm-up"><i class="ti-home"></i></span> <span class="hidden-xs-down">BULANAN</span></a> </li>
+                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#tahunan" role="tab"><span class="hidden-sm-up"><i class="ti-user"></i></span> <span class="hidden-xs-down">TAHUNAN</span></a> </li>
+                </ul>
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div class="tab-pane active" id="bulanan" role="tabpanel">
+                        <div class="p-20">
+                            <div id="nilai_bulanan"></div>
+                        </div>
+                    </div>
+                    <div class="tab-pane p-20" id="tahunan" role="tabpanel">
+                        <div id="nilai_tahunan"></div>
+                    </div>
+                    
+                </div>
+                
+                
             </div>
         </div>
     </div>

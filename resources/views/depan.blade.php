@@ -25,15 +25,7 @@
 <!-- ============================================================== -->
 @include('dashboard.baris1')
 @include('dashboard.baris2')
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-body">
-                This is some text within a card block.
-            </div>
-        </div>
-    </div>
-</div>
+
 <!-- ============================================================== -->
 <!-- End PAge Content -->
 <!-- ============================================================== -->
@@ -42,6 +34,7 @@
 @section('css')
 <!--highcharts-->
 <link href="{{asset('dist/grafik/highcharts.css')}}" rel="stylesheet">
+<link href="{{asset('dist/css/pages/tab-page.css')}}" rel="stylesheet">
 @endsection
 
 @section('js')

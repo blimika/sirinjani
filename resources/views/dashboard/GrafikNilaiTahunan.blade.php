@@ -1,5 +1,6 @@
 @php
- 
+ $unit_nama = Generate::ChartNilaiTahunan(\Carbon\Carbon::now()->format('Y'))['unit_nama'];
+ $point_rata = Generate::ChartNilaiTahunan(\Carbon\Carbon::now()->format('Y'))['point_rata']; 
 @endphp
 <script>
    Highcharts.chart('nilai_tahunan', {
@@ -29,14 +30,17 @@
         }
     },
     series: [
-        @for ($i = 1; $i < 11; $i++)
-            {
-            name: 'Nama {{$i}}',
-            data: [7.0, 6.9, 9.5, {{$i}}, {{$i+1}}, {{$i+1.5}}, {{$i+2}}, 26.5, 23.3, 18.3, 13.9, 9.6]
-            },
-        @endfor
-         
-    ]
+        @foreach ($unit_nama as $kode => $nama)
+        {
+            name: '{{$nama}}',
+            @php
+                $nilai = json_encode($point_rata[$kode]);
+                $nilai = str_replace('"', '', $nilai);
+            @endphp
+            data: {!! $nilai !!}
+        },
+        @endforeach
+        ]
 });
 </script>
 

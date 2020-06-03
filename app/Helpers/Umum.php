@@ -708,7 +708,40 @@ Class Generate {
 		//dd(json_encode($arr));
 		return $arr;
 	}
-	public static function ChartNilaiTahunan($kabkota,$tahun)
+	public static function ChartNilaiTahunan($tahun)
 	{
+		/*
+		select month(m_keg.keg_end) as bulan, year(m_keg.keg_end) as tahun, keg_t_unitkerja, count(*) as keg_jml, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_jumlah, sum(m_keg_target.keg_t_point) as point_total, avg(m_keg_target.keg_t_point) as point_rata from m_keg left join m_keg_target on m_keg.keg_id=m_keg_target.keg_id where year(m_keg.keg_end)='2020' and m_keg_target.keg_t_target>0 group by bulan,tahun,keg_t_unitkerja order by bulan asc
+		*/
+		//get dulu unitkerja
+		//get nilai unitkerja perbulan rata-rata
+
+		$data_unit = \App\UnitKerja::where([['unit_eselon','=','3'],['unit_jenis','=','2']])->get();
+		/*
+		{
+			name:,
+			data:
+		}
+		*/
+		
+		foreach ($data_unit as $item)
+		{
+			$unit_nama[$item->unit_kode]= $item->unit_nama;
+			$data = \DB::table('m_keg')
+				->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
+				->whereYear('m_keg.keg_end','=',$tahun)
+				->where('keg_t_unitkerja','=',$item->unit_kode)
+				->where('m_keg_target.keg_t_target','>','0')
+				->select(\DB::raw("month(m_keg.keg_end) as bulan, year(m_keg.keg_end) as tahun, keg_t_unitkerja, count(*) as keg_jml, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_jumlah, sum(m_keg_target.keg_t_point) as point_total, avg(m_keg_target.keg_t_point) as point_rata"))
+				->groupBy(['bulan'],['tahun'],['keg_t_unitkerja'])
+				->orderBy('bulan','asc')
+				->get();
+			foreach ($data as $row)
+			{
+				$point_rata[$item->unit_kode][] = number_format($row->point_rata,4,".",",");
+				$point_total[$item->unit_kode][] = $row->point_total;
+			}
+		}
+		return ['unit_nama'=>$unit_nama,'point_rata'=>$point_rata,'point_total'=>$point_total];
 	}
 }
