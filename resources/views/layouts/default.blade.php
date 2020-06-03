@@ -8,8 +8,8 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <!-- Favicon icon -->
-    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon.png">
-    <title>SiRinjani v2.0 - BPS Provinsi NTB</title>
+    <link rel="icon" type="image/png" sizes="16x16" href="{{asset('assets/images/favicon.png')}}">
+    <title>SiRinJani v2.0 - BPS Provinsi NTB</title>
     <!-- Custom CSS -->
     @section('css')
 
@@ -32,7 +32,7 @@
     <div class="preloader">
         <div class="loader">
             <div class="loader__figure"></div>
-            <p class="loader__label">SiRinjani v2.0 Loading</p>
+            <p class="loader__label">SiRinJani v2.0 Loading</p>
         </div>
     </div>
     <!-- ============================================================== -->
