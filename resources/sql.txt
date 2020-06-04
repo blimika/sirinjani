@@ -1,0 +1,14 @@
+//kegiatan
+insert into sirinjani.m_keg SELECT keg_id, keg_nama, keg_unitkerja, keg_start, keg_end, keg_jenis, keg_total_target, keg_target_satuan, keg_spj, keg_info, keg_dibuat_oleh, keg_diupdate_oleh, keg_dibuat_waktu, keg_diupdate_waktu from smko.kegiatan
+
+//keg_realiasi
+insert into m_keg_realisasi select keg_d_id, keg_id, keg_d_unitkerja, keg_d_jumlah, keg_d_tgl, keg_d_jenis, keg_d_link_laci, keg_d_ket, keg_d_dibuat_oleh, keg_d_diupdate_oleh, keg_d_dibuat_waktu, keg_d_diupdate_waktu from smko.keg_detil
+
+//keg_target
+insert into m_keg_target select keg_t_id, keg_id, keg_t_unitkerja, keg_t_target, keg_t_point_waktu, keg_t_point_jumlah, keg_t_point,keg_t_dibuat_oleh, keg_t_diupdate_oleh, keg_t_dibuat_waktu, keg_t_diupdate_waktu from smko.keg_target
+
+//spj_realisasi
+insert into m_spj_realisasi select spj_d_id, keg_id, spj_d_unitkerja, spj_d_jumlah, spj_d_tgl, spj_d_jenis, spj_d_link_laci, spj_d_ket, spj_d_dibuat_oleh, spj_d_diupdate_oleh, spj_d_dibuat_waktu, spj_d_diupdate_waktu from smko.spj_detil
+
+//spj_target
+insert into m_spj_target select keg_s_id, keg_id, keg_s_unitkerja, keg_s_target, keg_s_point_waktu, keg_s_point_jumlah, keg_s_point, keg_s_dibuat_oleh, keg_s_diupdate_oleh, keg_s_dibuat_waktu, keg_s_diupdate_waktu from smko.keg_spj
