@@ -1,7 +1,10 @@
 @php
- $unit_nama = Generate::ChartNilaiTahunan(\Carbon\Carbon::now()->format('Y'))['unit_nama'];
+ //$unit_nama = Generate::ChartNilaiTahunan($tahun)['unit_nama'];
+ foreach ($dataPeringkat as $item ) {
+     $unit_nama[] = $item->unit_nama;
+     $nilai[]=number_format($item->point_rata,4,".",",");
+ }
  $unit_nama = json_encode($unit_nama);
- $nilai = Generate::ChartNilaiTahunan(\Carbon\Carbon::now()->format('Y'))['point_rata'];
  $nilai = json_encode($nilai);
  $nilai = str_replace('"', '', $nilai);
 @endphp
@@ -12,7 +15,7 @@
         type: 'bar'
     },
         title: {
-            text: 'Nilai Tahun {{\Carbon\Carbon::now()->isoFormat('YYYY')}} (Max 5)',
+            text: 'Nilai Tahun {{\Carbon\Carbon::now()->isoFormat($tahun)}} (Max 5)',
             x: -20 //center
         },
         subtitle: {

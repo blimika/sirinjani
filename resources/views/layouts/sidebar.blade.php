@@ -40,9 +40,12 @@
                 <li><a href="{{route('kegiatan.bidang')}}">Bidang/Bagian</a></li>
             </ul>
         </li>
-        <li> <a class="has-arrow waves-effect waves-dark two-column" href="javascript:void(0)" aria-expanded="false"><i class="ti-palette"></i><span class="hide-menu">Peringkat dan Nilai</span></a>
+        <li> <a class="has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false"><i class="ti-palette"></i><span class="hide-menu">Peringkat dan Nilai</span></a>
             <ul aria-expanded="false" class="collapse">
-                <li><a href="#">Menurut Kegiatan</a></li>
+                <li><a href="{{route('peringkat.ckp')}}">Rekap Nilai CKP</a></li>
+                <li><a href="{{route('peringkat.tahunan')}}">Peringkat Bulanan</a></li>
+                <li><a href="{{route('peringkat.tahunan')}}">Peringkat Tahunan</a></li>
+                <li><a href="#">Rincian Perkabkota</a></li>
             </ul>
         </li>
         <li class="nav-small-cap">--- LAPORAN</li>

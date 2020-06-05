@@ -53,5 +53,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/pegawai/list', 'PegawaiController@index')->name('pegawai.list');
     Route::get('/pegawai/{nipbps}', 'PegawaiController@CariPegawai')->name('cari.pegawai');
     Route::post('/pegawai/gantipasswd', 'PegawaiController@GantiPassword')->name('pegawai.gantipasswd');
+    Route::get('/peringkat/bulanan', 'PeringkatController@bulanan')->name('peringkat.bulanan');
+    Route::get('/peringkat/tahunan', 'PeringkatController@tahunan')->name('peringkat.tahunan');
+    Route::get('/peringkat/ckp', 'PeringkatController@Ckp')->name('peringkat.ckp');
 });
 Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout')->name('logout');

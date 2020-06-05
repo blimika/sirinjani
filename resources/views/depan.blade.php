@@ -50,6 +50,7 @@
     <script src="{{asset('dist/grafik/accessibility.js')}}"></script>
     @if (Generate::TotalKegiatan(Carbon\Carbon::now()->format('Y')) > 0)
     @include('dashboard.GrafikNilai')
+    @include('dashboard.GrafikNilaiRataRata')
     @include('dashboard.GrafikNilaiTahunan')
     @endif
 @endsection
