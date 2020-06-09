@@ -1,6 +1,6 @@
 <ul>
     <li>
-        <div class="drop-title">Notifications</div>
+        <div class="drop-title">Notifikasi</div>
     </li>
     <li>
         <div class="message-center">
@@ -8,13 +8,13 @@
             <a href="javascript:void(0)">
                 <div class="btn btn-danger btn-circle"><i class="fa fa-link"></i></div>
                 <div class="mail-contnet">
-                    <h5>Luanch Admin</h5> <span class="mail-desc">Just see the my new admin!</span> <span class="time">9:30 AM</span> </div>
+                    <h5>Operator Sosial</h5> <span class="mail-desc">Menambahkan kegiatan baru!</span> <span class="time">9:30 AM</span> </div>
             </a>
             <!-- Message -->
             <a href="javascript:void(0)">
                 <div class="btn btn-success btn-circle"><i class="ti-calendar"></i></div>
                 <div class="mail-contnet">
-                    <h5>Event today</h5> <span class="mail-desc">Just a reminder that you have event</span> <span class="time">9:10 AM</span> </div>
+                    <h5>Operator Lobar</h5> <span class="mail-desc">Melakukan pengiriman</span> <span class="time">9:10 AM</span> </div>
             </a>
             <!-- Message -->
             <a href="javascript:void(0)">

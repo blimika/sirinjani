@@ -1,5 +1,5 @@
 <div class="row">
-    <div class="col-md-9">
+    <div class="col-md-12">
 <form class="form-horizontal">
       <div class="form-group row">
         <label for="bulan" class="col-sm-1 control-label">Filter</label>

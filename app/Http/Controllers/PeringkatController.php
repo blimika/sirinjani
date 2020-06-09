@@ -17,7 +17,7 @@ class PeringkatController extends Controller
                     ->whereYear('keg_end','<=',NOW())
                     ->orderBy('tahun','asc')
                       ->get();
-        if (request('tahun')==NULL)
+        if (request('tahun')<=0)
         {
             $tahun_filter=date('Y');
         }
@@ -41,5 +41,41 @@ class PeringkatController extends Controller
                 ->get();
         //dd($data);
         return view('peringkat.tahunan',['dataUnitkerja'=>$dataUnit,'dataTahun'=>$data_tahun,'tahun'=>$tahun_filter,'dataPeringkat'=>$data,'unit'=>request('unit')]);
+    }
+    public function bulanan()
+    {
+        $data_bulan = array(
+            1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'
+        );
+        $data_tahun = DB::table('m_keg')
+                    ->selectRaw('year(keg_start) as tahun')
+                    ->groupBy('tahun')
+                    ->orderBy('tahun','asc')
+                      ->get();
+        $data_tahun = DB::table('m_keg')
+        ->selectRaw('year(keg_end) as tahun')
+        ->groupBy('tahun')
+        ->whereYear('keg_end','<=',NOW())
+        ->orderBy('tahun','asc')
+          ->get();
+        if (request('bulan')<=0)
+        {
+        $bulan_filter=date('m');
+        }
+        else
+        {
+        $bulan_filter = request('bulan');
+        }
+
+        if (request('tahun')<=0)
+        {
+        $tahun_filter=date('Y');
+        }
+        else
+        {
+        $tahun_filter = request('tahun');
+        }
+        $dataUnit = UnitKerja::where([['unit_jenis','=','1'],['unit_eselon','=','3']])->get();
+        return view('peringkat.bulanan',['dataUnitkerja'=>$dataUnit,'dataTahun'=>$data_tahun,'tahun'=>$tahun_filter,'unit'=>request('unit'),'dataBulan'=>$data_bulan,'bulan'=>$bulan_filter]);
     }
 }

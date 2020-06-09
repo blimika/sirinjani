@@ -43,7 +43,7 @@
         <li> <a class="has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false"><i class="ti-palette"></i><span class="hide-menu">Peringkat dan Nilai</span></a>
             <ul aria-expanded="false" class="collapse">
                 <li><a href="{{route('peringkat.ckp')}}">Rekap Nilai CKP</a></li>
-                <li><a href="{{route('peringkat.tahunan')}}">Peringkat Bulanan</a></li>
+                <li><a href="{{route('peringkat.bulanan')}}">Peringkat Bulanan</a></li>
                 <li><a href="{{route('peringkat.tahunan')}}">Peringkat Tahunan</a></li>
                 <li><a href="#">Rincian Perkabkota</a></li>
             </ul>

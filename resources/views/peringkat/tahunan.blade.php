@@ -40,7 +40,7 @@
                             <div class="col-md-9">
                         <form class="form-horizontal">
                               <div class="form-group row">
-                                <label for="unit" class="col-sm-1 control-label">Filter</label>
+                                <label for="unit" class="col-sm-2 control-label">Peringkat berdasarkan </label>
                                 <div class="col-md-5">
                                     <select name="unit" id="unit" class="form-control">
                                     <option value="0">BPS Provinsi NTB</option>
@@ -53,7 +53,6 @@
                                 </div>
                                 <div class="col-md-2">
                                     <select name="tahun" id="tahun" class="form-control">
-                                     <option value="0">Pilih Tahun</option>
                                      @foreach ($dataTahun as $iTahun)
                                      <option value="{{$iTahun->tahun}}" @if (request('tahun')==$iTahun->tahun or $tahun==$iTahun->tahun)
                                      selected
