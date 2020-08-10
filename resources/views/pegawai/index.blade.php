@@ -14,12 +14,6 @@
                 <li class="breadcrumb-item"><a href="javascript:void(0)">Dashboard</a></li>
                 <li class="breadcrumb-item active">Pegawai List</li>
             </ol>
-            @if (Auth::user())
-                @if (Auth::user()->level > 3)
-                <button type="button" class="btn btn-info d-none d-lg-block m-l-15" data-toggle="modal" data-target="#SyncDataModal"><i class="fa fa-plus-circle"></i> Sync Data</button>
-                @endif
-            @endif
-            
         </div>
     </div>
 </div>
@@ -58,31 +52,21 @@
                             <thead>
                             <tr>
                             <th>No</th>
-                            <th>PIC</th>
                             <th>Nama</th>
                             <th>Username</th>
                             <th>Level</th>
                             <th>WhatsApp</th>
+                            <th>Lastlogin</th>
                             <th>Status</th> 
-                            @if (Auth::user()->level > 3)
                             <th>Aksi</th>
-                            @endif
                             </tr>
                             </thead>
                             <tbody>
                                 @foreach ($dataPegawai as $item)
                                     <tr>
                                         <td>{{$loop->iteration}}</td>
-                                        <td><img class="img-circle" src="{{$item->urlfoto}}" alt="User profile picture" height="40px" width="40px"></td>
                                         <td>
                                             {{$item->nama}}
-                                            <br />
-                                            NIP : {{Generate::PecahNip($item->nipbaru)}}
-                                            <br />
-                                            <button class="btn btn-rounded btn-xs btn-success waves-light waves-effect" data-toggle="modal" data-target="#DetilModal" data-nipbps="{{$item->nipbps}}"><i class="fas fa-search" data-toggle="tooltip" title="View Pegawai/Operator"></i></button> 
-                                            <small class="badge badge-dark">
-                                                {{$item->satuankerja}}
-                                            </small>
                                         </td>
                                         <td>{{$item->username}}</td>
                                         <td>{{$item->Level->level_nama}}</td>
@@ -92,21 +76,29 @@
                                             {{$item->nohp}}
                                             @endif
                                         </td>
+                                        <td>
+                                            @if ($item->lastlogin)
+                                            {{Tanggal::LengkapPendek($item->lastlogin)}}
+                                            @endif
+                                        </td>
                                         <td>@if ($item->aktif==1)
                                             <span class="label label-rounded label-info">Aktif</span>
                                             @else 
                                             <span class="label label-rounded label-danger">Tidak aktif</span>
                                             @endif
                                         </td>
-                                        @if (Auth::user()->level > 3)
+                                       
                                         <td>
+                                            <button class="btn btn-circle btn-sm btn-success waves-light waves-effect" data-toggle="modal" data-target="#DetilModal" data-nipbps="{{$item->nipbps}}"><i class="fas fa-search" data-toggle="tooltip" title="View Pegawai/Operator"></i></button>
+                                            @if (Auth::user()->level > 3)
                                             @if ($item->level<9)
                                                  @if ($item->level < 4 or ($item->level > 3 and Auth::user()->username != $item->username))
                                                      @include('pegawai.aksi')
                                                  @endif
                                             @endif
+                                            @endif
                                          </td>
-                                        @endif
+                                       
                                        
                                     </tr>
                                 @endforeach

@@ -69,69 +69,42 @@ class LoginController extends Controller
      }
     public function showLoginForm()
     {
-        //$dataTahunDasar = \App\TahunDasar::orderBy('tahun', 'asc')->get();
-        //return view('login.v2', compact('dataTahunDasar'));
         return view('login.index');
     }
-    protected function validateLogin(Request $request)
+    
+    protected function authenticate(Request $request)
     {
-        $count = User::where('username','=',$request->username)->count();
+        $count = User::where([['username','=',$request->username],['aktif','=',1]])->count();
         if ($count>0)
         {
-            $dd_cek_username = User::where('username','=',$request->username)->first();
-            if ($dd_cek_username->isLokal==1) {
-                //cek pake auth login
-                $this->validate($request, [
-                    $this->username() => 'required|string',
-                    'password' => 'required|string',
-                ]);
-                
-                if (auth()->attempt(['username' => $request->username, 'password' => $request->password])) {
-                    //JIKA BERHASIL, MAKA REDIRECT KE HALAMAN HOME
-                    return view('depan');
-                }
-                //JIKA SALAH, MAKA KEMBALI KE LOGIN DAN TAMPILKAN NOTIFIKASI 
-                return redirect()->route('login')->with(['error' => 'Password tidak benar!']);
+            $dd_cek_username = User::where([['username','=',$request->username],['aktif','=',1]])->first();
+             //cek pake auth login
+             $this->validate($request, [
+                $this->username() => 'required|string',
+                'password' => 'required|string',
+            ]);
+            
+            if (auth()->attempt(['username' => $request->username, 'password' => $request->password, 'aktif' => 1])) {
+                //JIKA BERHASIL, MAKA REDIRECT KE HALAMAN HOME
+                return view('depan');
             }
-            else {
-                //cek pake communityBPS
-                $h = new CommunityBPS($request->username,$request->password);
-                if ($h->errorLogin==false) {
-                    //berhasil login
-                    //Auth::login($request->username);
-                    //return redirect('/');
-                    //dd(Auth::user()->nama);
-                    //dd($h); 
-                    /*
-                    $dd_cek_username->passwd = $request->password;
-                    $dd_cek_username->update();
-                    */
-                    $dd_cek_username->lastlogin = Carbon::now()->toDateTimeString();
-                    $dd_cek_username->lastip = $this->getUserIpAddr();
-                    //$dd_cek_username->passwd = $request->password;
-                    $dd_cek_username->update();    
-                    $passwd = 'null';
-                    //Auth::attempt(['username' => $request->username, 'password' => $passwd]); 
-                    if (auth()->attempt(['username' => $request->username, 'password' => $passwd])) {
-                        //JIKA BERHASIL, MAKA REDIRECT KE HALAMAN HOME
-                        return view('depan');
-                    }              
-                }
-                else {
-                    //salah password
-                    //return view('login.index');
-                    return redirect()->route('login')->with(['error' => 'Password tidak benar!']);
-                }
-            }
+            //JIKA SALAH, MAKA KEMBALI KE LOGIN DAN TAMPILKAN NOTIFIKASI 
+            return redirect()->route('login')->withErrors('Password tidak benar!');
         }
         else {
             //tidak ada username
             //return view('login.index')->withError('Username tidak terdaftar');
-            return redirect()->route('login')->with(['error' => 'Username tidak terdaftar']);
+            return redirect()->route('login')->withErrors('Username tidak terdaftar atau tidak aktif');
         }
         
     }
-    
+    protected function validateLogin(Request $request)
+    {
+        $this->validate($request, [
+            $this->username() => 'required|string',
+            'password' => 'required|string',
+        ]);
+    }
     protected function attemptLogin(Request $request)
     {
         return $this->guard()->attempt(
@@ -141,16 +114,36 @@ class LoginController extends Controller
     }
     protected function credentials(Request $request)
     {
-        return $request->only($this->username(), 'password');
-    }
+        //return $request->only($this->username(), 'password', 'aktif' => 1);
+        return ['username' => $request->{$this->username()}, 'password' => $request->password, 'aktif' => 1];
+    }    
     
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        $errors = [$this->username() => trans('auth.failed')];
+
+        // Load user from database
+        $user = User::where($this->username(), $request->{$this->username()})->first();
+
+        // Check if user was successfully loaded, that the password matches
+        // and active is not 1. If so, override the default error message.
+        if ($user && \Hash::check($request->password, $user->password) && $user->aktif != 1) {
+            $errors = [$this->username() => trans('auth.belumaktif')];
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json($errors, 422);
+        }
+        return redirect()->back()
+            ->withInput($request->only($this->username(), 'remember'))
+            ->withErrors($errors);
+    }
     
     public function authenticated(Request $request, $user)
     {
         //catat lastlogin dan ip   
         $user->lastlogin = Carbon::now()->toDateTimeString();
         $user->lastip = $this->getUserIpAddr();
-        //$user->passwd = $request->password;
         $user->save();        
     }
     

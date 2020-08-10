@@ -6,13 +6,13 @@
 <!-- ============================================================== -->
 <div class="row page-titles">
     <div class="col-md-5 align-self-center">
-        <h4 class="text-themecolor">Peringkat Nilai Bulanan</h4>
+        <h4 class="text-themecolor">Laporan Kegiatan BPS Kabupaten/Kota</h4>
     </div>
     <div class="col-md-7 align-self-center text-right">
         <div class="d-flex justify-content-end align-items-center">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="javascript:void(0)">Dashboard</a></li>
-                <li class="breadcrumb-item active">Peringkat Nilai Bulanan</li>
+                <li class="breadcrumb-item"><a href="{{url('')}}">Dashboard</a></li>
+                <li class="breadcrumb-item active">Rincian Kegiatan</li>
             </ol>
         </div>
     </div>
@@ -36,24 +36,14 @@
             <div class="card-body">
                 <form class="form-horizontal">
                               <div class="form-group row">
-                                <label for="unit" class="col-sm-2 control-label">Peringkat berdasarkan </label>
+                                <label for="unit" class="col-sm-2 control-label">Tampilkan data berdasarkan </label>
                                 <div class="col-md-4">
                                     <select name="unit" id="unit" class="form-control">
-                                    <option value="0">BPS Provinsi NTB</option>
                                     @foreach ($dataUnitkerja as $d)
                                     <option value="{{$d->unit_kode}}" @if (request('unit')==$d->unit_kode or $unit==$d->unit_kode)
                                         selected
                                        @endif>{{$d->unit_nama}}</option>
                                     @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-md-2">
-                                    <select name="bulan" id="bulan" class="form-control">
-                                     @for ($i = 1; $i <= 12; $i++)
-                                         <option value="{{$i}}" @if (request('bulan')==$i or $bulan==$i)
-                                             selected
-                                         @endif>{{$dataBulan[$i]}}</option>
-                                     @endfor
                                     </select>
                                 </div>
                                 <div class="col-md-2">
@@ -77,66 +67,26 @@
 </div>
 
 <div class="row">
-    <div class="col-lg-6 col-sm-12 col-xs-12">
+    <div class="col-lg-12 col-sm-12 col-xs-12">
         <div class="card">
             <div class="card-body">
-                
-                    <h4 class="card-title">Peringkat Kabupaten/Kota Bulan {{$dataBulan[(int)($bulan)]}} {{$tahun}}</h4>
-                    @php
-                        if ($unit > 0)
-                        {
-                            $data_unit = $dataUnitkerja->where('unit_kode','=',$unit)->first();
-                            $nama_unit = $data_unit->unit_nama;
-                        }
-                        else 
-                        {
-                            $nama_unit ='';
-                        }
-                    @endphp     
-                    @if ($unit>0)
-                        <h5>Nilai Berdasarkan {{$nama_unit}}</h5>
-                    @endif 
-                    @if ($dataPeringkat->count() > 0)
-                    <div class="table-responsive">
-                    <table id="nilai" class="table table-bordered table-hover table-striped" cellspacing="0" width="100%">
+                <div class="table-responsive">
+                    <h4 class="card-title">Laporan Kegiatan Kabupaten/Kota {{$tahun}}</h4>
+                    <table class="table color-bordered-table success-bordered-table table-striped table-bordered">
                         <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Nama Kabupaten/Kota</th>
-                            <th>Jumlah Kegiatan</th>
-                            <th>Jumlah Target</th>
-                            <th>Poin</th>
-                        </tr>
+                            <tr>
+                                <th>Bulan</th>
+                                <th>Kegiatan</th>
+                                <th width="10%">Tgl Berakhir</th>
+                                <th width="4%">Target</th>
+                                <th width="4%">Nilai</th>
+                            </tr>
                         </thead>
                         <tbody>
-                        @foreach ($dataPeringkat as $item)
-                            <tr>
-                                <td>{{$loop->iteration}}</td>
-                                <td>{{$item->unit_nama}}</td>
-                                <td>{{$item->keg_jml}}</td>
-                                <td>{{$item->keg_jml_target}}</td>
-                                <td>{{number_format($item->point_rata,4,".",",")}}</td>
-                            </tr>
-                        @endforeach
+                                               
                         </tbody>
                     </table>
-                    </div>
-                    @else
-                        <div class="alert alert-danger">Data belum tersedia untuk bulan ini</div>
-                    @endif
-                
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-6 col-sm-12 col-xs-12">
-        <div class="card">
-            <div class="card-body">
-                <h4 class="card-title">Grafik Nilai</h4>
-                @if ($dataPeringkat->count() > 0)
-                <div id="nilai_bulanan"></div>
-                @else
-                    <div class="alert alert-danger">Data belum tersedia untuk bulan ini</div>
-                @endif
+                </div>
             </div>
         </div>
     </div>
@@ -172,7 +122,7 @@
     <!-- end - This is for export functionality only -->
     <script>
         $(function () {
-            $('#nilai').DataTable({
+            $('#tabel').DataTable({
                 dom: 'Bfrtip',
                 buttons: [
                     'copy', 'excel', 'pdf', 'print'
@@ -194,7 +144,5 @@
     <script src="{{asset('dist/grafik/export-data.js')}}"></script>
     <script src="{{asset('dist/grafik/series-label.js')}}"></script>
     <script src="{{asset('dist/grafik/accessibility.js')}}"></script>
-    @if ($dataPeringkat->count() > 0)
-        @include('peringkat.GrafikBulanan')
-    @endif
+    
 @endsection

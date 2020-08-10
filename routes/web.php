@@ -51,10 +51,13 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/unitkerja/{jenis}/{eselon}', 'UnitkerjaController@CariUnitkerja')->name('cari.unitkerja');
     Route::post('/cek/community', 'PegawaiController@cekCommunity')->name('cek.community');
     Route::get('/pegawai/list', 'PegawaiController@index')->name('pegawai.list');
-    Route::get('/pegawai/{nipbps}', 'PegawaiController@CariPegawai')->name('cari.pegawai');
+    Route::get('/pegawai/{pegID}', 'PegawaiController@CariPegawai')->name('cari.pegawai');
     Route::post('/pegawai/gantipasswd', 'PegawaiController@GantiPassword')->name('pegawai.gantipasswd');
     Route::get('/peringkat/bulanan', 'PeringkatController@bulanan')->name('peringkat.bulanan');
     Route::get('/peringkat/tahunan', 'PeringkatController@tahunan')->name('peringkat.tahunan');
+    Route::get('/peringkat/rincian', 'PeringkatController@rincian')->name('peringkat.rincian');
     Route::get('/peringkat/ckp', 'PeringkatController@Ckp')->name('peringkat.ckp');
+    Route::get('/laporan/bulanan', 'LaporanController@bulanan')->name('laporan.bulanan');
+    Route::get('/laporan/tahunan', 'LaporanController@tahunan')->name('laporan.tahunan');
 });
 Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout')->name('logout');

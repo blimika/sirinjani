@@ -3,12 +3,11 @@
 <!-- ============================================================== -->
 <li class="nav-item dropdown u-pro">
     <a class="nav-link dropdown-toggle waves-effect waves-dark profil" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        @if (Auth::user())
-        <img src="{{Auth::user()->urlfoto}}" alt="user" class="img-circle" />
-        @endif
-        <span class="hidden-md-down">
+       <span class="hidden-md-down">
             @if (Auth::user())
             {{Auth::user()->nama}}  
+            @else
+            MASUK
             @endif  
             &nbsp;<i class="fa fa-angle-down"></i></span> </a>
     <div class="dropdown-menu dropdown-menu-right animated flipInY">

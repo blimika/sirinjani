@@ -305,7 +305,59 @@ class PegawaiController extends Controller
         Session::flash('message_type', $pesan_warna);
         return redirect()->route('pegawai.list');
     }
-    public function CariPegawai($nipbps)
+    public function CariPegawai($pegID)
+    {
+        $count = User::where('id','=',$pegID)->count();
+        $arr = array(
+            'status'=>false,
+            'hasil'=>'Data pegawai tidak tersedia'
+        );
+        if ($count > 0) 
+        {
+            //ada nip pegawai ini
+            $data = User::where('id','=',$pegID)->first();
+            if ($data->lastlogin != "")
+            {
+                $lastlog_nama = Carbon::parse($data->lastlogin)->isoFormat('dddd, D MMMM Y H:mm');
+            }
+            else
+            {
+                $lastlog_nama = 'belum pernah login';
+            }
+            if ($data->lastip != "")
+            {
+                $lastip = $data->lastip;
+            }
+            else
+            {
+                $lastip = 'belum pernah login';
+            }
+            $dLevel = KodeLevel::where('level_id','<','9')->whereIn('level_jenis', array($data->NamaWilayah->bps_jenis, 3))->get();
+            $arr = array(
+                'status'=>true,
+                'peg_id'=>$data->id,
+                'nama'=>$data->nama,
+                'email'=>$data->email,
+                'username'=>$data->username,
+                'kodeunit'=>$data->kodeunit,
+                'kodebps'=>$data->kodebps,
+                'kodebps_nama'=>$data->NamaWilayah->bps_nama,
+                'nohp'=>$data->nohp,
+                'aktif'=>$data->aktif,
+                'level'=>$data->level,
+                'level_nama'=>$data->Level->level_nama,
+                'lastip'=>$lastip,
+                'lastlogin'=>$data->lastlogin,
+                'lastlogin_nama'=>$lastlog_nama,
+                'namaunit'=>$data->Unitkerja->unit_nama,
+                'tgl_dibuat'=>$data->created_at,
+                'data_level_jumlah'=>$dLevel->count(),
+                'data_level'=>$dLevel
+            );
+        }
+        return Response()->json($arr);
+    }
+    public function CariPegawaiLama($nipbps)
     {
         $count = User::where('nipbps','=',$nipbps)->count();
         $arr = array(
@@ -461,6 +513,59 @@ class PegawaiController extends Controller
         return redirect()->route('pegawai.list');
     }
     public function SimpanPegawai(Request $request)
+    {
+        //dd($request->all());
+        $count = User::where('username','=',$request->peg_username)->count();
+        if ($count > 0) 
+        {
+            $pesan_error="ERROR : USERNAME sudah digunakan!!";
+            $pesan_warna='danger';
+        }
+        else
+        {
+            //pegawai tidak ada
+            //operator kabkota langsung tambahkan kodeunit 0 dibelakang
+            //kalo provinsi apakah admin / operator bidang/bagian
+            /*
+            "wilayah" => "5200"
+            "peg_nama" => "admin provinsi"
+            "peg_username" => "admin5200"
+            "peg_password" => "admin"
+            "peg_ulangi_password" => "admin"
+            "peg_level" => "4"
+            "peg_email" => "admin@bpsntb.id"
+            "peg_nohp" => "081273128"
+            */
+            $wil = KodeWilayah::where('bps_kode','=',$request->wilayah)->first();
+            if ($wil->bps_jenis==1)
+            {
+                $kodeunit = $request->peg_kodeunit;
+            }
+            else 
+            {
+                $kodeunit = $request->wilayah.'0';
+            }
+            $data = new User();
+            $data->nama = $request->peg_nama;
+            $data->username = $request->peg_username;
+            $data->password = bcrypt($request->peg_password);
+            $data->email = $request->peg_email;
+            $data->aktif = 1;
+            $data->level = $request->peg_level;
+            $data->nohp = trim($request->peg_nohp);
+            $data->kodeunit= $kodeunit;
+            $data->kodebps = $request->wilayah;
+            $data->save();
+            $pesan_error='BERHASIL : Data Operator an. '.$request->peg_nama .' berhasil simpan';
+            $pesan_warna='success';
+        }
+        
+        
+        Session::flash('message', $pesan_error);
+        Session::flash('message_type', $pesan_warna);
+        return redirect()->route('pegawai.list');
+    }
+    public function SimpanPegawaiLama(Request $request)
     {
         //dd($request->all());
         $data = Generate::NipOperator($request->wilayah);

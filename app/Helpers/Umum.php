@@ -390,7 +390,7 @@ class Tanggal {
         $tahun=date("Y",strtotime($tgl));
 	    $tgl_=date("j",strtotime($tgl));
 		$bln_indo=date("n",strtotime($tgl));
-		$jam=date("H:i:s",strtotime($tgl));
+		$jam=date("H:i",strtotime($tgl));
         $tanggal= $tgl_ .' '.$bln_panjang[$bln_indo].' '.$tahun.' '.$jam;
         return $tanggal;
 	}
@@ -400,7 +400,7 @@ class Tanggal {
         $tahun=date("Y",strtotime($tgl));
 	    $tgl_=date("j",strtotime($tgl));
 		$bln_indo=date("n",strtotime($tgl));
-		$jam=date("H:i:s",strtotime($tgl));
+		$jam=date("H:i",strtotime($tgl));
         $tanggal= $tgl_ .' '.$bln_panjang[$bln_indo].' '.$tahun.' '.$jam;
         return $tanggal;
 	}
@@ -412,7 +412,7 @@ class Tanggal {
 	    $hari=date("w",strtotime($tgl));
 	    $tgl_=date("j",strtotime($tgl));
 		$bln_indo=date("n",strtotime($tgl));
-		$jam=date("H:i:s",strtotime($tgl));
+		$jam=date("H:i",strtotime($tgl));
         $tanggal= $nama_hari_indo[$hari].', '. $tgl_ .' '.$bln_panjang[$bln_indo].' '.$tahun.' '.$jam;
 	    return $tanggal;
 	}
@@ -424,7 +424,7 @@ class Tanggal {
 	    $hari=date("w",strtotime($tgl));
 	    $tgl_=date("j",strtotime($tgl));
 		$bln_indo=date("n",strtotime($tgl));
-		$jam=date("H:i:s",strtotime($tgl));
+		$jam=date("H:i",strtotime($tgl));
         $tanggal= $nama_hari_indo[$hari].', '. $tgl_ .' '.$bln_panjang[$bln_indo].' '.$tahun.' '.$jam;
 	    return $tanggal;
 	}

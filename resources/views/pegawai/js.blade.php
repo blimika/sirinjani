@@ -221,10 +221,10 @@ $(".flagPegawai").click(function (e) {
 
 $('#EditLokalModal').on('show.bs.modal', function (event) {
   var button = $(event.relatedTarget) // Button that triggered the modal
-  var nipbps = button.data('nipbps')
+  var peg_id = button.data('id')
   var unitjenis = button.data('unitjenis')
   $.ajax({
-        url : '{{route('cari.pegawai','')}}/'+nipbps,
+        url : '{{route('cari.pegawai','')}}/'+peg_id,
         method : 'get',
         cache: false,
         dataType: 'json',
@@ -233,7 +233,6 @@ $('#EditLokalModal').on('show.bs.modal', function (event) {
             $('#EditLokalModal .modal-body #peg_nama').val(data.nama)
             $('#EditLokalModal .modal-body #peg_level').val(data.level)
             $('#EditLokalModal .modal-body #peg_unitkerja').val(data.namaunit)
-            $('#EditLokalModal .modal-body #peg_nipbps').val(data.nipbps)
             $('#EditLokalModal .modal-body #peg_nohp').val(data.nohp)
             $('#EditLokalModal .modal-body #peg_id').val(data.peg_id)
             $('#EditLokalModal .modal-body #peg_username').val(data.username)

@@ -8,7 +8,9 @@
             @endif
             <span class="hide-menu">
                 @if (Auth::user())
-                {{Auth::user()->nama}}  
+                {{Auth::user()->nama}} 
+                @else 
+                MASUK 
                 @endif &nbsp;</span>
             </a>
             <ul aria-expanded="false" class="collapse">
@@ -42,24 +44,23 @@
         </li>
         <li> <a class="has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false"><i class="ti-palette"></i><span class="hide-menu">Peringkat dan Nilai</span></a>
             <ul aria-expanded="false" class="collapse">
-                <li><a href="{{route('peringkat.ckp')}}">Rekap Nilai CKP</a></li>
+                <!--<li><a href="{{route('peringkat.ckp')}}">Rekap Nilai CKP</a></li>-->
                 <li><a href="{{route('peringkat.bulanan')}}">Peringkat Bulanan</a></li>
                 <li><a href="{{route('peringkat.tahunan')}}">Peringkat Tahunan</a></li>
-                <li><a href="#">Rincian Perkabkota</a></li>
+                <li><a href="{{route('peringkat.rincian')}}">Rincian Perkabkota</a></li>
             </ul>
         </li>
         <li class="nav-small-cap">--- LAPORAN</li>
         <li> <a class="has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false"><i class="ti-layout-media-right-alt"></i><span class="hide-menu">Laporan</span></a>
             <ul aria-expanded="false" class="collapse">
-                <li><a href="form-basic.html">Bulanan</a></li>
-                <li><a href="form-layout.html">Tahunan</a></li>
+                <li><a href="{{route('laporan.bulanan')}}">Bulanan</a></li>
+                <li><a href="{{route('laporan.tahunan')}}">Tahunan</a></li>
             </ul>
         </li>
         <li> <a class="has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false"><i class="ti-settings"></i><span class="hide-menu">Master</span></a>
             <ul aria-expanded="false" class="collapse">
-                <li><a href="{{route('pegawai.list')}}">Pegawai</a></li>
+                <li><a href="{{route('pegawai.list')}}">Operator</a></li>
                 <li><a href="widget-apps.html">Unitkerja</a></li>
-                <li><a href="widget-charts.html">Charts Widgets</a></li>
             </ul>
         </li>
         
