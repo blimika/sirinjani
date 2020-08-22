@@ -26,7 +26,7 @@
                                     <td colspan="2">
                                         <div class="row">
                                             <div class="col-sm-6">
-                                                <h6>Penerimaan<span class="float-right">{{number_format(($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100,2,",",".")}}%</span></h6>
+                                                <h6>Pengiriman<span class="float-right">{{number_format(($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100,2,",",".")}}%</span></h6>
                                                 <div class="progress">
                                                     <div class="progress-bar 
                                                         @if (($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100 > 85)
@@ -40,7 +40,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-sm-6">
-                                                <h6>Pengiriman<span class="float-right">{{number_format(($item->RealisasiTerima->sum('keg_r_jumlah')/$item->keg_total_target)*100,2,",",".")}}%</span></h6>
+                                                <h6>Penerimaan<span class="float-right">{{number_format(($item->RealisasiTerima->sum('keg_r_jumlah')/$item->keg_total_target)*100,2,",",".")}}%</span></h6>
                                                 <div class="progress">
                                                     
                                                     <div class="progress-bar 
