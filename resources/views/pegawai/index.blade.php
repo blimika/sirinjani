@@ -78,6 +78,7 @@
                                         </td>
                                         <td>
                                             @if ($item->lastlogin)
+                                            {{$item->lastip}} - 
                                             {{Tanggal::LengkapPendek($item->lastlogin)}}
                                             @endif
                                         </td>

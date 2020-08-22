@@ -61,10 +61,14 @@
             <ul aria-expanded="false" class="collapse">
                 <li><a href="{{route('pegawai.list')}}">Operator</a></li>
                 <li><a href="widget-apps.html">Unitkerja</a></li>
+                @if (Auth::user())
+                    @if (Auth::user()->level == 9)
+                    <li><a href="{{route('db.index')}}">Database</a></li>
+                    @endif
+                @endif
+                
             </ul>
-        </li>
-        
-        
+        </li>        
     </ul>
 </nav>
 <!-- End Sidebar navigation -->

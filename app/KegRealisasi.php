@@ -19,3 +19,4 @@ class KegRealisasi extends Model
         return $this->hasOne('App\UnitKerja','unit_kode', 'keg_r_unitkerja');
     }
 }
+

@@ -19,3 +19,4 @@ class SpjRealisasi extends Model
         return $this->hasOne('App\JenisRealisasi','rkeg_id', 'spj_r_jenis');
     }
 }
+
