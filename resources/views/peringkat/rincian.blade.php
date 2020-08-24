@@ -99,14 +99,14 @@
                                     @if ($loop->first)
                                     <tr>
                                         <td rowspan="{{$dataRincian->where('bulan_keg','=',$i)->count()+1}}">{{$dataBulan[$i]}}</td>
-                                        <td><a href="{{route('kegiatan.detil',$item->keg_id)}}" class="text-success">{{$item->keg_nama}}</a></td>
+                                        <td><a href="{{route('kegiatan.detil',$item->keg_id)}}" class="text-info">{{$item->keg_nama}}</a></td>
                                         <td align="right">{{Tanggal::Pendek($item->keg_end)}}</td>
                                         <td align="right">{{$item->keg_t_target}}</td>
                                         <td align="right">{{$item->keg_t_point}}</td>
                                     </tr>
                                     @endif
                                     <tr>
-                                        <td><a href="{{route('kegiatan.detil',$item->keg_id)}}" class="text-success">{{$item->keg_nama}}</a></td>
+                                        <td><a href="{{route('kegiatan.detil',$item->keg_id)}}" class="text-info">{{$item->keg_nama}}</a></td>
                                         <td align="right">{{Tanggal::Pendek($item->keg_end)}}</td>
                                         <td align="right">{{$item->keg_t_target}}</td>
                                         <td align="right">{{$item->keg_t_point}}</td>
