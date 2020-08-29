@@ -18,6 +18,9 @@ use App\SpjTarget;
 use App\SpjTargetLama;
 use App\SpjRealisasi;
 use App\SpjRealisasiLama;
+use App\UserLama;
+use App\KodeWilayah;
+use App\UnitKerja;
 
 class DataController extends Controller
 {
@@ -29,14 +32,16 @@ class DataController extends Controller
         $keg_realisasi = KegRealisasi::count();
         $spj_target = SpjTarget::count();
         $spj_realisasi = SpjRealisasi::count();
+        $data_user = User::where('level','=','1')->count();
         //$keg_lama = DB::connection('mysql2')->select("select * from kegiatan");
         $keg_lama = KegiatanLama::count();
         $keg_target_lama = KegTargetLama::count();
         $keg_realisasi_lama = KegRealisasiLama::count();
         $spj_target_lama = SpjTargetLama::count();
         $spj_realisasi_lama = SpjRealisasiLama::count();
+        $user_lama = UserLama::where('user_level','=',1)->count();
         //dd($keg_lama);
-        return view('db.index',['keg'=>$keg,'keg_lama'=>$keg_lama,'keg_target'=>$keg_target,'keg_target_lama'=>$keg_target_lama,'keg_realisasi'=>$keg_realisasi,'keg_realisasi_lama'=>$keg_realisasi_lama,'spj_target'=>$spj_target,'spj_realisasi'=>$spj_realisasi,'spj_target_lama'=>$spj_target_lama,'spj_realisasi_lama'=>$spj_realisasi_lama]);
+        return view('db.index',['keg'=>$keg,'keg_lama'=>$keg_lama,'keg_target'=>$keg_target,'keg_target_lama'=>$keg_target_lama,'keg_realisasi'=>$keg_realisasi,'keg_realisasi_lama'=>$keg_realisasi_lama,'spj_target'=>$spj_target,'spj_realisasi'=>$spj_realisasi,'spj_target_lama'=>$spj_target_lama,'spj_realisasi_lama'=>$spj_realisasi_lama,'data_user'=>$data_user,'user_lama'=>$user_lama]);
     }
     public function Sinkron()
     {
@@ -73,12 +78,14 @@ class DataController extends Controller
                  $keg_realisasi_lama = KegRealisasiLama::get();
                  $spj_target_lama = SpjTargetLama::get();
                  $spj_realisasi_lama = SpjRealisasiLama::get();
+                 $user_lama = UserLama::where('user_level','=','1')->get();
                  //kegiatan
                  $data_keg = [];
                  $data_target = [];
                  $data_realisasi = [];
                  $data_spj = [];
                  $data_spj_realisasi = [];
+                 $data_user = [];
                  //keg_id, keg_nama, keg_unitkerja, keg_start, keg_end, keg_jenis, keg_total_target, keg_target_satuan, keg_spj, keg_info, keg_dibuat_oleh, keg_diupdate_oleh, keg_dibuat_waktu, keg_diupdate_waktu
                  //keg_id	keg_nama	keg_unitkerja	keg_start	keg_end	keg_jenis	keg_total_target	keg_target_satuan	keg_spj	keg_info	keg_dibuat_oleh	keg_diupdate_oleh	created_at	updated_at
                  foreach ($keg_lama as $item_keg) {
@@ -170,6 +177,29 @@ class DataController extends Controller
                         'updated_at' => $item_spj_real->spj_d_diupdate_waktu
                     ];
                  }
+                 
+                 foreach ($user_lama as $item_user) {
+                    $kode_unit = UnitKerja::where('unit_kode','=',$item_user->user_unitkerja)->first();
+                    if ($kode_unit->unit_jenis == 1) {
+                        //provinsi
+                        $kodebps = '5200';
+                    }
+                    else 
+                    {
+                        $kodebps = substr($item_user->user_unitkerja,0,4);
+                    }
+                    $data_user[] = [
+                        'nama' => $item_user->user_nama,
+                        'password' => bcrypt($item_user->user_id),
+                        'email' => $item_user->user_email,
+                        'username' => $item_user->user_id,
+                        'kodeunit' => $item_user->user_unitkerja,
+                        'kodebps' => $kodebps,
+                        'aktif' => 1,
+                        'level' => 1,
+                    ];
+                 }
+                 
                  //dd($data_keg);
                  foreach (array_chunk($data_keg,1000) as $k)  
                     {
@@ -190,10 +220,14 @@ class DataController extends Controller
                     {
                         DB::table('m_spj_target')->insert($s); 
                     }
-                    foreach (array_chunk($data_spj_realisasi,1000) as $sr)  
-                    {
-                        DB::table('m_spj_realisasi')->insert($sr); 
-                    }
+                foreach (array_chunk($data_spj_realisasi,1000) as $sr)  
+                {
+                    DB::table('m_spj_realisasi')->insert($sr); 
+                }
+                foreach (array_chunk($data_user,1000) as $du)  
+                {
+                    DB::table('users')->insert($du); 
+                }
                  $pesan_error="data sudah di sinkronisasi";
                  $pesan_warna="success";
             }

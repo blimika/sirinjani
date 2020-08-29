@@ -73,6 +73,9 @@ class DatabaseSeeder extends Seeder
         array('nama'=>'Operator Distribusi', 'password'=>bcrypt('distribusi'),'email'=>'distribusi@bpsntb.id','username'=>'distribusi','kodeunit'=>'52540','kodebps'=>'5200','aktif'=>'1','level'=>'3','created_at'=>NOW(),'updated_at'=>NOW()),
         array('nama'=>'Operator NWAS', 'password'=>bcrypt('nwas'),'email'=>'nwas@bpsntb.id','username'=>'nwas','kodeunit'=>'52550','kodebps'=>'5200','aktif'=>'1','level'=>'3','created_at'=>NOW(),'updated_at'=>NOW()),
         array('nama'=>'Operator IPDS', 'password'=>bcrypt('ipds'),'email'=>'ipds@bpsntb.id','username'=>'ipds','kodeunit'=>'52560','kodebps'=>'5200','aktif'=>'1','level'=>'3','created_at'=>NOW(),'updated_at'=>NOW()),
+        array('nama'=>'Isna Zuriatina', 'password'=>bcrypt('isna'),'email'=>'isna@bps.go.id','username'=>'isna','kodeunit'=>'52520','kodebps'=>'5200','aktif'=>'1','level'=>'3','created_at'=>NOW(),'updated_at'=>NOW()),
+        array('nama'=>'Lukman', 'password'=>bcrypt('lukman'),'email'=>'lukman@bps.go.id','username'=>'lukman','kodeunit'=>'52710','kodebps'=>'5271','aktif'=>'1','level'=>'4','created_at'=>NOW(),'updated_at'=>NOW()),
+        array('nama'=>'Ni Nyoman Ratna', 'password'=>bcrypt('omang'),'email'=>'nyomanratna@bps.go.id','username'=>'omang','kodeunit'=>'52550','kodebps'=>'5200','aktif'=>'1','level'=>'3','created_at'=>NOW(),'updated_at'=>NOW()),
         ));
         //golongan
         DB::table('t_gol')->delete();

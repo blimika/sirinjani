@@ -72,6 +72,11 @@
                                 <td>{{$spj_realisasi_lama}}</td>
                                 <td>{{$spj_realisasi}}</td>
                             </tr>
+                            <tr>
+                                <td>User Pemantau</td>
+                                <td>{{$user_lama}}</td>
+                                <td>{{$data_user}}</td>
+                            </tr>
                             @if (Auth::user()->level == 9)
                             <tr>
                                 <td colspan="3" class="text-right">
