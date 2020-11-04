@@ -41,18 +41,39 @@ class KegiatanController extends Controller
         {
             $tahun_filter=date('Y');
         }
+        elseif (request('tahun')==0)
+        {
+            $tahun_filter=date('Y');
+        }
         else
         {
             $tahun_filter = request('tahun');
         }
+        if (request('bulan')==NULL)
+        {
+            $bulan_filter= (int) date('m');
+        }
+        elseif (request('bulan')==0)
+        {
+            $bulan_filter = NULL;
+        }
+        else
+        {
+            $bulan_filter = request('bulan');
+        }
+        //dd($bulan_filter);
         $dataUnit = UnitKerja::where([['unit_jenis','=','1'],['unit_eselon','=','3']])->get();
+        //dd($dataUnit);
         $dataKegiatan = Kegiatan::leftJoin('t_unitkerja','m_keg.keg_unitkerja','=','t_unitkerja.unit_kode')
-                        ->when(request('bulan'),function ($query){
-                            return $query->whereMonth('keg_start','=',request('bulan'));
+                        ->when(request('unit'),function ($query){
+                            return $query->where('t_unitkerja.unit_parent','=',request('unit'));
+                        })
+                        ->when($bulan_filter,function ($query) use ($bulan_filter){
+                            return $query->whereMonth('keg_start','=',$bulan_filter);
                         })
                         ->orderBy('m_keg.created_at','desc')->whereYear('keg_start','=',$tahun_filter)->get();
         //dd($dataKegiatan);
-        return view('kegiatan.index',['dataKeg'=>$dataKegiatan,'dataUnitkerja'=>$dataUnit,'bulan'=>request('bulan'),'tahun'=>$tahun_filter,'dataBulan'=>$data_bulan,'dataTahun'=>$data_tahun]);
+        return view('kegiatan.index',['dataKeg'=>$dataKegiatan,'dataUnitkerja'=>$dataUnit,'bulan'=>$bulan_filter,'tahun'=>$tahun_filter,'dataBulan'=>$data_bulan,'dataTahun'=>$data_tahun,'unit'=>request('unit')]);
     }
 
     public function bidang()
@@ -60,7 +81,6 @@ class KegiatanController extends Controller
         $data_bulan = array(
             1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'
         );
-        $data_bidang = 
         $data_tahun = DB::table('m_keg')
                     ->selectRaw('year(keg_start) as tahun')
                     ->groupBy('tahun')

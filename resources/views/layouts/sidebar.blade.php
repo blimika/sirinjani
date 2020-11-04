@@ -39,7 +39,7 @@
                     @endif
                 @endif
                 <li><a href="{{route('kegiatan.list')}}">Semua</a></li>
-                <li><a href="{{route('kegiatan.bidang')}}">Bidang/Bagian</a></li>
+                <!---<li><a href="{{route('kegiatan.bidang')}}">Bidang/Bagian</a></li>--->
             </ul>
         </li>
         <li> <a class="has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false"><i class="ti-palette"></i><span class="hide-menu">Peringkat dan Nilai</span></a>
