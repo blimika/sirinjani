@@ -56,10 +56,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/peringkat/bulanan', 'PeringkatController@bulanan')->name('peringkat.bulanan');
     Route::get('/peringkat/tahunan', 'PeringkatController@tahunan')->name('peringkat.tahunan');
     Route::get('/peringkat/rincian', 'PeringkatController@rincian')->name('peringkat.rincian');
+    Route::get('/peringkat/export', 'PeringkatController@ExportExcel')->name('peringkat.export');
     Route::get('/peringkat/ckp', 'PeringkatController@Ckp')->name('peringkat.ckp');
     Route::get('/laporan/bulanan', 'LaporanController@bulanan')->name('laporan.bulanan');
     Route::get('/laporan/tahunan', 'LaporanController@tahunan')->name('laporan.tahunan');
     Route::get('/db/list', 'DataController@index')->name('db.index');
     Route::get('/db/sinkron', 'DataController@Sinkron')->name('db.sinkron');
+    Route::get('/db/kosongkan', 'DataController@Kosongkan')->name('db.kosongkan');
 });
 Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout')->name('logout');

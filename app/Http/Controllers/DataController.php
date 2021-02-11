@@ -241,4 +241,53 @@ class DataController extends Controller
         Session::flash('message_type', $pesan_warna);
         return redirect()->route('db.index');
     }
+    public function KosongkanLama()
+    {
+        if (Auth::user()->level == 9)
+        {
+            //superadmin
+            $keg = Kegiatan::truncate();
+            $keg_target = KegTarget::truncate();
+            $keg_realisasi = KegRealisasi::truncate();
+            $spj_target = SpjTarget::truncate();
+            $spj_realisasi = SpjRealisasi::truncate();
+            $data_user = User::where('level','=','1')->delete();
+            $pesan_error="Data sudah dikosongkan";
+            $pesan_warna="success";
+        }
+        else 
+        {
+            $pesan_error="Anda tidak memiliki akses";
+            $pesan_warna="danger";
+        }
+       
+        Session::flash('message', $pesan_error);
+        Session::flash('message_type', $pesan_warna);
+        return redirect()->route('db.index');
+    }
+    public function Kosongkan()
+    {
+        
+        if (Auth::user()->level == 9)
+        {
+            $keg = Kegiatan::truncate();
+            $keg_target = KegTarget::truncate();
+            $keg_realisasi = KegRealisasi::truncate();
+            $spj_target = SpjTarget::truncate();
+            $spj_realisasi = SpjRealisasi::truncate();
+            $data_user = User::where('level','=','1')->delete();
+            $arr = array(
+                'status'=>true,
+                'hasil'=>'Data sudah dikosongkan'
+            );
+        }
+        else 
+        {
+            $arr = array(
+                'status'=>false,
+                'hasil'=>'Anda tidak memiliki akses'
+            );
+        }
+        return Response()->json($arr);
+    }
 }

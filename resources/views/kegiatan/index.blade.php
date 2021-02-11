@@ -75,9 +75,9 @@
                                    <tr>
                                        <td>{{$loop->iteration}}</td>
                                        <td>
-                                           <span class="text-info">{{$item->keg_nama}}</span>
-                                           <br />
-                                           <a href="{{route('kegiatan.detil',$item->keg_id)}}" class="btn btn-xs btn-rounded btn-warning waves-light waves-effect"><i class="fas fa-search"></i></a> 
+                                           <div class="text-info">
+                                            <a href="{{route('kegiatan.detil',$item->keg_id)}}" class="text-info">{{$item->keg_nama}}</a> 
+                                           </div>
                                            <small class="badge badge-success">{{$item->JenisKeg->jkeg_nama}}</small>
                                            <div class="progress m-t-10">
                                                <div class="progress-bar 

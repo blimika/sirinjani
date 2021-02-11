@@ -26,10 +26,8 @@
             </ul>
         </li>
         <li class="nav-small-cap">--- OPERATOR</li>
-        <li> <a class="has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false"><i class="icon-speedometer"></i><span class="hide-menu">Dashboard</a>
-            <ul aria-expanded="false" class="collapse">
-                <li><a href="{{url('')}}">Depan </a></li>
-            </ul>
+        <li> <a class="waves-effect waves-dark" href="{{url('')}}" aria-expanded="false"><i class="icon-speedometer"></i><span class="hide-menu">Dashboard</a>
+            
         </li>
         <li> <a class="has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false"><i class="ti-layout-grid2"></i><span class="hide-menu">Kegiatan</span></a>
             <ul aria-expanded="false" class="collapse">
@@ -60,7 +58,6 @@
         <li> <a class="has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false"><i class="ti-settings"></i><span class="hide-menu">Master</span></a>
             <ul aria-expanded="false" class="collapse">
                 <li><a href="{{route('pegawai.list')}}">Operator</a></li>
-                <li><a href="widget-apps.html">Unitkerja</a></li>
                 @if (Auth::user())
                     @if (Auth::user()->level == 9)
                     <li><a href="{{route('db.index')}}">Database</a></li>

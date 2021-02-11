@@ -80,9 +80,19 @@
     <div class="col-lg-12 col-sm-12 col-xs-12">
         <div class="card">
             <div class="card-body">
+                <div class="row" style="margin-bottom:20px;">
+                    <div class="col-lg-6">
+                        <a href="{{route('peringkat.export')}}" class="btn btn-success"><i class="fas fa-file-excel"></i> Export ke Excel</a>
+                    </div>
+                    <div class="col-lg-6">
+                        <h4 class="text-right">Total {{$dataRincian->count()}} Kegiatan</h4>
+                    </div>
+                </div>
+                   
                 <div class="table-responsive">
-                    <h4 class="card-title">Rincian Kegiatan Kabupaten/Kota {{$tahun}}</h4>
-                    <h4 class="float-right">Total {{$dataRincian->count()}} Kegiatan</h4>
+                    <h4 class="card-title">Rincian Kegiatan {{$unitnama}} @if ($bulan > 0) Bulan {{$dataBulan[$bulan]}} @else Tahun @endif {{$tahun}}</h4>
+                    
+                    
                     <table class="table color-bordered-table success-bordered-table table-striped table-bordered">
                         <thead>
                             <tr>

@@ -80,6 +80,7 @@
                             @if (Auth::user()->level == 9)
                             <tr>
                                 <td colspan="3" class="text-right">
+                                    <button class="btn btn-danger btnkosongkan" data-toggle="tooltip" title="Kosongkan Database">KOSONGKAN</button>
                                     <a href="{{route('db.sinkron')}}" class="btn btn-info">SINKRON</a>
                                 </td>
                             </tr>
@@ -106,5 +107,6 @@
 @section('js')
    
     <!-- Sweet-Alert  -->
-    <script src="{{asset('assets/node_modules/sweetalert2/dist/sweetalert2.all.min.js')}}"></script>    
+    <script src="{{asset('assets/node_modules/sweetalert2/dist/sweetalert2.all.min.js')}}"></script>  
+    @include('db.js')  
 @endsection

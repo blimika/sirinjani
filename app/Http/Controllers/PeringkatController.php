@@ -162,6 +162,7 @@ class PeringkatController extends Controller
         {
             $unit_filter = request('unit');
         }
+        $unit_nama = UnitKerja::where('unit_kode',$unit_filter)->first();
         $data = DB::table('m_keg')
                 ->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
                 ->leftJoin(DB::raw("(select unit_kode as unit_kode_prov, unit_nama as unit_nama_prov, unit_parent as unit_parent_prov from t_unitkerja where unit_jenis='1') as unit_prov"),'m_keg.keg_unitkerja','=','unit_prov.unit_kode_prov')
@@ -177,6 +178,78 @@ class PeringkatController extends Controller
 				->orderBy('keg_end','asc')
                 ->get();
         //dd($data);
-        return view('peringkat.rincian',['dataUnitkerja'=>$dataUnit,'unit'=>$unit_filter,'dataBulan'=>$data_bulan,'dataTahun'=>$data_tahun,'tahun'=>$tahun_filter,'dataRincian'=>$data,'bulan'=>$bulan_filter]);
+        return view('peringkat.rincian',['dataUnitkerja'=>$dataUnit,'unit'=>$unit_filter,'unitnama'=>$unit_nama->unit_nama,'dataBulan'=>$data_bulan,'dataTahun'=>$data_tahun,'tahun'=>$tahun_filter,'dataRincian'=>$data,'bulan'=>$bulan_filter]);
+    }
+    public function ExportExcel()
+    {
+        $data_bulan = array(
+            1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'
+        );
+        $dataUnit = UnitKerja::where([['unit_jenis','=','2'],['unit_eselon','=','3']])->get();
+        $unitFilter = $dataUnit->first();
+        $data_tahun = DB::table('m_keg')
+        ->selectRaw('year(keg_end) as tahun')
+        ->groupBy('tahun')
+        ->whereYear('keg_end','<=',NOW())
+        ->orderBy('tahun','asc')
+          ->get();
+        if (request('bulan')<0)
+        {
+            $bulan_filter=date('m');
+        }
+        else
+        {
+            $bulan_filter = request('bulan');
+        }
+        if (request('tahun')<=0)
+        {
+            $tahun_filter=date('Y');
+        }
+        else
+        {
+            $tahun_filter = request('tahun');
+        }
+        if (request('unit')<=0)
+        {
+            $unit_filter = $unitFilter->unit_kode;
+        }
+        else
+        {
+            $unit_filter = request('unit');
+        }
+        $unit_nama = UnitKerja::where('unit_kode',$unit_filter)->first();
+        $data = DB::table('m_keg')
+                ->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
+                ->leftJoin(DB::raw("(select unit_kode as unit_kode_prov, unit_nama as unit_nama_prov, unit_parent as unit_parent_prov from t_unitkerja where unit_jenis='1') as unit_prov"),'m_keg.keg_unitkerja','=','unit_prov.unit_kode_prov')
+                ->leftJoin(DB::raw("(select unit_kode as unit_kode_parent, unit_nama as unit_nama_parent from t_unitkerja where unit_jenis='1' and unit_eselon='3') as unit_parent"),'unit_prov.unit_parent_prov','=','unit_parent.unit_kode_parent')
+                ->leftJoin('t_unitkerja','m_keg_target.keg_t_unitkerja','=','t_unitkerja.unit_kode')
+                ->when(request('bulan'),function ($query){
+                    return $query->whereMonth('m_keg.keg_end','=',request('bulan'));
+                })
+				->whereYear('m_keg.keg_end','=',$tahun_filter)
+                ->where('m_keg_target.keg_t_target','>','0')
+                ->where('m_keg_target.keg_t_unitkerja','=',$unit_filter)
+				->select(DB::raw("m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, month(m_keg.keg_end) as bulan_keg,m_keg.keg_id, m_keg.keg_nama, unit_kode_prov, unit_nama_prov, unit_kode_parent, unit_nama_parent, keg_end, m_keg_target.keg_t_target,m_keg_target.keg_t_point"))
+				->orderBy('keg_end','asc')
+                ->get()->toArray();
+        dd($data);
+        foreach ($DataAnggaran as $item) {
+            $anggaran_array[] = array(
+                'ANGGARAN ID' => $item->id,
+                'TAHUN ANGGARAN' => $item->tahun_anggaran,
+                'MAK' => $item->mak,
+                'URAIAN' => $item->uraian,
+                'PAGU UTAMA' => $item->pagu_utama,
+                'RENCANA PAGU' => $item->rencana_pagu,
+                'REALISASI PAGU' => $item->realisasi_pagu,
+                'SM UNITKERJA' => "[" . $item->unit_kode . "] " . $item->unit_nama,
+                'TURUNAN ID' => "",
+                'PAGU AWAL' => "",
+                'PAGU RENCANA' => "",
+                'PAGU REALISASI' => "",
+                'TURUNAN UNITKERJA' => ""
+            );
+           
+        }
     }
 }
