@@ -65,7 +65,7 @@
                                      @endforeach
                                     </select>
                                 </div>
-                                
+
                                 <div class="col-md-2">
                                     <button type="submit" class="btn btn-success">Filter</button>
                                 </div>
@@ -82,24 +82,24 @@
             <div class="card-body">
                 <div class="row" style="margin-bottom:20px;">
                     <div class="col-lg-6">
-                        <a href="{{route('peringkat.export')}}" class="btn btn-success"><i class="fas fa-file-excel"></i> Export ke Excel</a>
+                        <a href="{{route('peringkat.export',["$unit","$bulan","$tahun"])}}" class="btn btn-success"><i class="fas fa-file-excel"></i> Export ke Excel</a>
                     </div>
                     <div class="col-lg-6">
                         <h4 class="text-right">Total {{$dataRincian->count()}} Kegiatan</h4>
                     </div>
                 </div>
-                   
+
                 <div class="table-responsive">
                     <h4 class="card-title">Rincian Kegiatan {{$unitnama}} @if ($bulan > 0) Bulan {{$dataBulan[$bulan]}} @else Tahun @endif {{$tahun}}</h4>
-                    
-                    
-                    <table class="table color-bordered-table success-bordered-table table-striped table-bordered">
+                    <table class="table color-bordered-table success-bordered-table hover-table">
                         <thead>
                             <tr>
                                 <th>Bulan</th>
                                 <th>Kegiatan</th>
+                                <th width="10%">Tgl Mulai</th>
                                 <th width="10%">Tgl Berakhir</th>
                                 <th width="4%">Target</th>
+                                <th width="4%">Realisasi</th>
                                 <th width="4%">Nilai</th>
                             </tr>
                         </thead>
@@ -108,21 +108,38 @@
                                 @foreach ($dataRincian->where('bulan_keg','=',$i) as $item)
                                     @if ($loop->first)
                                     <tr>
-                                        <td rowspan="{{$dataRincian->where('bulan_keg','=',$i)->count()+1}}">{{$dataBulan[$i]}}</td>
-                                        <td><a href="{{route('kegiatan.detil',$item->keg_id)}}" class="text-info">{{$item->keg_nama}}</a></td>
+                                        <td rowspan="{{$dataRincian->where('bulan_keg','=',$i)->count()}}">{{$dataBulan[$i]}}</td>
+                                        <td><a href="{{route('kegiatan.detil',$item->keg_id)}}" class="text-info">{{$loop->iteration}}. {{$item->keg_nama}}</a></td>
+                                        <td align="right">{{Tanggal::Pendek($item->keg_start)}}</td>
                                         <td align="right">{{Tanggal::Pendek($item->keg_end)}}</td>
                                         <td align="right">{{$item->keg_t_target}}</td>
-                                        <td align="right">{{$item->keg_t_point}}</td>
+                                        <td align="right">
+                                            @if ($item->jumlah_realisasi)
+                                            {{$item->jumlah_realisasi}}
+                                            @else
+                                             0
+                                            @endif
+                                        </td>
+                                        <td align="right" @if ((float) $item->keg_t_point < 3) bgcolor="red" style="color:white;" @else bgcolor="green" style="color:white;" @endif>{{$item->keg_t_point}}</td>
+                                    </tr>
+                                    @else
+                                    <tr>
+                                        <td><a href="{{route('kegiatan.detil',$item->keg_id)}}" class="text-info">{{$loop->iteration}}. {{$item->keg_nama}}</a></td>
+                                        <td align="right">{{Tanggal::Pendek($item->keg_start)}}</td>
+                                        <td align="right">{{Tanggal::Pendek($item->keg_end)}}</td>
+                                        <td align="right">{{$item->keg_t_target}}</td>
+                                        <td align="right">
+                                            @if ($item->jumlah_realisasi)
+                                            {{$item->jumlah_realisasi}}
+                                            @else
+                                             0
+                                            @endif
+                                        </td>
+                                        <td align="right" @if ((float) $item->keg_t_point < 3) bgcolor="red" style="color:white;" @else bgcolor="green" style="color:white;" @endif>{{$item->keg_t_point}}</td>
                                     </tr>
                                     @endif
-                                    <tr>
-                                        <td><a href="{{route('kegiatan.detil',$item->keg_id)}}" class="text-info">{{$item->keg_nama}}</a></td>
-                                        <td align="right">{{Tanggal::Pendek($item->keg_end)}}</td>
-                                        <td align="right">{{$item->keg_t_target}}</td>
-                                        <td align="right">{{$item->keg_t_point}}</td>
-                                    </tr>
                                 @endforeach
-                            @endfor                            
+                            @endfor
                         </tbody>
                     </table>
                 </div>
@@ -168,7 +185,7 @@
                 ],
                 "displayLength": 30,
                 responsive: true
-                
+
             });
             $('.buttons-copy, .buttons-csv, .buttons-print, .buttons-pdf, .buttons-excel').addClass('btn btn-primary mr-1');
         });
@@ -183,5 +200,5 @@
     <script src="{{asset('dist/grafik/export-data.js')}}"></script>
     <script src="{{asset('dist/grafik/series-label.js')}}"></script>
     <script src="{{asset('dist/grafik/accessibility.js')}}"></script>
-    
+
 @endsection

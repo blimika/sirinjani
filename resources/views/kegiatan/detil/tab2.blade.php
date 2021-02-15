@@ -4,20 +4,20 @@
     <table class="table table-striped table-hover" >
         <thead>
         <tr>
-            <th class="text-center" rowspan="2">No</th>
-            <th class="text-center" rowspan="2">Unit Kerja</th>
-            <th class="text-center" rowspan="2">Target</th>
-            <th class="text-center" colspan="3">Pengiriman</th>
-            <th class="text-center" colspan="3">Penerimaan</th>
-            <th class="text-center" rowspan="2">Nilai</th>
+            <th class="text-center" rowspan="2" style="background-color:#cecece;vertical-align:middle;">No</th>
+            <th class="text-center" rowspan="2" style="background-color:#cecece;vertical-align:middle;">Unit Kerja</th>
+            <th class="text-center" rowspan="2" style="background-color:#cecece;vertical-align:middle;">Target</th>
+            <th class="text-center" colspan="3" style="background-color:#ccffcc;vertical-align:bottom;border-bottom:1px solid #cecece;">Pengiriman</th>
+            <th class="text-center" colspan="3" style="background-color:#99ffcc;vertical-align:bottom;border-bottom:1px solid #cecece;">Penerimaan</th>
+            <th class="text-center" rowspan="2" style="background-color:#66ff99;vertical-align:middle;">Nilai</th>
         </tr>
         <tr>
-            <th class="text-center">Rincian</th>
-            <th class="text-center">RR (%)</th>
-            <th class="text-center">&nbsp;</th>
-            <th class="text-center">Rincian</th>
-            <th class="text-center">RR (%)</th>
-            <th class="text-center">&nbsp;</th>
+            <th class="text-center" style="background-color:#ccffcc;vertical-align:bottom;">Rincian</th>
+            <th class="text-center" style="background-color:#ccffcc;vertical-align:bottom;">RR (%)</th>
+            <th class="text-center" style="background-color:#ccffcc;vertical-align:bottom;">&nbsp;</th>
+            <th class="text-center" style="background-color:#99ffcc;vertical-align:bottom;">Rincian</th>
+            <th class="text-center" style="background-color:#99ffcc;vertical-align:bottom;">RR (%)</th>
+            <th class="text-center" style="background-color:#99ffcc;vertical-align:bottom;">&nbsp;</th>
         </tr>
         </thead>
         <tbody>
@@ -40,11 +40,11 @@
                                      <!--hapus realiasi-->
                                      <button class="btn btn-danger btn-xs hapuskirim" data-kegrid="{{$r->keg_r_id}}" data-nama="konfirmasi pengiriman oleh {{$item->Unitkerja->unit_nama}} tanggal {{Tanggal::Pendek($r->keg_r_tgl)}}">
                                          <i class="fas fa-trash" data-toggle="tooltip" title="Hapus konfirmasi pengiriman tanggal {{Tanggal::Pendek($r->keg_r_tgl)}}"></i>
-                                     </button> 
+                                     </button>
                                      <!--batas hapus realisasi-->
-                                     | 
+                                     |
                                     @endif
-                                     <span class="badge badge-pill badge-primary" data-toggle="tooltip" title="Tanggal konfirmasi pengiriman">{{Tanggal::Pendek($r->keg_r_tgl)}}</span> 
+                                     <span class="badge badge-pill badge-primary" data-toggle="tooltip" title="Tanggal konfirmasi pengiriman">{{Tanggal::Pendek($r->keg_r_tgl)}}</span>
                                      | <span class="badge badge-pill badge-success" data-toggle="tooltip" title="Jumlah dikirim">{{$r->keg_r_jumlah}}</span>
                                      | <span class="badge badge-pill badge-warning" data-toggle="tooltip" title="Keterangan konfirmasi pengiriman">{{$r->keg_r_ket}}</span>
                                      @if ($r->keg_r_link != null)
@@ -59,16 +59,16 @@
                         <!---RR pengiriman--->
                         @if (($dataKegiatan->RealisasiKirim->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100 > 85)
                         <div class="badge badge-pill badge-success float-right">
-                            {{number_format(($dataKegiatan->RealisasiKirim->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100,2,",",".")}}%    
+                            {{number_format(($dataKegiatan->RealisasiKirim->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100,2,",",".")}}%
                         </div>
                         @elseif(($dataKegiatan->RealisasiKirim->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100 > 70)
                         <div class="badge badge-pill badge-warning float-right">
-                            {{number_format(($dataKegiatan->RealisasiKirim->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100,2,",",".")}}%    
+                            {{number_format(($dataKegiatan->RealisasiKirim->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100,2,",",".")}}%
                         </div>
-                        @else 
+                        @else
                         <div class="badge badge-pill badge-danger float-right">
-                            {{number_format(($dataKegiatan->RealisasiKirim->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100,2,",",".")}}%    
-                        </div> 
+                            {{number_format(($dataKegiatan->RealisasiKirim->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100,2,",",".")}}%
+                        </div>
                         @endif
                     </td>
                     <td>
@@ -92,11 +92,11 @@
                                      <!--hapus realiasi-->
                                      <button class="btn btn-danger btn-xs hapusterima" data-kegrid="{{$r->keg_r_id}}" data-nama="konfirmasi penerimaan oleh {{$item->Unitkerja->unit_nama}} tanggal {{Tanggal::Pendek($r->keg_r_tgl)}}">
                                          <i class="fas fa-trash" data-toggle="tooltip" title="Hapus konfirmasi penerimaan tanggal {{Tanggal::Pendek($r->keg_r_tgl)}}"></i>
-                                     </button> 
+                                     </button>
                                      <!--batas hapus realisasi-->
-                                     | 
+                                     |
                                      @endif
-                                     <span class="badge badge-pill badge-info" data-toggle="tooltip" title="Tanggal konfirmasi penerimaan">{{Tanggal::Pendek($r->keg_r_tgl)}}</span> 
+                                     <span class="badge badge-pill badge-info" data-toggle="tooltip" title="Tanggal konfirmasi penerimaan">{{Tanggal::Pendek($r->keg_r_tgl)}}</span>
                                      | <span class="badge badge-pill badge-success" data-toggle="tooltip" title="Jumlah diterima">{{$r->keg_r_jumlah}}</span>
                                      | <span class="badge badge-pill badge-warning" data-toggle="tooltip" title="Keterangan konfirmasi penerimaan">{{$r->keg_r_ket}}</span>
                                 </div>
@@ -108,16 +108,16 @@
                         <!--RR Penerimaan-->
                         @if (($dataKegiatan->RealisasiTerima->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100 > 85)
                         <div class="badge badge-pill badge-success float-right">
-                            {{number_format(($dataKegiatan->RealisasiTerima->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100,2,",",".")}}%    
+                            {{number_format(($dataKegiatan->RealisasiTerima->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100,2,",",".")}}%
                         </div>
                         @elseif(($dataKegiatan->RealisasiTerima->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100 > 70)
                         <div class="badge badge-pill badge-warning float-right">
-                            {{number_format(($dataKegiatan->RealisasiTerima->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100,2,",",".")}}%    
+                            {{number_format(($dataKegiatan->RealisasiTerima->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100,2,",",".")}}%
                         </div>
-                        @else 
+                        @else
                         <div class="badge badge-pill badge-danger float-right">
-                            {{number_format(($dataKegiatan->RealisasiTerima->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100,2,",",".")}}%    
-                        </div> 
+                            {{number_format(($dataKegiatan->RealisasiTerima->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100,2,",",".")}}%
+                        </div>
                         @endif
                         <!--Batas RR Penerimaan-->
                     </td>
@@ -132,11 +132,11 @@
                 </tr>
             @endforeach
             <tr>
-                <td></td>
-                <td>Total</td>
-                <td class="text-center">{{$dataKegiatan->Target->sum('keg_t_target')}}</td>
-                <td class="text-center">{{$dataKegiatan->RealisasiKirim->sum('keg_r_jumlah')}}</td>
-                <td>
+                <td style="background-color:#cecece;vertical-align:middle;">&nbsp;</td>
+                <td style="background-color:#cecece;vertical-align:middle;"><strong>Total</strong></td>
+                <td class="text-center" style="background-color:#cecece;vertical-align:middle;"><strong>{{$dataKegiatan->Target->sum('keg_t_target')}}</strong></td>
+                <td class="text-center" style="background-color:#ccffcc;vertical-align:bottom;"><strong>{{$dataKegiatan->RealisasiKirim->sum('keg_r_jumlah')}}</strong></td>
+                <td style="background-color:#ccffcc;vertical-align:bottom;"><strong>
                     <!--RR Total pengiriman-->
                     @if (($dataKegiatan->RealisasiKirim->sum('keg_r_jumlah')/$dataKegiatan->Target->sum('keg_t_target'))*100 > 85)
                         <div class="badge badge-pill badge-success float-right">
@@ -146,16 +146,20 @@
                         <div class="badge badge-pill badge-warning float-right">
                             {{number_format(($dataKegiatan->RealisasiKirim->sum('keg_r_jumlah')/$dataKegiatan->Target->sum('keg_t_target'))*100,2,",",".")}}%
                         </div>
-                    @else 
+                    @else
                         <div class="badge badge-pill badge-danger float-right">
                             {{number_format(($dataKegiatan->RealisasiKirim->sum('keg_r_jumlah')/$dataKegiatan->Target->sum('keg_t_target'))*100,2,",",".")}}%
                         </div>
                     @endif
                     <!--batas RR Total pengiriman-->
+                    </strong>
                 </td>
-                <td></td>
-                <td class="text-center">{{$dataKegiatan->RealisasiTerima->sum('keg_r_jumlah')}}</td>
-                <td>
+                <td style="background-color:#ccffcc;vertical-align:bottom;">&nbsp;</td>
+                <td class="text-center" style="background-color:#99ffcc;vertical-align:bottom;">
+                    <b>{{$dataKegiatan->RealisasiTerima->sum('keg_r_jumlah')}}</b>
+                </td>
+                <td style="background-color:#99ffcc;vertical-align:bottom;">
+                    <b>
                     <!--RR Total penerimaan-->
                     @if (($dataKegiatan->RealisasiTerima->sum('keg_r_jumlah')/$dataKegiatan->Target->sum('keg_t_target'))*100 > 85)
                     <div class="badge badge-pill badge-success float-right">
@@ -165,15 +169,16 @@
                     <div class="badge badge-pill badge-warning float-right">
                         {{number_format(($dataKegiatan->RealisasiTerima->sum('keg_r_jumlah')/$dataKegiatan->Target->sum('keg_t_target'))*100,2,",",".")}}%
                     </div>
-                @else 
+                @else
                     <div class="badge badge-pill badge-danger float-right">
                         {{number_format(($dataKegiatan->RealisasiTerima->sum('keg_r_jumlah')/$dataKegiatan->Target->sum('keg_t_target'))*100,2,",",".")}}%
                     </div>
                 @endif
                     <!--batas RR Total penerimaan-->
+                    </b>
                 </td>
-                <td></td>
-                <td></td>
+                <td style="background-color:#99ffcc;vertical-align:bottom;">&nbsp;</td>
+                <td style="background-color:#66ff99;vertical-align:middle;">&nbsp;</td>
             </tr>
         </tbody>
     </table>

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use DB;
 use App\UnitKerja;
+use App\Exports\FormatViewExim;
+use Excel;
 
 class PeringkatController extends Controller
 {
@@ -138,9 +140,9 @@ class PeringkatController extends Controller
         ->whereYear('keg_end','<=',NOW())
         ->orderBy('tahun','asc')
           ->get();
-        if (request('bulan')<0)
+        if (request('bulan')<=0)
         {
-            $bulan_filter=date('m');
+            $bulan_filter=(int) date('m');
         }
         else
         {
@@ -165,91 +167,61 @@ class PeringkatController extends Controller
         $unit_nama = UnitKerja::where('unit_kode',$unit_filter)->first();
         $data = DB::table('m_keg')
                 ->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
+                ->leftJoin(DB::raw("(select keg_id, keg_r_unitkerja, sum(keg_r_jumlah) as jumlah_realisasi from m_keg_realisasi where keg_r_unitkerja='".$unit_filter."' and keg_r_jenis='1' group by keg_id) as realisasi"),'m_keg.keg_id','=','realisasi.keg_id')
                 ->leftJoin(DB::raw("(select unit_kode as unit_kode_prov, unit_nama as unit_nama_prov, unit_parent as unit_parent_prov from t_unitkerja where unit_jenis='1') as unit_prov"),'m_keg.keg_unitkerja','=','unit_prov.unit_kode_prov')
                 ->leftJoin(DB::raw("(select unit_kode as unit_kode_parent, unit_nama as unit_nama_parent from t_unitkerja where unit_jenis='1' and unit_eselon='3') as unit_parent"),'unit_prov.unit_parent_prov','=','unit_parent.unit_kode_parent')
                 ->leftJoin('t_unitkerja','m_keg_target.keg_t_unitkerja','=','t_unitkerja.unit_kode')
-                ->when(request('bulan'),function ($query){
-                    return $query->whereMonth('m_keg.keg_end','=',request('bulan'));
+                ->when($bulan_filter,function ($query) use ($bulan_filter) {
+                    return $query->whereMonth('m_keg.keg_end','=',$bulan_filter);
                 })
 				->whereYear('m_keg.keg_end','=',$tahun_filter)
                 ->where('m_keg_target.keg_t_target','>','0')
                 ->where('m_keg_target.keg_t_unitkerja','=',$unit_filter)
-				->select(DB::raw("m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, month(m_keg.keg_end) as bulan_keg,m_keg.keg_id, m_keg.keg_nama, unit_kode_prov, unit_nama_prov, unit_kode_parent, unit_nama_parent, keg_end, m_keg_target.keg_t_target,m_keg_target.keg_t_point"))
+				->select(DB::raw("m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, month(m_keg.keg_end) as bulan_keg,m_keg.keg_id, m_keg.keg_nama, unit_kode_prov, unit_nama_prov, unit_kode_parent, unit_nama_parent, keg_start, keg_end, m_keg_target.keg_t_target, realisasi.jumlah_realisasi, m_keg_target.keg_t_point"))
 				->orderBy('keg_end','asc')
                 ->get();
         //dd($data);
         return view('peringkat.rincian',['dataUnitkerja'=>$dataUnit,'unit'=>$unit_filter,'unitnama'=>$unit_nama->unit_nama,'dataBulan'=>$data_bulan,'dataTahun'=>$data_tahun,'tahun'=>$tahun_filter,'dataRincian'=>$data,'bulan'=>$bulan_filter]);
     }
-    public function ExportExcel()
+    public function ExportExcel($unitkerja,$bulan,$tahun)
     {
         $data_bulan = array(
             1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'
         );
-        $dataUnit = UnitKerja::where([['unit_jenis','=','2'],['unit_eselon','=','3']])->get();
-        $unitFilter = $dataUnit->first();
-        $data_tahun = DB::table('m_keg')
-        ->selectRaw('year(keg_end) as tahun')
-        ->groupBy('tahun')
-        ->whereYear('keg_end','<=',NOW())
-        ->orderBy('tahun','asc')
-          ->get();
-        if (request('bulan')<0)
-        {
-            $bulan_filter=date('m');
-        }
-        else
-        {
-            $bulan_filter = request('bulan');
-        }
-        if (request('tahun')<=0)
-        {
-            $tahun_filter=date('Y');
-        }
-        else
-        {
-            $tahun_filter = request('tahun');
-        }
-        if (request('unit')<=0)
-        {
-            $unit_filter = $unitFilter->unit_kode;
-        }
-        else
-        {
-            $unit_filter = request('unit');
-        }
-        $unit_nama = UnitKerja::where('unit_kode',$unit_filter)->first();
+        $unit_nama = UnitKerja::where('unit_kode',$unitkerja)->first();
         $data = DB::table('m_keg')
                 ->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
+                ->leftJoin(DB::raw("(select keg_id, keg_r_unitkerja, sum(keg_r_jumlah) as jumlah_realisasi from m_keg_realisasi where keg_r_unitkerja='".$unitkerja."' and keg_r_jenis='1' group by keg_id) as realisasi"),'m_keg.keg_id','=','realisasi.keg_id')
                 ->leftJoin(DB::raw("(select unit_kode as unit_kode_prov, unit_nama as unit_nama_prov, unit_parent as unit_parent_prov from t_unitkerja where unit_jenis='1') as unit_prov"),'m_keg.keg_unitkerja','=','unit_prov.unit_kode_prov')
                 ->leftJoin(DB::raw("(select unit_kode as unit_kode_parent, unit_nama as unit_nama_parent from t_unitkerja where unit_jenis='1' and unit_eselon='3') as unit_parent"),'unit_prov.unit_parent_prov','=','unit_parent.unit_kode_parent')
                 ->leftJoin('t_unitkerja','m_keg_target.keg_t_unitkerja','=','t_unitkerja.unit_kode')
-                ->when(request('bulan'),function ($query){
-                    return $query->whereMonth('m_keg.keg_end','=',request('bulan'));
+                ->when($bulan,function ($query) use ($bulan){
+                    return $query->whereMonth('m_keg.keg_end','=',$bulan);
                 })
-				->whereYear('m_keg.keg_end','=',$tahun_filter)
+				->whereYear('m_keg.keg_end','=',$tahun)
                 ->where('m_keg_target.keg_t_target','>','0')
-                ->where('m_keg_target.keg_t_unitkerja','=',$unit_filter)
-				->select(DB::raw("m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, month(m_keg.keg_end) as bulan_keg,m_keg.keg_id, m_keg.keg_nama, unit_kode_prov, unit_nama_prov, unit_kode_parent, unit_nama_parent, keg_end, m_keg_target.keg_t_target,m_keg_target.keg_t_point"))
+                ->where('m_keg_target.keg_t_unitkerja','=',$unitkerja)
+				->select(DB::raw("m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, month(m_keg.keg_end) as bulan_keg, year(m_keg.keg_end) as tahun_keg,m_keg.keg_id, m_keg.keg_nama, unit_kode_prov, unit_nama_prov, unit_kode_parent, unit_nama_parent, keg_start, keg_end, m_keg_target.keg_t_target, realisasi.jumlah_realisasi, m_keg_target.keg_t_point"))
 				->orderBy('keg_end','asc')
                 ->get()->toArray();
-        dd($data);
-        foreach ($DataAnggaran as $item) {
-            $anggaran_array[] = array(
-                'ANGGARAN ID' => $item->id,
-                'TAHUN ANGGARAN' => $item->tahun_anggaran,
-                'MAK' => $item->mak,
-                'URAIAN' => $item->uraian,
-                'PAGU UTAMA' => $item->pagu_utama,
-                'RENCANA PAGU' => $item->rencana_pagu,
-                'REALISASI PAGU' => $item->realisasi_pagu,
-                'SM UNITKERJA' => "[" . $item->unit_kode . "] " . $item->unit_nama,
-                'TURUNAN ID' => "",
-                'PAGU AWAL' => "",
-                'PAGU RENCANA' => "",
-                'PAGU REALISASI' => "",
-                'TURUNAN UNITKERJA' => ""
+        //dd($data);
+        foreach ($data as $item) {
+            $rincian_array[] = array(
+                'BPS KABKOTA' => $item->unit_nama,
+                'BULAN' => $data_bulan[$item->bulan_keg],
+                'TAHUN' => $item->tahun_keg,
+                'KEG_ID' => $item->keg_id,
+                'KEGIATAN' => $item->keg_nama,
+                'TANGGAL MULAI' => $item->keg_start,
+                'TANGGAL BERAKHIR' => $item->keg_end,
+                'TARGET' => $item->keg_t_target,
+                'REALISASI' => $item->jumlah_realisasi,
+                'NILAI' => $item->keg_t_point
             );
-           
         }
+        $fileName = 'rincian-kegiatan-kabkota-';
+        $namafile = $fileName . date('Y-m-d_H-i-s') . '.xlsx';
+        //dd($anggaran_array);
+        return Excel::download(new FormatViewExim($rincian_array), $namafile);
     }
 }
