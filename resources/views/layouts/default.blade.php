@@ -60,7 +60,7 @@
                         <!-- Logo text --><span class="hidden-sm-down">
                          <!-- dark Logo text -->
                          <img src="{{asset('assets/images/logo-text.png')}}" alt="homepage" class="dark-logo" />
-                         <!-- Light Logo text -->    
+                         <!-- Light Logo text -->
                          <img src="{{asset('assets/images/logo-light-text.png')}}" class="light-logo" alt="homepage" /></span> </a>
                 </div>
                 <!-- ============================================================== -->
@@ -101,9 +101,9 @@
                         </li>
                         <!-- ============================================================== -->
                         <!-- End Comment -->
-                        <!-- ============================================================== -->                        
+                        <!-- ============================================================== -->
                         @include('layouts.menuprofiles')
-                       
+
                     </ul>
                 </div>
             </nav>
@@ -133,7 +133,7 @@
             <!-- ============================================================== -->
             <div class="container-fluid">
                 @yield('konten')
-                
+
             </div>
             <!-- ============================================================== -->
             <!-- End Container fluid  -->
@@ -147,6 +147,7 @@
         <!-- ============================================================== -->
         <footer class="footer">
             &copy; 2017 - {{date('Y')}} Bidang IPDS BPS Provinsi NTB
+            <span class="font-weight-bold float-right text-danger"><b>Si<span class="text-success">Rinjani</span></b> <span class="text-dark font-weight-normal">v2.0</span></span>
         </footer>
         <!-- ============================================================== -->
         <!-- End footer -->

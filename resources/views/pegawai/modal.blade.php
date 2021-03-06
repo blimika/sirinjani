@@ -1,61 +1,14 @@
-<!-- modal sync -->
-<div id="SyncDataModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Sync data Community</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            </div>
-            <div class="modal-body">
-                <!--isi modal-->
-                <form class="m-t-10" name="formSyncData" method="post" action="{{route('pegawai.sync')}}">
-                 @csrf
-                 <div class="form-group">
-                    <label for="wilayah">Wilayah</label>
-                    <div class="controls">
-                    <select class="form-control" name="wilayah" id="wilayah" required>
-                        <option value="">Pilih Wilayah</option>
-                        @foreach ($dataWilayah as $item)
-                            <option value="{{$item->bps_kode}}">{{$item->bps_nama}}</option>
-                        @endforeach
-                    </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="peg_username">Username Community</label>
-                    <div class="controls">
-                    <input type="text" class="form-control" id="peg_username" name="peg_username" placeholder="Username" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="peg_password">Password Community</label>
-                    <div class="controls">
-                    <input type="password" class="form-control" id="peg_password" name="peg_password" placeholder="Password" required>
-                    </div>
-                </div>
-                
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary waves-effect" data-dismiss="modal">CLOSE</button>
-                <button type="submit" class="btn btn-success waves-effect waves-light" >SYNC</button>
-            </div>
-        </form>
-        </div>
-    </div>
-</div>
-<!-- /.sync -->
-
 <!-- modal detil -->
 <div id="DetilModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Detil Pegawai</h4>
+                <h4 class="modal-title">Detil Operator</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
             </div>
             <div class="modal-body">
                 <!--isi modal-->
-                <center class="m-t-30"> <img src="" id="profil" class="img-circle" width="150px" height="150px" />
+                <center class="m-t-30">
                     <h3 class="card-title m-t-10" id="nama"></h3>
                     <h6 class="card-subtitle">(<span id="username"></span>)</h6>
                     <h5 class="card-title m-t-10" id="level"></h5>
@@ -67,20 +20,20 @@
                 </center>
                 <div>
                     <hr> </div>
-                <div class="card-body"> 
+                <div class="card-body">
                     <small class="text-muted">Alamat E-mail </small>
-                    <h6 id="email"></h6> 
+                    <h6 id="email"></h6>
                     <small class="text-muted p-t-30 db">Akses akun</small>
-                    <h6 id="akses"></h6> 
+                    <h6 id="akses"></h6>
                     <small class="text-muted p-t-30 db">Status akun</small>
                     <h6 id="status"></h6>
                     <small class="text-muted p-t-30 db">Last IP</small>
                     <h6 id="lastip"></h6>
                     <small class="text-muted p-t-30 db">Last login</small>
                     <h6 id="lastlogin"></h6>
-                   
+
                 </div>
-                
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary waves-effect" data-dismiss="modal">CLOSE</button>
@@ -139,12 +92,12 @@
                     </div>
                     </div>
                </div>
-               
+
                <div class="modal-footer">
                    <button type="button" class="btn btn-primary waves-effect" data-dismiss="modal">CLOSE</button>
                    <button type="submit" class="btn btn-success waves-effect waves-light">UPDATE</button>
                </div>
-               
+
            </form>
         </div>
     </div>
@@ -165,7 +118,7 @@
                 @csrf
                 <input type="hidden" name="peg_id" id="peg_id" value="" />
                 @include('pegawai.formedit')
-                
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary waves-effect" data-dismiss="modal">CLOSE</button>
@@ -182,7 +135,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Tambah Lokal Operator</h4>
+                <h4 class="modal-title">Tambah Operator</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
             </div>
             <div class="modal-body">
@@ -190,7 +143,7 @@
                 <form class="m-t-10" name="formTambahOperator" method="post" action="{{route('pegawai.simpan')}}">
                  @csrf
                  @include('pegawai.formopt')
-                
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary waves-effect" data-dismiss="modal">CLOSE</button>

@@ -20,7 +20,7 @@
 <div class="row">
     <div class="col-lg-12 col-sm-12">
         @if (Session::has('message'))
-        <div class="alert alert-{{ Session::get('message_type') }}" id="waktu2" style="margin-top:10px;">{{ Session::get('message') }}</div>
+        <div class="alert alert-{{ Session::get('message_type') }}" id="waktu2" style="margin-top:10px;">{!! Session::get('message') !!}</div>
         @endif
     </div>
 </div>
@@ -44,7 +44,7 @@
                     @endif
                 @endif
                 @if (Auth::user()->level > 5)
-                @include('pegawai.filter')
+                @include('operator.filter')
                 @endif
                 <div class="row">
                     <div class="table-responsive">
@@ -62,7 +62,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                                @foreach ($dataPegawai as $item)
+                                @foreach ($dataOperator as $item)
                                     <tr>
                                         <td>{{$loop->iteration}}</td>
                                         <td>
@@ -92,11 +92,15 @@
                                         <td>
                                             <button class="btn btn-circle btn-sm btn-success waves-light waves-effect" data-toggle="modal" data-target="#DetilModal" data-idop="{{$item->id}}"><i class="fas fa-search" data-toggle="tooltip" title="View Operator"></i></button>
                                             @if (Auth::user()->level > 3)
-                                            @if ($item->level<9)
-                                                 @if ($item->level < 4 or ($item->level > 3 and Auth::user()->username != $item->username))
-                                                     @include('pegawai.aksi')
-                                                 @endif
-                                            @endif
+                                                @if ($item->level < 9 )
+                                                    @if ($item->level < 4 or ($item->level > 3 and Auth::user()->username != $item->username))
+                                                        @include('operator.aksi')
+                                                    @endif
+                                                @else
+                                                    @if (Auth::user()->username != $item->username and Auth::user()->level > 5)
+                                                        @include('operator.aksi')
+                                                    @endif
+                                                @endif
                                             @endif
                                          </td>
 
@@ -114,7 +118,7 @@
 <!-- ============================================================== -->
 <!-- End PAge Content -->
 <!-- ============================================================== -->
-@include('pegawai.modal')
+@include('operator.modal')
 @endsection
 
 @section('css')
@@ -154,5 +158,12 @@
     </script>
     <!-- Sweet-Alert  -->
     <script src="{{asset('assets/node_modules/sweetalert2/dist/sweetalert2.all.min.js')}}"></script>
-    @include('pegawai.js')
+    @if (Auth::user()->level > 5)
+        @include('operator.jssuper')
+    @elseif (Auth::user()->level == 5)
+        @include('operator.jsadminprov')
+    @elseif (Auth::user()->level == 4)
+        @include('operator.jsadminkab')
+    @endif
+    @include('operator.jsumum')
 @endsection

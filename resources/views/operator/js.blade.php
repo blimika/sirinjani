@@ -3,7 +3,7 @@ $('#DetilModal').on('show.bs.modal', function (event) {
   var button = $(event.relatedTarget) // Button that triggered the modal
   var idop = button.data('idop')
   $.ajax({
-        url : '{{route("cari.operator","")}}/'+nipbps,
+        url : '{{route("operator.cari","")}}/'+idop,
         method : 'get',
         cache: false,
         dataType: 'json',
@@ -48,7 +48,7 @@ $('#EditPegModal').on('show.bs.modal', function (event) {
   var button = $(event.relatedTarget) // Button that triggered the modal
   var nipbps = button.data('nipbps')
   $.ajax({
-        url : '{{route('cari.pegawai','')}}/'+nipbps,
+        url : '{{route("operator.cari","")}}/'+nipbps,
         method : 'get',
         cache: false,
         dataType: 'json',
@@ -105,7 +105,7 @@ $(".hapuspegawai").click(function (e) {
                         }
                     });
                     $.ajax({
-                        url : '{{route('pegawai.hapus')}}',
+                        url : '{{route('operator.hapus')}}',
                         method : 'post',
                         data: {
                             id: id
@@ -176,7 +176,7 @@ $(".flagPegawai").click(function (e) {
                         }
                     });
                     $.ajax({
-                        url : '{{route('pegawai.flag')}}',
+                        url : '{{route('operator.flag')}}',
                         method : 'post',
                         data: {
                             id: id,
@@ -224,7 +224,7 @@ $('#EditLokalModal').on('show.bs.modal', function (event) {
   var peg_id = button.data('id')
   var unitjenis = button.data('unitjenis')
   $.ajax({
-        url : '{{route('cari.pegawai','')}}/'+peg_id,
+        url : '{{route('operator.cari','')}}/'+peg_id,
         method : 'get',
         cache: false,
         dataType: 'json',
@@ -269,17 +269,11 @@ $('#EditLokalModal').on('show.bs.modal', function (event) {
     });
 });
 
-$('#TambahOperator').on('show.bs.modal', function (event) {
-  var button = $(event.relatedTarget) // Button that triggered the modal
-  var nipbps = button.data('nipbps')
-
-});
-
 $('#GantiPasswordModal').on('show.bs.modal', function (event) {
   var button = $(event.relatedTarget) // Button that triggered the modal
   var nipbps = button.data('nipbps')
   $.ajax({
-        url : '{{route('cari.pegawai','')}}/'+nipbps,
+        url : '{{route('operator.cari','')}}/'+nipbps,
         method : 'get',
         cache: false,
         dataType: 'json',

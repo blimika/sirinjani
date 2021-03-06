@@ -1,0 +1,555 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\User;
+use Carbon\Carbon;
+use Session;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use App\KodeWilayah;
+use App\KodeLevel;
+use App\UnitKerja;
+use Excel;
+use App\Helpers\Generate;
+
+class OperatorController extends Controller
+{
+    //
+    public function list()
+    {
+        $data_wilayah = KodeWilayah::all();
+        //dd($data_wilayah);
+        $dataFungsi = Unitkerja::where([['unit_jenis','=','1'],['unit_eselon','<','4']])->get();
+        //level
+        // 1=pemantau, operator kab, 3=oper prov, 4=admin kabkota, 5=adminprov
+        if (Auth::user()->level > 5)
+        {
+            //superadmin
+            $dataOperator = User::when(request('wilayah'),function ($query){
+                return $query->where('kodebps','=',request('wilayah'));
+            })->get();
+            $dataLevel = KodeLevel::get();
+        }
+        else
+        {
+            //selain superadmin
+            $dataOperator = User::where('kodebps','=',Auth::user()->kodebps)->get();
+            $dataLevel = KodeLevel::where('level_id','<','9')->whereIn('level_jenis', array(Auth::user()->NamaWilayah->bps_jenis, 3))->get();
+        }
+        //$dataUnitkerja = UnitKerja::where([['unit_eselon','=','3'],['unit_jenis','=','1']])->get();
+
+        return view('operator.index',['dataFungsi'=>$dataFungsi,'dataLevel'=>$dataLevel,'dataWilayah'=>$data_wilayah,'dataOperator'=>$dataOperator,'wilayah'=>request('wilayah')]);
+    }
+    public function cekOperator($username)
+    {
+        $count = User::where('username','=',$username)->count();
+        $arr = array(
+            'status'=>true,
+            'hasil'=>'username operator tersedia'
+        );
+        if ($count > 0)
+        {
+            $arr = array(
+                'status'=>false,
+                'hasil'=>'username operator tidak tersedia'
+            );
+        }
+        return Response()->json($arr);
+    }
+    public function cariOperator($id)
+    {
+        $count = User::where('id','=',$id)->count();
+        $arr = array(
+            'status'=>false,
+            'hasil'=>'Data operator tidak tersedia'
+        );
+        if ($count > 0)
+        {
+            //ada nip pegawai ini
+            $data = User::where('id',$id)->first();
+            if ($data->lastlogin != "")
+            {
+                $lastlog_nama = Carbon::parse($data->lastlogin)->isoFormat('dddd, D MMMM Y H:mm');
+            }
+            else
+            {
+                $lastlog_nama = 'belum pernah login';
+            }
+            if ($data->lastip != "")
+            {
+                $lastip = $data->lastip;
+            }
+            else
+            {
+                $lastip = 'belum pernah login';
+            }
+            $arr = array(
+                'status'=>true,
+                'id'=>$data->id,
+                'nama'=>$data->nama,
+                'email'=>$data->email,
+                'username'=>$data->username,
+                'kodeunit'=>$data->kodeunit,
+                'namaunit'=>$data->Unitkerja->unit_nama,
+                'kodebps'=>$data->kodebps,
+                'kodebps_nama'=>$data->NamaWilayah->bps_nama,
+                'nohp'=>$data->nohp,
+                'aktif'=>$data->aktif,
+                'level'=>$data->level,
+                'level_nama'=>$data->Level->level_nama,
+                'lastip'=>$lastip,
+                'lastlogin'=>$data->lastlogin,
+                'lastlogin_nama'=>$lastlog_nama,
+                'created_at'=>$data->created_at,
+                'updated_at'=>$data->updated_at
+            );
+        }
+        return Response()->json($arr);
+    }
+    public function OperatorHapus(Request $request)
+    {
+        $count = User::where('id','=',$request->id)->count();
+        $arr = array(
+            'status'=>false,
+            'hasil'=>'Data operator tidak tersedia'
+        );
+        if ($count>0)
+        {
+            $data = User::where('id','=',$request->id)->first();
+            $nama = $data->nama;
+            $data->delete();
+            $arr = array(
+                'status'=>true,
+                'hasil'=>'Data operator '.$nama.' berhasil dihapus'
+            );
+        }
+        return Response()->json($arr);
+    }
+    public function FlagOperator(Request $request)
+    {
+        $count = User::where('id','=',$request->id)->count();
+        $arr = array(
+            'status'=>false,
+            'hasil'=>'Data operator tidak tersedia'
+        );
+        if ($count>0)
+        {
+            $data=User::where('id','=',$request->id)->first();
+            if ($request->flag==1)
+            {
+                $aktif = 0;
+            }
+            else
+            {
+                $aktif = 1;
+            }
+            $data->aktif = $aktif;
+            $data->update();
+            $arr = array(
+                'status'=>true,
+                'hasil'=>'Flag operator sudah diubah'
+            );
+        }
+        return Response()->json($arr);
+    }
+    public function SuperSimpan(Request $request)
+    {
+        //dd($request->all());
+        /*
+        array:10 [▼
+            "_token" => "MM68boW5WHcj50uIFg91CmqW1tiSs8ZAFjRvRRZD"
+            "wilayah" => "5200"
+            "operator_level" => "1"
+            "unitkode_prov" => "52510"
+            "operator_nama" => "test"
+            "operator_username" => "test"
+            "operator_password" => "test"
+            "operator_ulangi_password" => "test"
+            "operator_email" => "test@gdafa.com"
+            "operator_no_wa" => "0998892384923"
+            ]
+        */
+        if (Auth::user()->level == 9)
+        {
+            //cek username ada tidak
+            $count = User::where('username',$request->operator_username)->count();
+            if ($count == 0)
+            {
+                //simpan
+                //cek password dan ulangi password
+                if ($request->operator_password == $request->operator_ulangi_password)
+                {
+                    if ($request->unitkode_prov)
+                    {
+                        //ada
+                        $kodeunit = $request->unitkode_prov;
+                    }
+                    else
+                    {
+                        $kodeunit = $request->wilayah.'0';
+                    }
+                    $data = new User();
+                    $data->nama = $request->operator_nama;
+                    $data->password = bcrypt($request->operator_password);
+                    $data->email = $request->operator_email;
+                    $data->username  = $request->operator_username;
+                    $data->kodeunit = $kodeunit;
+                    $data->kodebps = $request->wilayah;
+                    $data->nohp = trim($request->operator_no_wa);
+                    $data->level = $request->operator_level;
+                    $data->aktif = 1;
+                    $data->save();
+                    $pesan_error='Operator <b>'.$request->operator_nama.' ('.$request->operator_username.') </b> sudah disimpan';
+                    $pesan_warna='success';
+                }
+                else
+                {
+                    $pesan_error='Operator password dan operator ulangi password tidak sama';
+                    $pesan_warna='danger';
+                }
+            }
+            else
+            {
+                //user sudah di pakai
+                $pesan_error='Username <b>'.$request->operator_username.'</b> sudah terpakai, gunakan username yang lain';
+                $pesan_warna='danger';
+            }
+        }
+        else
+        {
+            $pesan_error='Anda tidak mempunyai akses terhadap aksi ini';
+            $pesan_warna='danger';
+        }
+        Session::flash('message', $pesan_error);
+        Session::flash('message_type', $pesan_warna);
+        return redirect()->route('operator.list');
+    }
+    public function SuperUpdate(Request $request)
+    {
+        //dd($request->all());
+        /*
+        array:9 [▼
+        "_token" => "2lWZtx9LoZ4BWuhSBxy2MzulT0dSSSH4zoCBZK3P"
+        "wilayah" => "5200"
+        "operator_level" => "5"
+        "unitkode_prov" => "52510"
+        "operator_nama" => "super"
+        "operator_username" => "super"
+        "operator_email" => "super@super.com"
+        "operator_no_wa" => "089898881231"
+        "operator_id" => "53"
+        ]
+        */
+        if (Auth::user()->level == 9)
+        {
+            //cek id operator ada tidak
+            $count = User::where('id',$request->operator_id)->count();
+            if ($count > 0)
+            {
+                //simpan
+                //cek password dan ulangi password
+
+                if ($request->unitkode_prov)
+                {
+                    //ada
+                    $kodeunit = $request->unitkode_prov;
+                }
+                else
+                {
+                    $kodeunit = $request->wilayah.'0';
+                }
+                $data =  User::where('id',$request->operator_id)->first();
+                $data->nama = $request->operator_nama;
+                $data->email = $request->operator_email;
+                //$data->username  = $request->operator_username;
+                $data->kodeunit = $kodeunit;
+                $data->kodebps = $request->wilayah;
+                $data->nohp = trim($request->operator_no_wa);
+                $data->level = $request->operator_level;
+                $data->aktif = 1;
+                $data->update();
+                $pesan_error='Operator <b>'.$request->operator_nama.' ('.$request->operator_username.') </b> berhasil di update';
+                $pesan_warna='success';
+            }
+            else
+            {
+                //user sudah di pakai
+                $pesan_error='Operator <b>'.$request->operator_username.'</b> tidak ada';
+                $pesan_warna='danger';
+            }
+        }
+        else
+        {
+            $pesan_error='Anda tidak mempunyai akses terhadap aksi ini';
+            $pesan_warna='danger';
+        }
+        Session::flash('message', $pesan_error);
+        Session::flash('message_type', $pesan_warna);
+        return redirect()->route('operator.list');
+    }
+    public function GantiPassword(Request $request)
+    {
+        //dd($request->all());
+        /*
+        array:5 [▼
+        "_token" => "2lWZtx9LoZ4BWuhSBxy2MzulT0dSSSH4zoCBZK3P"
+        "operator_id" => "49"
+        "operator_nama" => "Anang Zakaria"
+        "operator_password_baru" => "test"
+        "operator_password_baru_ulangi" => "test"
+        ]
+        */
+        $count = User::where('id',$request->operator_id)->count();
+        if ($count > 0)
+        {
+            //operator ada
+            if ($request->operator_password_baru != $request->operator_password_baru_ulangi)
+            {
+                $pesan_error="ERROR : Password baru dengan ulangi password baru tidak sama !!";
+                $pesan_warna='danger';
+            }
+            else
+            {
+                $data = User::where('id',$request->operator_id)->first();
+                $data->password = bcrypt($request->operator_password_baru);
+                $data->update();
+                $pesan_error='BERHASIL : Password Operator an. <b>'.$data->nama .' ('.$data->username.')</b> berhasil diganti';
+                $pesan_warna='success';
+            }
+        }
+        else
+        {
+            $pesan_error="ERROR : data operator tidak tersedia!!";
+            $pesan_warna='danger';
+        }
+        Session::flash('message', $pesan_error);
+        Session::flash('message_type', $pesan_warna);
+        return redirect()->route('operator.list');
+    }
+    public function AdminProvSimpan(Request $request)
+    {
+        //dd($request->all());
+        /*
+        array:9 [▼
+        "_token" => "OMoyuBlNBfpfhwsbjIW9gOjE8gliflCpxxCCQRzK"
+        "operator_level" => "3"
+        "unitkode_prov" => "52520"
+        "operator_nama" => "dfafdasfdsa"
+        "operator_username" => "admin52001"
+        "operator_password" => "aa"
+        "operator_ulangi_password" => "aa"
+        "operator_email" => "aa@dfadfa.com"
+        "operator_no_wa" => "00324932432"
+        ]
+        wilayah pakai wilayah admin yg add
+        */
+        if (Auth::user()->level == 5)
+        {
+            //cek username ada tidak
+            $count = User::where('username',$request->operator_username)->count();
+            if ($count == 0)
+            {
+                //simpan
+                //cek password dan ulangi password
+                if ($request->operator_password == $request->operator_ulangi_password)
+                {
+                    $data = new User();
+                    $data->nama = $request->operator_nama;
+                    $data->password = bcrypt($request->operator_password);
+                    $data->email = $request->operator_email;
+                    $data->username  = $request->operator_username;
+                    $data->kodeunit = $request->unitkode_prov;
+                    $data->kodebps = Auth::user()->kodebps;
+                    $data->nohp = trim($request->operator_no_wa);
+                    $data->level = $request->operator_level;
+                    $data->aktif = 1;
+                    $data->save();
+                    $pesan_error='Operator <b>'.$request->operator_nama.' ('.$request->operator_username.') </b> sudah disimpan';
+                    $pesan_warna='success';
+                }
+                else
+                {
+                    $pesan_error='Operator password dan operator ulangi password tidak sama';
+                    $pesan_warna='danger';
+                }
+            }
+            else
+            {
+                //user sudah di pakai
+                $pesan_error='Username <b>'.$request->operator_username.'</b> sudah terpakai, gunakan username yang lain';
+                $pesan_warna='danger';
+            }
+        }
+        else
+        {
+            $pesan_error='Anda tidak mempunyai akses terhadap aksi ini';
+            $pesan_warna='danger';
+        }
+        Session::flash('message', $pesan_error);
+        Session::flash('message_type', $pesan_warna);
+        return redirect()->route('operator.list');
+    }
+    public function AdminProvUpdate(Request $request)
+    {
+        //dd($request->all());
+        /*
+        array:8 [▼
+        "_token" => "OMoyuBlNBfpfhwsbjIW9gOjE8gliflCpxxCCQRzK"
+        "operator_level" => "5"
+        "unitkode_prov" => "52520"
+        "operator_nama" => "Admin Sosial Baru"
+        "operator_username" => "adminsos"
+        "operator_email" => "admin@sosial.bpsntb.id"
+        "operator_no_wa" => "089239238432"
+        "operator_id" => "56"
+        ]
+        */
+        if (Auth::user()->level == 5)
+        {
+            //cek id operator ada tidak
+            $count = User::where('id',$request->operator_id)->count();
+            if ($count > 0)
+            {
+                //simpan
+                //cek password dan ulangi password
+                $data =  User::where('id',$request->operator_id)->first();
+                $data->nama = $request->operator_nama;
+                $data->email = $request->operator_email;
+                //$data->username  = $request->operator_username;
+                $data->kodeunit = $request->unitkode_prov;
+                $data->nohp = trim($request->operator_no_wa);
+                $data->level = $request->operator_level;
+                $data->aktif = 1;
+                $data->update();
+                $pesan_error='Operator <b>'.$request->operator_nama.' ('.$request->operator_username.') </b> berhasil di update';
+                $pesan_warna='success';
+            }
+            else
+            {
+                //user sudah di pakai
+                $pesan_error='Operator <b>'.$request->operator_username.'</b> tidak ada';
+                $pesan_warna='danger';
+            }
+        }
+        else
+        {
+            $pesan_error='Anda tidak mempunyai akses terhadap aksi ini';
+            $pesan_warna='danger';
+        }
+        Session::flash('message', $pesan_error);
+        Session::flash('message_type', $pesan_warna);
+        return redirect()->route('operator.list');
+    }
+    public function AdminKabSimpan(Request $request)
+    {
+        //dd($request->all());
+        /*
+        array:8 [▼
+        "_token" => "MNfx5FYUtMMfjv8IFukE7hVgLFjq5aGdnSZ6RtYY"
+        "operator_level" => "4"
+        "operator_nama" => "AA"
+        "operator_username" => "admin52010"
+        "operator_password" => "op"
+        "operator_ulangi_password" => "op"
+        "operator_email" => "aa@dafaminka.com"
+        "operator_no_wa" => "2342343242"
+        ]
+        */
+        if (Auth::user()->level == 4)
+        {
+            //cek username ada tidak
+            $count = User::where('username',$request->operator_username)->count();
+            if ($count == 0)
+            {
+                //simpan
+                //cek password dan ulangi password
+                if ($request->operator_password == $request->operator_ulangi_password)
+                {
+                    $data = new User();
+                    $data->nama = $request->operator_nama;
+                    $data->password = bcrypt($request->operator_password);
+                    $data->email = $request->operator_email;
+                    $data->username  = $request->operator_username;
+                    $data->kodeunit = Auth::user()->kodebps."0";
+                    $data->kodebps = Auth::user()->kodebps;
+                    $data->nohp = trim($request->operator_no_wa);
+                    $data->level = $request->operator_level;
+                    $data->aktif = 1;
+                    $data->save();
+                    $pesan_error='Operator <b>'.$request->operator_nama.' ('.$request->operator_username.') </b> sudah disimpan';
+                    $pesan_warna='success';
+                }
+                else
+                {
+                    $pesan_error='Operator password dan operator ulangi password tidak sama';
+                    $pesan_warna='danger';
+                }
+            }
+            else
+            {
+                //user sudah di pakai
+                $pesan_error='Username <b>'.$request->operator_username.'</b> sudah terpakai, gunakan username yang lain';
+                $pesan_warna='danger';
+            }
+        }
+        else
+        {
+            $pesan_error='Anda tidak mempunyai akses terhadap aksi ini';
+            $pesan_warna='danger';
+        }
+        Session::flash('message', $pesan_error);
+        Session::flash('message_type', $pesan_warna);
+        return redirect()->route('operator.list');
+    }
+    public function AdminKabUpdate(Request $request)
+    {
+        //dd($request->all());
+        /*
+        array:7 [▼
+        "_token" => "MNfx5FYUtMMfjv8IFukE7hVgLFjq5aGdnSZ6RtYY"
+        "operator_level" => "4"
+        "operator_nama" => "AA Baru"
+        "operator_username" => "admin52010"
+        "operator_email" => "aa@dafaminka.com"
+        "operator_no_wa" => "2342343242"
+        "operator_id" => "57"
+        ]
+        */
+        if (Auth::user()->level == 4)
+        {
+            //cek id operator ada tidak
+            $count = User::where('id',$request->operator_id)->count();
+            if ($count > 0)
+            {
+                //simpan
+                //cek password dan ulangi password
+                $data =  User::where('id',$request->operator_id)->first();
+                $data->nama = $request->operator_nama;
+                $data->email = $request->operator_email;
+                //$data->username  = $request->operator_username;
+                $data->nohp = trim($request->operator_no_wa);
+                $data->level = $request->operator_level;
+                $data->aktif = 1;
+                $data->update();
+                $pesan_error='Operator <b>'.$request->operator_nama.' ('.$request->operator_username.') </b> berhasil di update';
+                $pesan_warna='success';
+            }
+            else
+            {
+                //user sudah di pakai
+                $pesan_error='Operator <b>'.$request->operator_username.'</b> tidak ada';
+                $pesan_warna='danger';
+            }
+        }
+        else
+        {
+            $pesan_error='Anda tidak mempunyai akses terhadap aksi ini';
+            $pesan_warna='danger';
+        }
+        Session::flash('message', $pesan_error);
+        Session::flash('message_type', $pesan_warna);
+        return redirect()->route('operator.list');
+    }
+}

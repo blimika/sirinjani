@@ -47,16 +47,6 @@
                                     </select>
                                 </div>
                                 <div class="col-md-2">
-                                    <select name="bulan" id="bulan" class="form-control">
-                                    <option value="0">Semua Bulan</option>
-                                     @for ($i = 1; $i <= 12; $i++)
-                                         <option value="{{$i}}" @if (request('bulan')==$i or $bulan==$i)
-                                             selected
-                                         @endif>{{$dataBulan[$i]}}</option>
-                                     @endfor
-                                    </select>
-                                </div>
-                                <div class="col-md-2">
                                     <select name="tahun" id="tahun" class="form-control">
                                      @foreach ($dataTahun as $iTahun)
                                      <option value="{{$iTahun->tahun}}" @if (request('tahun')==$iTahun->tahun or $tahun==$iTahun->tahun)
@@ -80,7 +70,7 @@
         <div class="card">
             <div class="card-body">
                 <div class="table-responsive">
-                    <h4 class="card-title">Laporan Kegiatan {{$unit_nama}} @if ($bulan > 0) Bulan {{$dataBulan[(int)$bulan]}} @else Tahun @endif {{ $tahun }}</h4>
+                    <h4 class="card-title">Laporan Kegiatan {{$unit_nama}} Tahun {{ $tahun }}</h4>
                     <table class="table color-bordered-table success-bordered-table table-striped table-bordered">
                         <thead>
                             <tr>

@@ -42,6 +42,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/spj/penerimaan', 'SpjController@terimaSpj')->name('spj.penerimaan');
     Route::post('/spj/updatepenerimaan', 'SpjController@UpdateterimaSpj')->name('spj.updatepenerimaan');
     Route::post('/spj/hapuspenerimaan', 'SpjController@HapusterimaSpj')->name('spj.hapuspenerimaan');
+    /*
     Route::post('/pegawai/sync', 'PegawaiController@syncData')->name('pegawai.sync');
     Route::post('/pegawai/flag', 'PegawaiController@FlagPegawai')->name('pegawai.flag');
     Route::post('/pegawai/hapus', 'PegawaiController@HapusPegawai')->name('pegawai.hapus');
@@ -49,10 +50,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/pegawai/updatepegawai', 'PegawaiController@UpdatePegawai')->name('pegawai.updatenet');
     Route::post('/pegawai/updatelokal', 'PegawaiController@UpdateLokal')->name('pegawai.updatelokal');
     Route::get('/unitkerja/{jenis}/{eselon}', 'UnitkerjaController@CariUnitkerja')->name('cari.unitkerja');
-    Route::post('/cek/community', 'PegawaiController@cekCommunity')->name('cek.community');
     Route::get('/pegawai/list', 'PegawaiController@index')->name('pegawai.list');
     Route::get('/pegawai/{pegID}', 'PegawaiController@CariPegawai')->name('cari.pegawai');
     Route::post('/pegawai/gantipasswd', 'PegawaiController@GantiPassword')->name('pegawai.gantipasswd');
+    */
     Route::get('/peringkat/bulanan', 'PeringkatController@bulanan')->name('peringkat.bulanan');
     Route::get('/peringkat/tahunan', 'PeringkatController@tahunan')->name('peringkat.tahunan');
     Route::get('/peringkat/rincian', 'PeringkatController@rincian')->name('peringkat.rincian');
@@ -63,5 +64,20 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/db/list', 'DataController@index')->name('db.index');
     Route::get('/db/sinkron', 'DataController@Sinkron')->name('db.sinkron');
     Route::get('/db/kosongkan', 'DataController@Kosongkan')->name('db.kosongkan');
+    Route::get('/operator/list', 'OperatorController@list')->name('operator.list');
+    Route::get('/operator/cari/{id}', 'OperatorController@cariOperator')->name('operator.cari');
+    Route::get('/operator/cek/{username}', 'OperatorController@cekOperator')->name('operator.cek');
+    Route::post('/operator/hapus', 'OperatorController@OperatorHapus')->name('operator.hapus');
+    Route::post('/operator/flag', 'OperatorController@FlagOperator')->name('operator.flag');
+    Route::post('/operator/supersimpan', 'OperatorController@SuperSimpan')->name('operator.supersimpan');
+    Route::post('/operator/superupdate', 'OperatorController@SuperUpdate')->name('operator.superupdate');
+    Route::post('/operator/adminprovsimpan', 'OperatorController@AdminProvSimpan')->name('operator.adminprovsimpan');
+    Route::post('/operator/adminprovupdate', 'OperatorController@AdminProvUpdate')->name('operator.adminprovupdate');
+    Route::post('/operator/adminkabsimpan', 'OperatorController@AdminKabSimpan')->name('operator.adminkabsimpan');
+    Route::post('/operator/adminkabupdate', 'OperatorController@AdminKabUpdate')->name('operator.adminkabupdate');
+    Route::post('/operator/gantipasswd', 'OperatorController@GantiPassword')->name('operator.gantipasswd');
+    Route::get('/myprofile', 'MyProfileController@MyProfile')->name('my.profile');
+    Route::post('/profile/update', 'MyProfileController@UpdateProfile')->name('profile.update');
+    Route::post('/profile/gantipasswd', 'MyProfileController@GantiPassword')->name('profile.gantipassword');
 });
 Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout')->name('logout');
