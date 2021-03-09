@@ -5,7 +5,7 @@
         <label for="unit" class="col-sm-1 control-label">Filter</label>
         <div class="col-md-5">
             <select name="unit" id="unit" class="form-control">
-            <option value="0">Pilih Bidang/Bagian</option>
+            <option value="0">Pilih Bagian/Fungsi</option>
             @foreach ($dataUnitkerja as $d)
             <option value="{{$d->unit_kode}}" @if (request('unit')==$d->unit_kode or $unit==$d->unit_kode)
                 selected
@@ -33,7 +33,7 @@
              @endforeach
             </select>
         </div>
-        
+
         <div class="col-md-2">
             <button type="submit" class="btn btn-success">Filter</button>
         </div>

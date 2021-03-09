@@ -31,13 +31,13 @@
                     <div class="controls">
                     <input type="text" class="form-control tglterima" id="keg_r_tgl" name="keg_r_tgl" placeholder="Tanggal Kirim" autocomplete="off" required>
                     </div>
-                </div> 
+                </div>
                 <div class="form-group">
                     <label for="keg_r_jumlah">Jumlah diterima</label>
                     <div class="controls">
                     <input type="number" class="form-control" id="keg_r_jumlah" name="keg_r_jumlah" placeholder="Jumlah di Kirim" required>
                     </div>
-                </div>     
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary waves-effect" data-dismiss="modal">CLOSE</button>
@@ -80,13 +80,13 @@
                     <div class="controls">
                     <input type="text" class="form-control tglterima" id="keg_r_tgl" name="keg_r_tgl" placeholder="Tanggal Kirim" autocomplete="off" required>
                     </div>
-                </div> 
+                </div>
                 <div class="form-group">
                     <label for="keg_r_jumlah">Jumlah</label>
                     <div class="controls">
                     <input type="number" class="form-control" id="keg_r_jumlah" name="keg_r_jumlah" placeholder="Jumlah di Kirim" required>
                     </div>
-                </div>                
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary waves-effect" data-dismiss="modal">CLOSE</button>
@@ -129,25 +129,25 @@
                     <div class="controls">
                     <input type="text" class="form-control tglkirim" id="keg_r_tgl" name="keg_r_tgl" placeholder="Tanggal Kirim" autocomplete="off" required>
                     </div>
-                </div> 
+                </div>
                 <div class="form-group">
                     <label for="keg_r_jumlah">Jumlah</label>
                     <div class="controls">
                     <input type="number" class="form-control" id="keg_r_jumlah" name="keg_r_jumlah" placeholder="Jumlah di Kirim" required>
                     </div>
-                </div> 
+                </div>
                 <div class="form-group">
                     <label for="keg_r_ket">Dikirim melalui</label>
                     <div class="controls">
                     <input type="text" class="form-control" id="keg_r_ket" name="keg_r_ket" placeholder="dikirim via apa? cth: Email, WhatsApp, Telegram, dst" required>
                     </div>
-                </div>  
+                </div>
                 <div class="form-group">
                     <label for="keg_r_link">Link Download</label>
                     <div class="controls">
                     <input type="text" class="form-control" id="keg_r_link" name="keg_r_link" placeholder="Url : https://...link download bila dikirim via cloud">
                     </div>
-                </div>               
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary waves-effect" data-dismiss="modal">CLOSE</button>
@@ -190,25 +190,25 @@
                     <div class="controls">
                     <input type="text" class="form-control tglkirim" id="keg_r_tgl" name="keg_r_tgl" placeholder="Tanggal Kirim" autocomplete="off" required>
                     </div>
-                </div> 
+                </div>
                 <div class="form-group">
                     <label for="keg_r_jumlah">Jumlah</label>
                     <div class="controls">
                     <input type="number" class="form-control" id="keg_r_jumlah" name="keg_r_jumlah" placeholder="Jumlah di Kirim" required>
                     </div>
-                </div> 
+                </div>
                 <div class="form-group">
                     <label for="keg_r_ket">Dikirim melalui</label>
                     <div class="controls">
                     <input type="text" class="form-control" id="keg_r_ket" name="keg_r_ket" placeholder="dikirim via apa? cth: Email, WhatsApp, Telegram, dst" required>
                     </div>
-                </div>  
+                </div>
                 <div class="form-group">
                     <label for="keg_r_link">Link Download</label>
                     <div class="controls">
                     <input type="text" class="form-control" id="keg_r_link" name="keg_r_link" placeholder="Url : https://...link download bila dikirim via cloud">
                     </div>
-                </div>               
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary waves-effect" data-dismiss="modal">CLOSE</button>
@@ -250,7 +250,7 @@
                     <div class="controls">
                         <textarea class="form-control" rows="8" name="keg_info" id="keg_info"></textarea>
                     </div>
-                </div>         
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary waves-effect" data-dismiss="modal">CLOSE</button>

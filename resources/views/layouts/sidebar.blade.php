@@ -3,9 +3,6 @@
     <ul id="sidebarnav">
         <li class="user-pro">
             <a class="has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false">
-            @if (Auth::user())
-            <img src="{{Auth::user()->urlfoto}}" alt="user" class="img-circle" />
-            @endif
             <span class="hide-menu">
                 @if (Auth::user())
                 {{Auth::user()->nama}}
@@ -38,10 +35,10 @@
         </li>
         <li> <a class="has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false"><i class="ti-palette"></i><span class="hide-menu">Peringkat dan Nilai</span></a>
             <ul aria-expanded="false" class="collapse">
-                <!--<li><a href="{{route('peringkat.ckp')}}">Rekap Nilai CKP</a></li>-->
                 <li><a href="{{route('peringkat.bulanan')}}">Peringkat Bulanan</a></li>
                 <li><a href="{{route('peringkat.tahunan')}}">Peringkat Tahunan</a></li>
                 <li><a href="{{route('peringkat.rincian')}}">Rincian Perkabkota</a></li>
+                <li><a href="{{route('peringkat.ckp')}}">Rekap Nilai CKP</a></li>
             </ul>
         </li>
         <li class="nav-small-cap">--- LAPORAN</li>

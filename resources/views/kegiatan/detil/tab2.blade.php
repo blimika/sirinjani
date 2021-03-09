@@ -1,5 +1,4 @@
-<h3 class="m-t-20"><b>Rekap Target BPS Kabupaten/Kota</b></h3>
-<hr>
+
 <div class="table-responsive">
     <table class="table table-striped table-hover" >
         <thead>
@@ -57,11 +56,15 @@
                     </td>
                     <td>
                         <!---RR pengiriman--->
-                        @if (($dataKegiatan->RealisasiKirim->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100 > 85)
+                        @if (($dataKegiatan->RealisasiKirim->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100 > 99)
+                        <div class="badge badge-pill badge-info float-right">
+                            {{number_format(($dataKegiatan->RealisasiKirim->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100,2,",",".")}}%
+                        </div>
+                        @elseif (($dataKegiatan->RealisasiKirim->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100 > 80)
                         <div class="badge badge-pill badge-success float-right">
                             {{number_format(($dataKegiatan->RealisasiKirim->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100,2,",",".")}}%
                         </div>
-                        @elseif(($dataKegiatan->RealisasiKirim->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100 > 70)
+                        @elseif(($dataKegiatan->RealisasiKirim->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100 > 50)
                         <div class="badge badge-pill badge-warning float-right">
                             {{number_format(($dataKegiatan->RealisasiKirim->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100,2,",",".")}}%
                         </div>
@@ -74,7 +77,7 @@
                     <td>
                         @if (Auth::user()->level > 4 or (((Auth::user()->level == 2 or Auth::user()->level == 4) and Auth::user()->kodeunit == $item->keg_t_unitkerja)) and Carbon\Carbon::parse($dataKegiatan->keg_start)->format('Y-m-d') <= Carbon\Carbon::now()->format('Y-m-d'))
                         <button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#PengirimanModal" data-kegid="{{$item->keg_id}}" data-kabkota="{{$item->keg_t_unitkerja}}" data-kabkotanama="{{$item->Unitkerja->unit_nama}}" data-targetkabkota="{{$item->keg_t_target}}" data-tglstart="{{$dataKegiatan->keg_start}}">
-                            <i class="fas fa-plus"data-toggle="tooltip" data-placement="top" title="Tambah Pengiriman {{$item->Unitkerja->unit_nama}}"></i>
+                            <i class="fas fa-plus" data-toggle="tooltip" data-placement="top" title="Tambah Pengiriman {{$item->Unitkerja->unit_nama}}"></i>
                         </button>
                         @endif
                     </td>
@@ -106,11 +109,15 @@
                     </td>
                     <td>
                         <!--RR Penerimaan-->
-                        @if (($dataKegiatan->RealisasiTerima->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100 > 85)
+                        @if (($dataKegiatan->RealisasiTerima->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100 > 99)
+                        <div class="badge badge-pill badge-info float-right">
+                            {{number_format(($dataKegiatan->RealisasiTerima->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100,2,",",".")}}%
+                        </div>
+                        @elseif (($dataKegiatan->RealisasiTerima->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100 > 80)
                         <div class="badge badge-pill badge-success float-right">
                             {{number_format(($dataKegiatan->RealisasiTerima->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100,2,",",".")}}%
                         </div>
-                        @elseif(($dataKegiatan->RealisasiTerima->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100 > 70)
+                        @elseif(($dataKegiatan->RealisasiTerima->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100 > 50)
                         <div class="badge badge-pill badge-warning float-right">
                             {{number_format(($dataKegiatan->RealisasiTerima->where('keg_r_unitkerja','=',$item->keg_t_unitkerja)->sum('keg_r_jumlah')/$item->keg_t_target)*100,2,",",".")}}%
                         </div>
@@ -128,7 +135,7 @@
                         </button>
                         @endif
                     </td>
-                    <td>{{$item->keg_t_point}}</td>
+                    <td>{{number_format($item->keg_t_point,2,",",".")}}</td>
                 </tr>
             @endforeach
             <tr>
@@ -138,11 +145,15 @@
                 <td class="text-center" style="background-color:#ccffcc;vertical-align:bottom;"><strong>{{$dataKegiatan->RealisasiKirim->sum('keg_r_jumlah')}}</strong></td>
                 <td style="background-color:#ccffcc;vertical-align:bottom;"><strong>
                     <!--RR Total pengiriman-->
-                    @if (($dataKegiatan->RealisasiKirim->sum('keg_r_jumlah')/$dataKegiatan->Target->sum('keg_t_target'))*100 > 85)
+                    @if (($dataKegiatan->RealisasiKirim->sum('keg_r_jumlah')/$dataKegiatan->Target->sum('keg_t_target'))*100 > 99)
+                        <div class="badge badge-pill badge-info float-right">
+                            {{number_format(($dataKegiatan->RealisasiKirim->sum('keg_r_jumlah')/$dataKegiatan->Target->sum('keg_t_target'))*100,2,",",".")}}%
+                        </div>
+                    @elseif (($dataKegiatan->RealisasiKirim->sum('keg_r_jumlah')/$dataKegiatan->Target->sum('keg_t_target'))*100 > 80)
                         <div class="badge badge-pill badge-success float-right">
                             {{number_format(($dataKegiatan->RealisasiKirim->sum('keg_r_jumlah')/$dataKegiatan->Target->sum('keg_t_target'))*100,2,",",".")}}%
                         </div>
-                    @elseif (($dataKegiatan->RealisasiKirim->sum('keg_r_jumlah')/$dataKegiatan->Target->sum('keg_t_target'))*100 > 70)
+                    @elseif (($dataKegiatan->RealisasiKirim->sum('keg_r_jumlah')/$dataKegiatan->Target->sum('keg_t_target'))*100 > 50)
                         <div class="badge badge-pill badge-warning float-right">
                             {{number_format(($dataKegiatan->RealisasiKirim->sum('keg_r_jumlah')/$dataKegiatan->Target->sum('keg_t_target'))*100,2,",",".")}}%
                         </div>
@@ -161,11 +172,15 @@
                 <td style="background-color:#99ffcc;vertical-align:bottom;">
                     <b>
                     <!--RR Total penerimaan-->
-                    @if (($dataKegiatan->RealisasiTerima->sum('keg_r_jumlah')/$dataKegiatan->Target->sum('keg_t_target'))*100 > 85)
+                    @if (($dataKegiatan->RealisasiTerima->sum('keg_r_jumlah')/$dataKegiatan->Target->sum('keg_t_target'))*100 > 99)
+                    <div class="badge badge-pill badge-info float-right">
+                        {{number_format(($dataKegiatan->RealisasiTerima->sum('keg_r_jumlah')/$dataKegiatan->Target->sum('keg_t_target'))*100,2,",",".")}}%
+                    </div>
+                    @elseif (($dataKegiatan->RealisasiTerima->sum('keg_r_jumlah')/$dataKegiatan->Target->sum('keg_t_target'))*100 > 80)
                     <div class="badge badge-pill badge-success float-right">
                         {{number_format(($dataKegiatan->RealisasiTerima->sum('keg_r_jumlah')/$dataKegiatan->Target->sum('keg_t_target'))*100,2,",",".")}}%
                     </div>
-                @elseif (($dataKegiatan->RealisasiTerima->sum('keg_r_jumlah')/$dataKegiatan->Target->sum('keg_t_target'))*100 > 70)
+                @elseif (($dataKegiatan->RealisasiTerima->sum('keg_r_jumlah')/$dataKegiatan->Target->sum('keg_t_target'))*100 > 50)
                     <div class="badge badge-pill badge-warning float-right">
                         {{number_format(($dataKegiatan->RealisasiTerima->sum('keg_r_jumlah')/$dataKegiatan->Target->sum('keg_t_target'))*100,2,",",".")}}%
                     </div>

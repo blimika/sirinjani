@@ -99,7 +99,8 @@
                                 <th width="10%">Tgl Mulai</th>
                                 <th width="10%">Tgl Berakhir</th>
                                 <th width="4%">Target</th>
-                                <th width="4%">Realisasi</th>
+                                <th width="4%">Dikirim</th>
+                                <th width="4%">Diterima</th>
                                 <th width="4%">Nilai</th>
                             </tr>
                         </thead>
@@ -114,13 +115,20 @@
                                         <td align="right">{{Tanggal::Pendek($item->keg_end)}}</td>
                                         <td align="right">{{$item->keg_t_target}}</td>
                                         <td align="right">
-                                            @if ($item->jumlah_realisasi)
-                                            {{$item->jumlah_realisasi}}
+                                            @if ($item->jumlah_dikirim)
+                                            {{$item->jumlah_dikirim}}
                                             @else
                                              0
                                             @endif
                                         </td>
-                                        <td align="right" @if ((float) $item->keg_t_point < 3) bgcolor="red" style="color:white;" @else bgcolor="green" style="color:white;" @endif>{{$item->keg_t_point}}</td>
+                                        <td align="right">
+                                            @if ($item->jumlah_diterima)
+                                            {{$item->jumlah_diterima}}
+                                            @else
+                                             0
+                                            @endif
+                                        </td>
+                                        <td align="right" @if ((float) $item->keg_t_point < 3) bgcolor="red" style="color:white;" @else bgcolor="green" style="color:white;" @endif>{{number_format($item->keg_t_point,2,",",".")}}</td>
                                     </tr>
                                     @else
                                     <tr>
@@ -129,13 +137,20 @@
                                         <td align="right">{{Tanggal::Pendek($item->keg_end)}}</td>
                                         <td align="right">{{$item->keg_t_target}}</td>
                                         <td align="right">
-                                            @if ($item->jumlah_realisasi)
-                                            {{$item->jumlah_realisasi}}
+                                            @if ($item->jumlah_dikirim)
+                                            {{$item->jumlah_dikirim}}
                                             @else
                                              0
                                             @endif
                                         </td>
-                                        <td align="right" @if ((float) $item->keg_t_point < 3) bgcolor="red" style="color:white;" @else bgcolor="green" style="color:white;" @endif>{{$item->keg_t_point}}</td>
+                                        <td align="right">
+                                            @if ($item->jumlah_diterima)
+                                            {{$item->jumlah_diterima}}
+                                            @else
+                                             0
+                                            @endif
+                                        </td>
+                                        <td align="right" @if ((float) $item->keg_t_point < 3) bgcolor="red" style="color:white;" @else bgcolor="green" style="color:white;" @endif>{{number_format($item->keg_t_point,2,",",".")}}</td>
                                     </tr>
                                     @endif
                                 @endforeach

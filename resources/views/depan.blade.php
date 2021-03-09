@@ -4,16 +4,13 @@
 <!-- ============================================================== -->
 <!-- Bread crumb and right sidebar toggle -->
 <!-- ============================================================== -->
-<div class="row page-titles">
+<div class="row page-titles hidden-md-up">
     <div class="col-md-5 align-self-center">
-        <h4 class="text-themecolor">Sistem Monitoring Kinerja Online (SiRinjani)</h4>
+        <h4 class="text-themecolor">Sistem Monitoring Kinerja Online v2.0 <br />BPS Provinsi Nusa Tenggara Barat</h4>
     </div>
     <div class="col-md-7 align-self-center text-right">
         <div class="d-flex justify-content-end align-items-center">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
-                <li class="breadcrumb-item active">Dashboard</li>
-            </ol>
+
         </div>
     </div>
 </div>
@@ -26,7 +23,7 @@
 @if (Generate::TotalKegiatan(Carbon\Carbon::now()->format('Y')) > 0)
 @include('dashboard.baris1')
 @include('dashboard.baris2')
-@else 
+@else
 @include('dashboard.kosong')
 @endif
 <!-- ============================================================== -->

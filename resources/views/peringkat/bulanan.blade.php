@@ -65,7 +65,7 @@
                                      @endforeach
                                     </select>
                                 </div>
-                                
+
                                 <div class="col-md-2">
                                     <button type="submit" class="btn btn-success">Filter</button>
                                 </div>
@@ -80,7 +80,7 @@
     <div class="col-lg-6 col-sm-12 col-xs-12">
         <div class="card">
             <div class="card-body">
-                
+
                     <h4 class="card-title">Peringkat Kabupaten/Kota Bulan {{$dataBulan[(int)($bulan)]}} {{$tahun}}</h4>
                     @php
                         if ($unit > 0)
@@ -88,14 +88,14 @@
                             $data_unit = $dataUnitkerja->where('unit_kode','=',$unit)->first();
                             $nama_unit = $data_unit->unit_nama;
                         }
-                        else 
+                        else
                         {
                             $nama_unit ='';
                         }
-                    @endphp     
+                    @endphp
                     @if ($unit>0)
                         <h5>Nilai Berdasarkan {{$nama_unit}}</h5>
-                    @endif 
+                    @endif
                     @if ($dataPeringkat->count() > 0)
                     <div class="table-responsive">
                     <table id="nilai" class="table table-bordered table-hover table-striped" cellspacing="0" width="100%">
@@ -115,7 +115,7 @@
                                 <td>{{$item->unit_nama}}</td>
                                 <td>{{$item->keg_jml}}</td>
                                 <td>{{$item->keg_jml_target}}</td>
-                                <td>{{number_format($item->point_rata,4,".",",")}}</td>
+                                <td>{{number_format($item->point_rata,2,".",",")}}</td>
                             </tr>
                         @endforeach
                         </tbody>
@@ -124,7 +124,7 @@
                     @else
                         <div class="alert alert-danger">Data belum tersedia untuk bulan ini</div>
                     @endif
-                
+
             </div>
         </div>
     </div>
@@ -179,7 +179,7 @@
                 ],
                 "displayLength": 30,
                 responsive: true
-                
+
             });
             $('.buttons-copy, .buttons-csv, .buttons-print, .buttons-pdf, .buttons-excel').addClass('btn btn-primary mr-1');
         });

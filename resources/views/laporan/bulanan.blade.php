@@ -106,8 +106,16 @@
                                             <td align="right">{{Tanggal::Pendek($detil->keg_start)}}</td>
                                             <td align="right">{{Tanggal::Pendek($detil->keg_end)}}</td>
                                             <td align="right">{{$detil->Target->sum('keg_t_target')}}</td>
-                                            <td align="right">{{ $detil->RealisasiKirim->sum('keg_r_jumlah') }}</td>
-                                            <td align="right">{{ $detil->RealisasiTerima->sum('keg_r_jumlah') }}</td>
+                                            <td align="right">
+                                                {{$detil->RealisasiKirim->sum('keg_r_jumlah')}}
+                                                <br />
+                                                ({{number_format(($detil->RealisasiKirim->sum('keg_r_jumlah')/$detil->Target->sum('keg_t_target'))*100,2,",",".")}})
+                                            </td>
+                                            <td align="right">
+                                                {{$detil->RealisasiTerima->sum('keg_r_jumlah')}}
+                                                <br />
+                                                ({{number_format(($detil->RealisasiTerima->sum('keg_r_jumlah')/$detil->RealisasiKirim->sum('keg_r_jumlah'))*100,2,",",".")}})
+                                            </td>
                                         </tr>
                                     @endforeach
 
@@ -115,6 +123,7 @@
                             @endforeach
                         </tbody>
                     </table>
+                    <small>Catatan: Persentase <b>Dikirim</b> adalah terhadap <b>Target</b>, Persentase <b>Diterima</b> adalah terhadap <b>Dikirim</b></small>
                 </div>
             </div>
         </div>

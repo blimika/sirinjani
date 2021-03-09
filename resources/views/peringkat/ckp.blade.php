@@ -37,25 +37,6 @@
                 <form class="form-horizontal">
                               <div class="form-group row">
                                 <label for="unit" class="col-sm-2 control-label">Nilai berdasarkan </label>
-                                <div class="col-md-4">
-                                    <select name="unit" id="unit" class="form-control">
-                                    <option value="0">BPS Provinsi NTB</option>
-                                    @foreach ($dataUnitkerja as $d)
-                                    <option value="{{$d->unit_kode}}" @if (request('unit')==$d->unit_kode or $unit==$d->unit_kode)
-                                        selected
-                                       @endif>{{$d->unit_nama}}</option>
-                                    @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-md-2">
-                                    <select name="bulan" id="bulan" class="form-control">
-                                     @for ($i = 1; $i <= 12; $i++)
-                                         <option value="{{$i}}" @if (request('bulan')==$i or $bulan==$i)
-                                             selected
-                                         @endif>{{$dataBulan[$i]}}</option>
-                                     @endfor
-                                    </select>
-                                </div>
                                 <div class="col-md-2">
                                     <select name="tahun" id="tahun" class="form-control">
                                      @foreach ($dataTahun as $iTahun)
@@ -65,7 +46,7 @@
                                      @endforeach
                                     </select>
                                 </div>
-                                
+
                                 <div class="col-md-2">
                                     <button type="submit" class="btn btn-success">Filter</button>
                                 </div>
@@ -80,61 +61,24 @@
     <div class="col-lg-12 col-sm-12 col-xs-12">
         <div class="card">
             <div class="card-body">
-                <div class="table-responsive">
-                    <h4 class="card-title">Nilai CKP Kabupaten/Kota Bulan {{$dataBulan[(int)($bulan)]}} {{$tahun}}</h4>
-                    @php
-                        if ($unit > 0)
-                        {
-                            $data_unit = $dataUnitkerja->where('unit_kode','=',$unit)->first();
-                            $nama_unit = $data_unit->unit_nama;
-                        }
-                        else 
-                        {
-                            $nama_unit ='';
-                        }
-                    @endphp     
-                    @if ($unit>0)
-                        <h5>Nilai Berdasarkan {{$nama_unit}}</h5>
-                    @endif 
-                    <table id="nilai" class="table table-bordered table-hover table-striped" cellspacing="0" width="100%">
-                        <thead>
-                        <tr>
-                            <th rowspan="3" class="text-center">No</th>
-                            <th rowspan="3" class="text-center">Nama Kabupaten/Kota</th>
-                            <th colspan="12" class="text-center">BIDANG/BAGIAN</th>
-                            <th colspan="3" class="text-center">TOTAL</th>
-                        </tr>
-                        <tr>                           
-                            <th colspan="2" class="text-center">TATA USAHA</th>
-                            <th colspan="2" class="text-center">SOSIAL</th>
-                            <th colspan="2" class="text-center">PRODUKSI</th>
-                            <th colspan="2" class="text-center">DISTRIBUSI</th>
-                            <th colspan="2" class="text-center">NERWILIS</th>
-                            <th colspan="2" class="text-center">IPDS</th>
-                            <th rowspan="2" class="text-center">KEG</th>
-                            <th rowspan="2" class="text-center">Total</th>
-                            <th rowspan="2" class="text-center">Nilai</th>
-                        </tr>
-                        <tr>
-                            <th>Nilai</th>
-                            <th>CKP</th>
-                            <th>Nilai</th>
-                            <th>CKP</th>
-                            <th>Nilai</th>
-                            <th>CKP</th>
-                            <th>Nilai</th>
-                            <th>CKP</th>
-                            <th>Nilai</th>
-                            <th>CKP</th>
-                            <th>Nilai</th>
-                            <th>CKP</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        
-                        </tbody>
-                    </table>
+                <!-- Nav tabs -->
+            <ul class="nav nav-tabs customtab" role="tablist">
+                <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#nilaickp" role="tab"><span class="hidden-sm-up"><i class="ti-home"></i></span> <span class="hidden-xs-down">Nilai CKP</span></a> </li>
+                <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#nilaipoin" role="tab"><span class="hidden-sm-up"><i class="ti-user"></i></span> <span class="hidden-xs-down">Nilai Poin</span></a> </li>
+            </ul>
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div class="tab-pane active" id="nilaickp" role="tabpanel">
+                    <div class="p-10">
+                       @include('peringkat.ckp1')
+                    </div>
                 </div>
+                <div class="tab-pane" id="nilaipoin" role="tabpanel">
+                    <div class="p-10">
+                        @include('peringkat.ckp2')
+                     </div>
+                </div>
+            </div>
             </div>
         </div>
     </div>
@@ -177,7 +121,7 @@
                 ],
                 "displayLength": 30,
                 responsive: true
-                
+
             });
             $('.buttons-copy, .buttons-csv, .buttons-print, .buttons-pdf, .buttons-excel').addClass('btn btn-primary mr-1');
         });
@@ -192,5 +136,5 @@
     <script src="{{asset('dist/grafik/export-data.js')}}"></script>
     <script src="{{asset('dist/grafik/series-label.js')}}"></script>
     <script src="{{asset('dist/grafik/accessibility.js')}}"></script>
-    
+
 @endsection

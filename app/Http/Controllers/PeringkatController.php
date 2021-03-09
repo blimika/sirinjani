@@ -99,24 +99,15 @@ class PeringkatController extends Controller
     public function Ckp()
     {
         $data_bulan = array(
-            1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'
+            1=>'Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'
         );
-        $dataUnit = UnitKerja::where([['unit_jenis','=','1'],['unit_eselon','=','3']])->get();
+        $Kabkota = UnitKerja::where([['unit_jenis','=','2'],['unit_eselon','=','3']])->get();
         $data_tahun = DB::table('m_keg')
         ->selectRaw('year(keg_end) as tahun')
         ->groupBy('tahun')
         ->whereYear('keg_end','<=',NOW())
         ->orderBy('tahun','asc')
           ->get();
-        if (request('bulan')<=0)
-        {
-        $bulan_filter=date('m');
-        }
-        else
-        {
-        $bulan_filter = request('bulan');
-        }
-
         if (request('tahun')<=0)
         {
         $tahun_filter=date('Y');
@@ -125,7 +116,16 @@ class PeringkatController extends Controller
         {
         $tahun_filter = request('tahun');
         }
-        return view('peringkat.ckp',['dataUnitkerja'=>$dataUnit,'dataTahun'=>$data_tahun,'tahun'=>$tahun_filter,'unit'=>request('unit'),'dataBulan'=>$data_bulan,'bulan'=>$bulan_filter]);
+        if (request('bulan')<=0)
+        {
+            $bulan_filter=date('m');
+        }
+        else
+        {
+            $bulan_filter = request('bulan');
+        }
+
+        return view('peringkat.ckp',['dataKabkota'=>$Kabkota,'dataTahun'=>$data_tahun,'tahun'=>$tahun_filter,'unit'=>request('unit'),'dataBulan'=>$data_bulan]);
     }
     public function rincian()
     {
@@ -167,7 +167,8 @@ class PeringkatController extends Controller
         $unit_nama = UnitKerja::where('unit_kode',$unit_filter)->first();
         $data = DB::table('m_keg')
                 ->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
-                ->leftJoin(DB::raw("(select keg_id, keg_r_unitkerja, sum(keg_r_jumlah) as jumlah_realisasi from m_keg_realisasi where keg_r_unitkerja='".$unit_filter."' and keg_r_jenis='1' group by keg_id) as realisasi"),'m_keg.keg_id','=','realisasi.keg_id')
+                ->leftJoin(DB::raw("(select keg_id, keg_r_unitkerja, sum(keg_r_jumlah) as jumlah_dikirim from m_keg_realisasi where keg_r_unitkerja='".$unit_filter."' and keg_r_jenis='1' group by keg_id) as pengiriman"),'m_keg.keg_id','=','pengiriman.keg_id')
+                ->leftJoin(DB::raw("(select keg_id, keg_r_unitkerja, sum(keg_r_jumlah) as jumlah_diterima from m_keg_realisasi where keg_r_unitkerja='".$unit_filter."' and keg_r_jenis='2' group by keg_id) as penerimaan"),'m_keg.keg_id','=','penerimaan.keg_id')
                 ->leftJoin(DB::raw("(select unit_kode as unit_kode_prov, unit_nama as unit_nama_prov, unit_parent as unit_parent_prov from t_unitkerja where unit_jenis='1') as unit_prov"),'m_keg.keg_unitkerja','=','unit_prov.unit_kode_prov')
                 ->leftJoin(DB::raw("(select unit_kode as unit_kode_parent, unit_nama as unit_nama_parent from t_unitkerja where unit_jenis='1' and unit_eselon='3') as unit_parent"),'unit_prov.unit_parent_prov','=','unit_parent.unit_kode_parent')
                 ->leftJoin('t_unitkerja','m_keg_target.keg_t_unitkerja','=','t_unitkerja.unit_kode')
@@ -177,7 +178,7 @@ class PeringkatController extends Controller
 				->whereYear('m_keg.keg_end','=',$tahun_filter)
                 ->where('m_keg_target.keg_t_target','>','0')
                 ->where('m_keg_target.keg_t_unitkerja','=',$unit_filter)
-				->select(DB::raw("m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, month(m_keg.keg_end) as bulan_keg,m_keg.keg_id, m_keg.keg_nama, unit_kode_prov, unit_nama_prov, unit_kode_parent, unit_nama_parent, keg_start, keg_end, m_keg_target.keg_t_target, realisasi.jumlah_realisasi, m_keg_target.keg_t_point"))
+				->select(DB::raw("m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, month(m_keg.keg_end) as bulan_keg,m_keg.keg_id, m_keg.keg_nama, unit_kode_prov, unit_nama_prov, unit_kode_parent, unit_nama_parent, keg_start, keg_end, m_keg_target.keg_t_target, pengiriman.jumlah_dikirim, penerimaan.jumlah_diterima, m_keg_target.keg_t_point"))
 				->orderBy('keg_end','asc')
                 ->get();
         //dd($data);
@@ -191,7 +192,8 @@ class PeringkatController extends Controller
         $unit_nama = UnitKerja::where('unit_kode',$unitkerja)->first();
         $data = DB::table('m_keg')
                 ->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
-                ->leftJoin(DB::raw("(select keg_id, keg_r_unitkerja, sum(keg_r_jumlah) as jumlah_realisasi from m_keg_realisasi where keg_r_unitkerja='".$unitkerja."' and keg_r_jenis='1' group by keg_id) as realisasi"),'m_keg.keg_id','=','realisasi.keg_id')
+                ->leftJoin(DB::raw("(select keg_id, keg_r_unitkerja, sum(keg_r_jumlah) as jumlah_dikirim from m_keg_realisasi where keg_r_unitkerja='".$unitkerja."' and keg_r_jenis='1' group by keg_id) as pengiriman"),'m_keg.keg_id','=','pengiriman.keg_id')
+                ->leftJoin(DB::raw("(select keg_id, keg_r_unitkerja, sum(keg_r_jumlah) as jumlah_diterima from m_keg_realisasi where keg_r_unitkerja='".$unitkerja."' and keg_r_jenis='2' group by keg_id) as penerimaan"),'m_keg.keg_id','=','penerimaan.keg_id')
                 ->leftJoin(DB::raw("(select unit_kode as unit_kode_prov, unit_nama as unit_nama_prov, unit_parent as unit_parent_prov from t_unitkerja where unit_jenis='1') as unit_prov"),'m_keg.keg_unitkerja','=','unit_prov.unit_kode_prov')
                 ->leftJoin(DB::raw("(select unit_kode as unit_kode_parent, unit_nama as unit_nama_parent from t_unitkerja where unit_jenis='1' and unit_eselon='3') as unit_parent"),'unit_prov.unit_parent_prov','=','unit_parent.unit_kode_parent')
                 ->leftJoin('t_unitkerja','m_keg_target.keg_t_unitkerja','=','t_unitkerja.unit_kode')
@@ -201,7 +203,7 @@ class PeringkatController extends Controller
 				->whereYear('m_keg.keg_end','=',$tahun)
                 ->where('m_keg_target.keg_t_target','>','0')
                 ->where('m_keg_target.keg_t_unitkerja','=',$unitkerja)
-				->select(DB::raw("m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, month(m_keg.keg_end) as bulan_keg, year(m_keg.keg_end) as tahun_keg,m_keg.keg_id, m_keg.keg_nama, unit_kode_prov, unit_nama_prov, unit_kode_parent, unit_nama_parent, keg_start, keg_end, m_keg_target.keg_t_target, realisasi.jumlah_realisasi, m_keg_target.keg_t_point"))
+				->select(DB::raw("m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, month(m_keg.keg_end) as bulan_keg, year(m_keg.keg_end) as tahun_keg,m_keg.keg_id, m_keg.keg_nama, unit_kode_prov, unit_nama_prov, unit_kode_parent, unit_nama_parent, keg_start, keg_end, m_keg_target.keg_t_target, pengiriman.jumlah_dikirim, penerimaan.jumlah_diterima, m_keg_target.keg_t_point"))
 				->orderBy('keg_end','asc')
                 ->get()->toArray();
         //dd($data);
@@ -215,7 +217,8 @@ class PeringkatController extends Controller
                 'TANGGAL MULAI' => $item->keg_start,
                 'TANGGAL BERAKHIR' => $item->keg_end,
                 'TARGET' => $item->keg_t_target,
-                'REALISASI' => $item->jumlah_realisasi,
+                'DIKIRIM' => $item->jumlah_dikirim,
+                'DITERIMA' => $item->jumlah_diterima,
                 'NILAI' => $item->keg_t_point
             );
         }

@@ -1,5 +1,3 @@
-<h3 class="m-t-20"><b>Rekap SPJ BPS Kabupaten/Kota</b></h3>
-<hr>
 <div class="table-responsive">
     <table class="table table-striped table-hover" >
         <thead>
@@ -40,11 +38,11 @@
                                      <!--hapus realiasi-->
                                      <button class="btn btn-danger btn-xs hapuskirimspj" data-kegrid="{{$r->spj_r_id}}" data-nama="konfirmasi pengiriman oleh {{$item->Unitkerja->unit_nama}} tanggal {{Tanggal::Pendek($r->spj_r_tgl)}}">
                                          <i class="fas fa-trash" data-toggle="tooltip" title="Hapus konfirmasi pengiriman tanggal {{Tanggal::Pendek($r->spj_r_tgl)}}"></i>
-                                     </button> 
+                                     </button>
                                      <!--batas hapus realisasi-->
-                                     | 
+                                     |
                                      @endif
-                                     <span class="badge badge-pill badge-info" data-toggle="tooltip" title="Tanggal konfirmasi pengiriman">{{Tanggal::Pendek($r->spj_r_tgl)}}</span> 
+                                     <span class="badge badge-pill badge-info" data-toggle="tooltip" title="Tanggal konfirmasi pengiriman">{{Tanggal::Pendek($r->spj_r_tgl)}}</span>
                                      | <span class="badge badge-pill badge-success" data-toggle="tooltip" title="Jumlah dikirim">{{$r->spj_r_jumlah}}</span>
                                      | <span class="badge badge-pill badge-warning" data-toggle="tooltip" title="Keterangan konfirmasi pengiriman">{{$r->spj_r_ket}}</span>
                                      @if ($r->spj_r_link != null)
@@ -59,23 +57,23 @@
                         <!---RR pengiriman--->
                         @if (($dataKegiatan->RealisasiKirimSpj->where('spj_r_unitkerja','=',$item->spj_t_unitkerja)->sum('spj_r_jumlah')/$item->spj_t_target)*100 > 85)
                         <div class="badge badge-pill badge-success float-right">
-                            {{number_format(($dataKegiatan->RealisasiKirimSpj->where('spj_r_unitkerja','=',$item->spj_t_unitkerja)->sum('spj_r_jumlah')/$item->spj_t_target)*100,2,",",".")}}%    
+                            {{number_format(($dataKegiatan->RealisasiKirimSpj->where('spj_r_unitkerja','=',$item->spj_t_unitkerja)->sum('spj_r_jumlah')/$item->spj_t_target)*100,2,",",".")}}%
                         </div>
                         @elseif(($dataKegiatan->RealisasiKirimSpj->where('keg_r_unitkerja','=',$item->spj_t_unitkerja)->sum('spj_r_jumlah')/$item->spj_t_target)*100 > 70)
                         <div class="badge badge-pill badge-warning float-right">
-                            {{number_format(($dataKegiatan->RealisasiKirimSpj->where('spj_r_unitkerja','=',$item->spj_t_unitkerja)->sum('spj_r_jumlah')/$item->spj_t_target)*100,2,",",".")}}%    
+                            {{number_format(($dataKegiatan->RealisasiKirimSpj->where('spj_r_unitkerja','=',$item->spj_t_unitkerja)->sum('spj_r_jumlah')/$item->spj_t_target)*100,2,",",".")}}%
                         </div>
-                        @else 
+                        @else
                         <div class="badge badge-pill badge-danger float-right">
-                            {{number_format(($dataKegiatan->RealisasiKirimSpj->where('spj_r_unitkerja','=',$item->spj_t_unitkerja)->sum('spj_r_jumlah')/$item->spj_t_target)*100,2,",",".")}}%    
-                        </div> 
+                            {{number_format(($dataKegiatan->RealisasiKirimSpj->where('spj_r_unitkerja','=',$item->spj_t_unitkerja)->sum('spj_r_jumlah')/$item->spj_t_target)*100,2,",",".")}}%
+                        </div>
                         @endif
                     </td>
                     <td>
                         @if (Auth::user()->level > 4 or (((Auth::user()->level == 2 or Auth::user()->level == 4) and Auth::user()->kodeunit == $item->spj_t_unitkerja)) and Carbon\Carbon::parse($dataKegiatan->keg_start)->format('Y-m-d') <= Carbon\Carbon::now()->format('Y-m-d'))
                         <button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#PengirimanSpjModal" data-kegid="{{$item->keg_id}}" data-kabkota="{{$item->spj_t_unitkerja}}" data-kabkotanama="{{$item->Unitkerja->unit_nama}}" data-targetkabkota="{{$item->spj_t_target}}" data-tglstart="{{$dataKegiatan->keg_start}}">
                             <i class="fas fa-plus"data-toggle="tooltip" data-placement="top" title="Tambah Pengiriman {{$item->Unitkerja->unit_nama}}"></i>
-                        </button> 
+                        </button>
                         @endif
                     </td>
                     <td>
@@ -92,11 +90,11 @@
                                      <!--hapus realiasi-->
                                      <button class="btn btn-danger btn-xs hapusterimaspj" data-kegrid="{{$r->spj_r_id}}" data-nama="konfirmasi penerimaan oleh {{$item->Unitkerja->unit_nama}} tanggal {{Tanggal::Pendek($r->spj_r_tgl)}}">
                                          <i class="fas fa-trash" data-toggle="tooltip" title="Hapus konfirmasi penerimaan tanggal {{Tanggal::Pendek($r->spj_r_tgl)}}"></i>
-                                     </button> 
+                                     </button>
                                      <!--batas hapus realisasi-->
                                      |
                                      @endif
-                                     <span class="badge badge-pill badge-info" data-toggle="tooltip" title="Tanggal konfirmasi penerimaan">{{Tanggal::Pendek($r->spj_r_tgl)}}</span> 
+                                     <span class="badge badge-pill badge-info" data-toggle="tooltip" title="Tanggal konfirmasi penerimaan">{{Tanggal::Pendek($r->spj_r_tgl)}}</span>
                                      | <span class="badge badge-pill badge-success" data-toggle="tooltip" title="Jumlah diterima">{{$r->spj_r_jumlah}}</span>
                                      | <span class="badge badge-pill badge-warning" data-toggle="tooltip" title="Keterangan konfirmasi penerimaan">{{$r->spj_r_ket}}</span>
                                 </div>
@@ -106,18 +104,22 @@
                     </td>
                     <td>
                         <!--RR Penerimaan-->
-                        @if (($dataKegiatan->RealisasiTerimaSpj->where('spj_r_unitkerja','=',$item->spj_t_unitkerja)->sum('spj_r_jumlah')/$item->spj_t_target)*100 > 85)
+                        @if (($dataKegiatan->RealisasiTerimaSpj->where('spj_r_unitkerja','=',$item->spj_t_unitkerja)->sum('spj_r_jumlah')/$item->spj_t_target)*100 > 99)
+                        <div class="badge badge-pill badge-info float-right">
+                            {{number_format(($dataKegiatan->RealisasiTerimaSpj->where('spj_r_unitkerja','=',$item->spj_t_unitkerja)->sum('spj_r_jumlah')/$item->spj_t_target)*100,2,",",".")}}%
+                        </div>
+                        @elseif (($dataKegiatan->RealisasiTerimaSpj->where('spj_r_unitkerja','=',$item->spj_t_unitkerja)->sum('spj_r_jumlah')/$item->spj_t_target)*100 > 80)
                         <div class="badge badge-pill badge-success float-right">
-                            {{number_format(($dataKegiatan->RealisasiTerimaSpj->where('spj_r_unitkerja','=',$item->spj_t_unitkerja)->sum('spj_r_jumlah')/$item->spj_t_target)*100,2,",",".")}}%    
+                            {{number_format(($dataKegiatan->RealisasiTerimaSpj->where('spj_r_unitkerja','=',$item->spj_t_unitkerja)->sum('spj_r_jumlah')/$item->spj_t_target)*100,2,",",".")}}%
                         </div>
-                        @elseif(($dataKegiatan->RealisasiTerimaSpj->where('spj_r_unitkerja','=',$item->spj_t_unitkerja)->sum('spj_r_jumlah')/$item->spj_t_target)*100 > 70)
+                        @elseif(($dataKegiatan->RealisasiTerimaSpj->where('spj_r_unitkerja','=',$item->spj_t_unitkerja)->sum('spj_r_jumlah')/$item->spj_t_target)*100 > 50)
                         <div class="badge badge-pill badge-warning float-right">
-                            {{number_format(($dataKegiatan->RealisasiTerimaSpj->where('spj_r_unitkerja','=',$item->spj_t_unitkerja)->sum('spj_r_jumlah')/$item->spj_t_target)*100,2,",",".")}}%    
+                            {{number_format(($dataKegiatan->RealisasiTerimaSpj->where('spj_r_unitkerja','=',$item->spj_t_unitkerja)->sum('spj_r_jumlah')/$item->spj_t_target)*100,2,",",".")}}%
                         </div>
-                        @else 
+                        @else
                         <div class="badge badge-pill badge-danger float-right">
-                            {{number_format(($dataKegiatan->RealisasiTerimaSpj->where('spj_r_unitkerja','=',$item->spj_t_unitkerja)->sum('spj_r_jumlah')/$item->spj_t_target)*100,2,",",".")}}%    
-                        </div> 
+                            {{number_format(($dataKegiatan->RealisasiTerimaSpj->where('spj_r_unitkerja','=',$item->spj_t_unitkerja)->sum('spj_r_jumlah')/$item->spj_t_target)*100,2,",",".")}}%
+                        </div>
                         @endif
                         <!--Batas RR Penerimaan-->
                     </td>
@@ -128,7 +130,7 @@
                         </button>
                         @endif
                     </td>
-                    <td>{{$item->spj_t_point}}</td>
+                    <td>{{number_format($item->spj_t_point,2,",",".")}}</td>
                 </tr>
             @endforeach
             <tr>
@@ -138,15 +140,19 @@
                 <td class="text-center">{{$dataKegiatan->RealisasiKirimSpj->sum('spj_r_jumlah')}}</td>
                 <td>
                     <!--RR Total pengiriman-->
-                    @if (($dataKegiatan->RealisasiKirimSpj->sum('spj_r_jumlah')/$dataKegiatan->TargetSpj->sum('spj_t_target'))*100 > 85)
-                        <div class="badge badge-pill badge-success float-right">
+                    @if (($dataKegiatan->RealisasiKirimSpj->sum('spj_r_jumlah')/$dataKegiatan->TargetSpj->sum('spj_t_target'))*100 > 99)
+                        <div class="badge badge-pill badge-info float-right">
                             {{number_format(($dataKegiatan->RealisasiKirimSpj->sum('spj_r_jumlah')/$dataKegiatan->TargetSpj->sum('spj_t_target'))*100,2,",",".")}}%
                         </div>
-                    @elseif (($dataKegiatan->RealisasiKirimSpj->sum('spj_r_jumlah')/$dataKegiatan->TargetSpj->sum('spj_t_target'))*100 > 70)
+                    @elseif (($dataKegiatan->RealisasiKirimSpj->sum('spj_r_jumlah')/$dataKegiatan->TargetSpj->sum('spj_t_target'))*100 > 80)
+                    <div class="badge badge-pill badge-success float-right">
+                        {{number_format(($dataKegiatan->RealisasiKirimSpj->sum('spj_r_jumlah')/$dataKegiatan->TargetSpj->sum('spj_t_target'))*100,2,",",".")}}%
+                    </div>
+                    @elseif (($dataKegiatan->RealisasiKirimSpj->sum('spj_r_jumlah')/$dataKegiatan->TargetSpj->sum('spj_t_target'))*100 > 50)
                         <div class="badge badge-pill badge-warning float-right">
                             {{number_format(($dataKegiatan->RealisasiKirimSpj->sum('spj_r_jumlah')/$dataKegiatan->TargetSpj->sum('spj_t_target'))*100,2,",",".")}}%
                         </div>
-                    @else 
+                    @else
                         <div class="badge badge-pill badge-danger float-right">
                             {{number_format(($dataKegiatan->RealisasiKirimSpj->sum('spj_r_jumlah')/$dataKegiatan->TargetSpj->sum('spj_t_target'))*100,2,",",".")}}%
                         </div>
@@ -165,7 +171,7 @@
                     <div class="badge badge-pill badge-warning float-right">
                         {{number_format(($dataKegiatan->RealisasiTerimaSpj->sum('spj_r_jumlah')/$dataKegiatan->TargetSpj->sum('spj_t_target'))*100,2,",",".")}}%
                     </div>
-                @else 
+                @else
                     <div class="badge badge-pill badge-danger float-right">
                         {{number_format(($dataKegiatan->RealisasiTerimaSpj->sum('spj_r_jumlah')/$dataKegiatan->TargetSpj->sum('spj_t_target'))*100,2,",",".")}}%
                     </div>

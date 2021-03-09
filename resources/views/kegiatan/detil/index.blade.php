@@ -38,7 +38,7 @@
     <!-- Column -->
     @if ($status == true)
         @include('kegiatan.detil.true')
-    @else 
+    @else
         @include('kegiatan.detil.false')
     @endif
     <!-- Column -->
@@ -56,14 +56,18 @@
 <link href="{{asset('assets/node_modules/sweetalert2/dist/sweetalert2.min.css')}}" rel="stylesheet">
 <!-- Date picker plugins css -->
 <link href="{{asset('assets/node_modules/bootstrap-datepicker/bootstrap-datepicker.min.css')}}" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="{{asset('assets/node_modules/html5-editor/bootstrap-wysihtml5.css')}}" />
 @endsection
 
 @section('js')
     <!-- Date Picker Plugin JavaScript -->
      <script src="{{asset('assets/node_modules/bootstrap-datepicker/bootstrap-datepicker.min.js')}}"></script>
-    
+
     <!-- Sweet-Alert  -->
     <script src="{{asset('assets/node_modules/sweetalert2/dist/sweetalert2.all.min.js')}}"></script>
+    <!-- wysuhtml5 Plugin JavaScript -->
+    <script src="{{asset('assets/node_modules/html5-editor/wysihtml5-0.3.0.js')}}"></script>
+    <script src="{{asset('assets/node_modules/html5-editor/bootstrap-wysihtml5.js')}}"></script>
     @include('kegiatan.detil.js')
     @include('kegiatan.detil.jsSpj')
 @endsection

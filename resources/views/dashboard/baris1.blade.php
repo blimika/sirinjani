@@ -8,11 +8,11 @@
                 <div class="text-right"> <span class="text-muted">Tahun {{Carbon\Carbon::now()->format('Y')}}</span>
                     <h1 class="font-light">
                         @if (Generate::TotalKegiatan(Carbon\Carbon::now()->format('Y')) < Generate::TotalKegiatan(Carbon\Carbon::now()->format('Y') - 1))
-                            <sup><i class="ti-arrow-down text-danger"></i></sup>
+                            <sup><i class="ti-arrow-down text-danger" data-toggle="tooltip" data-placement="top" title="Lebih rendah dari jumlah kegiatan tahun {{Carbon\Carbon::now()->format('Y')-1}}"></i></sup>
                         @else
-                            <sup><i class="ti-arrow-up text-success"></i></sup> 
+                            <sup><i class="ti-arrow-up text-success" data-toggle="tooltip" data-placement="bottom" title="Lebih tinggi dari jumlah kegiatan tahun {{Carbon\Carbon::now()->format('Y')-1}}"></i></sup>
                         @endif
-                        {{Generate::TotalKegiatan(Carbon\Carbon::now()->format('Y'))}} <sup><span class="h4">({{Generate::TotalTargetKegiatan(Carbon\Carbon::now()->format('Y'))}})</span></sup></h1>
+                        {{Generate::TotalKegiatan(Carbon\Carbon::now()->format('Y'))}} <sup><span class="h4" data-toggle="tooltip" data-placement="bottom" title="Total target semua kegiatan">({{Generate::TotalTargetKegiatan(Carbon\Carbon::now()->format('Y'))}})</span></sup></h1>
                 </div>
                 @if (Generate::TotalKegiatan(Carbon\Carbon::now()->format('Y')) < Generate::TotalKegiatan(Carbon\Carbon::now()->format('Y') - 1))
                 <span class="text-danger">
@@ -23,11 +23,11 @@
                 %
                 </span>
                 <div class="progress">
-                    <div 
+                    <div
                     @if (Generate::TotalKegiatan(Carbon\Carbon::now()->format('Y')) < Generate::TotalKegiatan(Carbon\Carbon::now()->format('Y') - 1))
-                        class="progress-bar bg-danger" 
+                        class="progress-bar bg-danger"
                     @else
-                        class="progress-bar bg-success"  
+                        class="progress-bar bg-success"
                     @endif role="progressbar" style="width: {{number_format(((abs(Generate::TotalKegiatan(Carbon\Carbon::now()->format('Y'))- Generate::TotalKegiatan(Carbon\Carbon::now()->format('Y') - 1))/Generate::TotalKegiatan(Carbon\Carbon::now()->format('Y')))*100),2,".",",")}}%; height: 6px;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
             </div>
@@ -74,10 +74,10 @@
         <div class="card">
             <div class="card-body">
                 <h4 class="card-title">Unit Kerja terbanyak kegiatan</h4>
-                <div class="text-right"> 
+                <div class="text-right">
                     <div class="text-muted">Tahun {{Carbon\Carbon::now()->format('Y')}}</div>
-                    
-                    <h4 class="font-light"><span class="pull-left"><i class="fa fa-trophy"></i></span> 
+
+                    <h4 class="font-light"><span class="pull-left"><i class="fa fa-trophy"></i></span>
                         {{Generate::KegiatanTerbanyak(Carbon\Carbon::now()->format('Y'))['nama_unit']}}
                     </h4>
                 </div>

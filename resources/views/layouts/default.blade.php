@@ -83,6 +83,14 @@
                                 <input type="text" class="form-control" placeholder="Search & enter">
                             </form>
                         </li> -->
+                        <li class="nav-item">
+                            <span class="d-none d-md-block d-lg-block">
+                                <h5>Sistem Monitoring Kinerja Online <small>v2.0</small>
+                                    <br />
+                                BPS Provinsi Nusa Tenggara Barat</h5>
+                            </span>
+
+                        </li>
                     </ul>
                     <!-- ============================================================== -->
                     <!-- User profile and search -->
@@ -146,7 +154,7 @@
         <!-- footer -->
         <!-- ============================================================== -->
         <footer class="footer">
-            &copy; 2017 - {{date('Y')}} Bidang IPDS BPS Provinsi NTB
+            &copy; 2017 - {{date('Y')}} Fungsi IPDS BPS Provinsi NTB
             <span class="font-weight-bold float-right text-danger"><b>Si<span class="text-success">Rinjani</span></b> <span class="text-dark font-weight-normal">v2.0</span></span>
         </footer>
         <!-- ============================================================== -->

@@ -1,16 +1,16 @@
 <?php
 namespace App\Helpers;
 
-class CommunityBPS 
+class CommunityBPS
 {
-	private $cookie; // cookies 
+	private $cookie; // cookies
 	private $ch; // curl
 	private $username; // username community
 	private $password; // password community
 	private $nip; // nip bps
 	private $isLogin = false;
 	public $errorLogin = true;
-	
+
 	// CONSTRUCTOR
 	function __construct($username, $password){
 		$this->cookie = "cookie.txt";
@@ -19,22 +19,22 @@ class CommunityBPS
 		$this->password = $password;
 		$this->login();
 	}
-	
+
 	// DESTRUCTOR
 	function __destruct() {
         if($this->ch) curl_close($this->ch);
     }
-	
-	/**** 
-		GET ASN PROFILE METHOD 
+
+	/****
+		GET ASN PROFILE METHOD
 		if exists, it will return an array, else will return false
 	****/
 	public function getprofil($nip){ // $nip = nip bps (example 340057260)
-		$postdata = ""; 
-		$url="https://community.bps.go.id/portal/index.php?id=2,6,".$nip; 
+		$postdata = "";
+		$url="https://community.bps.go.id/portal/index.php?id=2,6,".$nip;
 		$ch = $this->connectcurl($this->ch, $url, $postdata);
-		$result = curl_exec ($ch); 
-		
+		$result = curl_exec ($ch);
+
 		$urlfoto = 'https://community.bps.go.id'.$this->get_string_between($result, '<center><img width=120px src="..', '" ></center>');
 		$nama = trim(($this->get_string_between($result, 'Nama Lengkap</td><td width="2px" align="left">:</td><td align="left">', '</td></tr>')));
 		$nipbps = $nip;
@@ -63,82 +63,82 @@ class CommunityBPS
 			'alamatkantor'=>$alamatkantor,
 			'urlfoto'=>$urlfoto
 		) : false;
-		
+
 	}
-	
-	/**** 
-		GET ALL ASN PROFILE IN BPS KABKOT 
+
+	/****
+		GET ALL ASN PROFILE IN BPS KABKOT
 		if exists, it will return arrays of profile, else will return false
 	****/
 	public function get_list_pegawai_kabkot($kodekab){  // $kodekab = BPS Kabkot code (example 7206)
-		$postdata = ""; 
-		$url="https://community.bps.go.id/portal/index.php?id=2,2,0&kab=".$kodekab; 
+		$postdata = "";
+		$url="https://community.bps.go.id/portal/index.php?id=2,2,0&kab=".$kodekab;
 		$ch = $this->connectcurl($this->ch, $url, $postdata);
-		$result = curl_exec ($ch); 
-		
+		$result = curl_exec ($ch);
+
 		$webpagestart = stripos($result, '<!DOCTYPE');
 		$webpage = substr($result,$webpagestart);
-		$doc = new \DOMDocument; 
-		$doc->loadHTML($webpage, LIBXML_NOWARNING | LIBXML_NOERROR); 
-		
+		$doc = new \DOMDocument;
+		$doc->loadHTML($webpage, LIBXML_NOWARNING | LIBXML_NOERROR);
+
 		$content_node=$doc->getElementById("tengah");
-		$listurlpegawai = array(); // to get ASN nip 
+		$listurlpegawai = array(); // to get ASN nip
 		$div_a_class_nodes=$this->getElementsByClass($content_node, 'div', 'left_box');
 		foreach($div_a_class_nodes as $nodess){
-			$items = $nodess->getElementsByTagName('a'); 
-			foreach($items as $value) 
-			{ 
-				$attrs = $value->attributes; 
+			$items = $nodess->getElementsByTagName('a');
+			foreach($items as $value)
+			{
+				$attrs = $value->attributes;
 				$listurlpegawai[]=substr($attrs->getNamedItem('href')->nodeValue, -9);
 			}
 
 		}
-		
+
 		// convert all ASN nip to arrays of profile
 		$listpegawai = array();
 		foreach($listurlpegawai as $nip){
 			$listpegawai[] = $this->getprofil($nip);
 		}
-		
+
 		return count($listpegawai)>0 ? $listpegawai : false;
 	}
-	
-	
-	/**** 
-		GET ALL ASN PROFILE IN BPS KABKOT 
+
+
+	/****
+		GET ALL ASN PROFILE IN BPS KABKOT
 		if exists, it will return arrays of profile, else will return false
 	****/
 	public function get_list_pegawai_provinsi($kodeprov){  // $kodekab = BPS Kabkot code (example 7206)
-		$postdata = "org=".$kodeprov; 
-		$url="https://community.bps.go.id/portal/index.php?id=2,0,0"; 
+		$postdata = "org=".$kodeprov;
+		$url="https://community.bps.go.id/portal/index.php?id=2,0,0";
 		$ch = $this->connectcurl($this->ch, $url, $postdata);
-		$result = curl_exec ($ch); 
-		
+		$result = curl_exec ($ch);
+
 		$webpagestart = stripos($result, '<!DOCTYPE');
 		$webpage = substr($result,$webpagestart);
-		$doc = new \DOMDocument; 
-		$doc->loadHTML($webpage, LIBXML_NOWARNING | LIBXML_NOERROR); 
-		
+		$doc = new \DOMDocument;
+		$doc->loadHTML($webpage, LIBXML_NOWARNING | LIBXML_NOERROR);
+
 		$content_node=$doc->getElementById("tengah");
-		$listurlpegawai = array(); // to get ASN nip 
+		$listurlpegawai = array(); // to get ASN nip
 		$div_a_class_nodes=$this->getElementsByClass($content_node, 'div', 'left_box');
 		foreach($div_a_class_nodes as $nodess){
-			$items = $nodess->getElementsByTagName('a'); 
-			
-			foreach($items as $key => $value) 
-			{ 
-				$attrs = $value->attributes; 
+			$items = $nodess->getElementsByTagName('a');
+
+			foreach($items as $key => $value)
+			{
+				$attrs = $value->attributes;
 				$listurlpegawai[]=$attrs->getNamedItem('href')->nodeValue;
 			}
 
 		}
-		
+
 		// convert all ASN nip to arrays of profile
 		$listpegawai = array();
 		$i = 0;
 		foreach($listurlpegawai as $nip){
 			$getnip = substr($nip,-9);
-			
+
 			if($i==0) {
 				if(substr($getnip, -7)=='0000000'){
 					$listpegawai[] = false;
@@ -152,74 +152,74 @@ class CommunityBPS
 					$listpegawai[] = $this->get_sublist_pegawai_provinsi($nip);
 				}
 			}
-			
+
 			$i++;
 		}
-		
+
 		return count($listpegawai)>0 ? $listpegawai : false;
 		//return $listurlpegawai;
 	}
-	
-	/**** 
+
+	/****
 		GET ASN BY QUERY
 		it will return array with index listpegawai and pesanerror
 	****/
 	public function pencarian($query, $wilayah="All"){  // $wilayah = BPS Code
-		$postdata = "wil=".$wilayah."&namapg=".trim($query); 
-		$url="https://community.bps.go.id/portal/index.php?id=2,5,0"; 
+		$postdata = "wil=".$wilayah."&namapg=".trim($query);
+		$url="https://community.bps.go.id/portal/index.php?id=2,5,0";
 		$ch = $this->connectcurl($this->ch, $url, $postdata);
-		$result = curl_exec ($ch); 
-		
+		$result = curl_exec ($ch);
+
 		$webpagestart = stripos($result, '<!DOCTYPE');
 		$webpage = substr($result,$webpagestart);
-		$doc = new \DOMDocument; 
-		$doc->loadHTML($webpage, LIBXML_NOWARNING | LIBXML_NOERROR); 
-		
-		$listurlpegawai = array(); // to get ASN nip 
+		$doc = new \DOMDocument;
+		$doc->loadHTML($webpage, LIBXML_NOWARNING | LIBXML_NOERROR);
+
+		$listurlpegawai = array(); // to get ASN nip
 		$div_a_class_nodes=$this->getElementsByClass($doc, 'div', 'left_box');
-		
+
 		foreach($div_a_class_nodes as $nodess){
-			$items = $nodess->getElementsByTagName('a'); 
-			foreach($items as $value) 
-			{ 
-				$attrs = $value->attributes; 
+			$items = $nodess->getElementsByTagName('a');
+			foreach($items as $value)
+			{
+				$attrs = $value->attributes;
 				$listurlpegawai[]=substr($attrs->getNamedItem('href')->nodeValue, -9);
 			}
 
 		}
-		
+
 		// convert all ASN nip to arrays of profile
 		$listpegawai = array();
 		foreach($listurlpegawai as $nip){
 			if($nip=='y.back(1)') break;
 			$listpegawai[] = $this->getprofil($nip);
 		}
-		
+
 		$pesanerror = null;
 		if(count($listpegawai)==0){
-			$pesanerror = trim($this->get_string_between($result, '<div class=pesan_error>', '<br>')); 
+			$pesanerror = trim($this->get_string_between($result, '<div class=pesan_error>', '<br>'));
 		}
-		
+
 		$hasil = array(
 			'listpegawai'=>$listpegawai,
 			'pesanerror'=>$pesanerror
 		);
-		
+
 		return $hasil;
 	}
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
 	/*****
 		****************************************
 			DONT DO ANYTHING WITH CODES BELOW
 		****************************************
 	******/
-	
+
 	// INITIATE LOGIN COMMUNITY BPS TO USE OTHERS METHOD
 	private function login() {
 		$redirectto = 'https://community.bps.go.id';
@@ -227,11 +227,11 @@ class CommunityBPS
 		$appid = '0';
 		$remoteip = '0.0.0.0';
 		$requesturl = "";
-		$postdata = "uname=".$this->username."&pass=".$this->password."&redirectto=".$redirectto."&appname=".$appname."&appid=".$appid."&remoteip=".$remoteip."&requesturl=".$requesturl; 
-		$url="https://community.bps.go.id/libs/clogin.php"; 
-		
+		$postdata = "uname=".$this->username."&pass=".$this->password."&redirectto=".$redirectto."&appname=".$appname."&appid=".$appid."&remoteip=".$remoteip."&requesturl=".$requesturl;
+		$url="https://community.bps.go.id/libs/clogin.php";
+
 		$ch = $this->connectcurl($this->ch, $url, $postdata);
-		$result = curl_exec ($ch); 
+		$result = curl_exec ($ch);
 
 		// get cookies after login
 		preg_match_all('/^Set-Cookie:\s*([^;]*)/mi', $result, $matches);
@@ -242,13 +242,13 @@ class CommunityBPS
 		}
 
 		if(isset($cookies['CommunityBPS'])){
-			
+
 			$kukis = $cookies['CommunityBPS'];
 			$len_char=strlen($kukis)-32;
 			$sessionid=substr($kukis,0,$len_char);
 			$nip=substr($kukis,0,9);
 			$hashkey=substr($kukis,-32);
-			
+
 			$this->nip = $nip;
 			$this->ch = $ch;
 			$this->errorLogin = false;
@@ -259,31 +259,31 @@ class CommunityBPS
 			$this->errorLogin = true;
 		}
 	}
-	
+
 	// CONFIG CURL
 	private function connectcurl($ch, $url, $postdata){
-	
-		$cookie="cookie.txt"; 
-		curl_setopt ($ch, CURLOPT_URL, $url); 
-		curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, FALSE); 
-		curl_setopt ($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.6) Gecko/20070725 Firefox/2.0.0.6"); 
-		curl_setopt ($ch, CURLOPT_TIMEOUT, 60); 
-		curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, 0); 
-		curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1); 
-		curl_setopt ($ch, CURLOPT_COOKIEJAR, $cookie); 
-		curl_setopt ($ch, CURLOPT_REFERER, $url); 
+
+		$cookie="cookie.txt";
+		curl_setopt ($ch, CURLOPT_URL, $url);
+		curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+		curl_setopt ($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
+		curl_setopt ($ch, CURLOPT_TIMEOUT, 60);
+		curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, 0);
+		curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt ($ch, CURLOPT_COOKIEJAR, $cookie);
+		curl_setopt ($ch, CURLOPT_REFERER, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
 
-		curl_setopt ($ch, CURLOPT_POSTFIELDS, $postdata); 
-		curl_setopt ($ch, CURLOPT_POST, 1); 
+		curl_setopt ($ch, CURLOPT_POSTFIELDS, $postdata);
+		curl_setopt ($ch, CURLOPT_POST, 1);
 
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_HEADER, 1);
-		
+
 		return $ch;
 	}
-	
+
 	// GET SUBSTRING BETWEEN TWO STRING
 	private function get_string_between($string, $start, $end){
 		$string = ' ' . $string;
@@ -293,7 +293,7 @@ class CommunityBPS
 		$len = strpos($string, $end, $ini) - $ini;
 		return substr($string, $ini, $len);
 	}
-	
+
 	// GET ELEMENTS OF HTML DOM BY CLASS NAME
 	private function getElementsByClass(&$parentNode, $tagName, $className) {
 		$nodes=array();
@@ -308,40 +308,40 @@ class CommunityBPS
 
 		return $nodes;
 	}
-	
+
 	// GET ALL ASN PROFILE MORE DEEPER
-	private function get_sublist_pegawai_provinsi($suburl){ 
-		$postdata = ""; 
-		$url="https://community.bps.go.id/portal/".$suburl; 
+	private function get_sublist_pegawai_provinsi($suburl){
+		$postdata = "";
+		$url="https://community.bps.go.id/portal/".$suburl;
 		$ch = $this->connectcurl($this->ch, $url, $postdata);
-		$result = curl_exec ($ch); 
-		
+		$result = curl_exec ($ch);
+
 		$webpagestart = stripos($result, '<!DOCTYPE');
 		$webpage = substr($result,$webpagestart);
-		$doc = new \DOMDocument; 
-		$doc->loadHTML($webpage, LIBXML_NOWARNING | LIBXML_NOERROR); 
-		
+		$doc = new \DOMDocument;
+		$doc->loadHTML($webpage, LIBXML_NOWARNING | LIBXML_NOERROR);
+
 		$content_node=$doc->getElementById("tengah");
-		$listurlpegawai = array(); // to get ASN nip 
+		$listurlpegawai = array(); // to get ASN nip
 		$div_a_class_nodes=$this->getElementsByClass($content_node, 'div', 'left_box');
 		foreach($div_a_class_nodes as $nodess){
-			$items = $nodess->getElementsByTagName('a'); 
-			foreach($items as $value) 
-			{ 
-				$attrs = $value->attributes; 
+			$items = $nodess->getElementsByTagName('a');
+			foreach($items as $value)
+			{
+				$attrs = $value->attributes;
 				$listurlpegawai[]=substr($attrs->getNamedItem('href')->nodeValue, -9);
 			}
 		}
-		
+
 		// convert all ASN nip to arrays of profile
 		$listpegawai = array();
 		foreach($listurlpegawai as $nip){
 			$listpegawai[] = $this->getprofil($nip);
 		}
-		
+
 		return count($listpegawai)>0 ? $listpegawai : false;
 	}
-	
+
 }
 
 //class Tanggal
@@ -440,7 +440,7 @@ Class Generate {
         return $code_gen;
 	}
 	public static function NipOperator($wilayah) {
-        
+
 		//nipbps 9 digit
 		//nipbaru 18 digit
 		$max = \App\User::where('kodebps','=',$wilayah)->count();
@@ -666,7 +666,7 @@ Class Generate {
 	}
 	public static function KegiatanDeadline()
 	{
-		$data = \App\Kegiatan::whereBetween('keg_end',array(\Carbon\Carbon::now()->subDays(1)->format('Y-m-d'), \Carbon\Carbon::now()->addWeek()->format('Y-m-d')))->orderBy('keg_end')->get();
+		$data = \App\Kegiatan::whereBetween('keg_end',array(\Carbon\Carbon::now()->format('Y-m-d'), \Carbon\Carbon::now()->addWeek()->format('Y-m-d')))->orderBy('keg_end')->get();
 		return $data;
 	}
 	public static function ChartNilaiBulan($bulan,$tahun)
@@ -693,7 +693,7 @@ Class Generate {
 			$point_waktu[]=$item->point_waktu;
 			$point_jumlah[]=$item->point_jumlah;
 			$point_total[]=$item->point_total;
-			$point_rata[]=number_format($item->point_rata,4,".",",");
+			$point_rata[]=number_format($item->point_rata,2,".",",");
 		}
 		$arr = array(
 			'unit_nama'=>$unit_nama,
@@ -732,7 +732,7 @@ Class Generate {
 			$point_waktu[]=$item->point_waktu;
 			$point_jumlah[]=$item->point_jumlah;
 			$point_total[]=$item->point_total;
-			$point_rata[]=number_format($item->point_rata,4,".",",");
+			$point_rata[]=number_format($item->point_rata,2,".",",");
 		}
 		$arr = array(
 			'unit_nama'=>$unit_nama,
@@ -762,7 +762,7 @@ Class Generate {
 			data:
 		}
 		*/
-		
+
 		foreach ($data_unit as $item)
 		{
 			$unit_nama[$item->unit_kode]= $item->unit_nama;
@@ -777,10 +777,128 @@ Class Generate {
 				->get();
 			foreach ($data as $row)
 			{
-				$point_rata[$item->unit_kode][] = number_format($row->point_rata,4,".",",");
+				$point_rata[$item->unit_kode][] = number_format($row->point_rata,2,".",",");
 				$point_total[$item->unit_kode][] = $row->point_total;
 			}
 		}
 		return ['unit_nama'=>$unit_nama,'point_rata'=>$point_rata,'point_total'=>$point_total];
 	}
+    public static function NilaiCkpBulan($kabkota,$bulan,$tahun)
+    {
+        $data = \DB::table('m_keg')
+                ->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
+                ->leftJoin(\DB::raw("(select unit_kode as unit_kode_prov, unit_nama as unit_nama_prov, unit_parent as unit_parent_prov from t_unitkerja where unit_jenis='1') as unit_prov"),'m_keg.keg_unitkerja','=','unit_prov.unit_kode_prov')
+                ->leftJoin('t_unitkerja','m_keg_target.keg_t_unitkerja','=','t_unitkerja.unit_kode')
+				->where('m_keg_target.keg_t_unitkerja',$kabkota)
+                ->whereMonth('m_keg.keg_end','=',(int)$bulan)
+				->whereYear('m_keg.keg_end','=',$tahun)
+				->where('m_keg_target.keg_t_target','>','0')
+				->select(\DB::raw("month(m_keg.keg_end) as bulan, year(m_keg.keg_end) as tahun,m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_jumlah, sum(m_keg_target.keg_t_point) as point_total, avg(m_keg_target.keg_t_point) as point_rata, count(*) as keg_jml"))
+				->groupBy('m_keg_target.keg_t_unitkerja')
+				->orderBy('point_rata','desc')
+                ->first();
+        if ($data->point_rata)
+        {
+            $nilai_point = number_format($data->point_rata,2,".",",");
+        }
+        else
+        {
+            $nilai_point = 0;
+        }
+
+        /*
+        1	5.00-4.50	99-97
+        2	4.49-4.00	96-94
+        3	3.99-3.50	93-91
+        4	3.49-3.00	90-88
+        5	2.99-2.50	87-85
+        6	< 2.50	    84-80
+        */
+        if ($nilai_point == 5)
+            {
+                $nilai_ckp = 99;
+            }
+        elseif ($nilai_point < 5 and $nilai_point >= 4.5)
+            {
+                $nilai_rill = $nilai_point - 4.5;
+                $nilai_rill = $nilai_rill/0.5;
+                $nilai_rill = $nilai_rill/2;
+                $nilai_ckp = 97 + $nilai_rill;
+            }
+        elseif ($nilai_point == 4.49)
+        {
+            $nilai_ckp = 96;
+        }
+        elseif ($nilai_point < 4.49  and $nilai_point >= 4)
+        {
+            $nilai_rill = $nilai_point - 4;
+            $nilai_rill = $nilai_rill/0.49;
+            $nilai_rill = $nilai_rill/2;
+            $nilai_ckp = 94 + $nilai_rill;
+        }
+        elseif ($nilai_point == 3.99)
+        {
+            $nilai_ckp = 93;
+        }
+        elseif ($nilai_point < 3.99  and $nilai_point >= 3.50)
+        {
+            $nilai_rill = $nilai_point - 3.5;
+            $nilai_rill = $nilai_rill/0.49;
+            $nilai_rill = $nilai_rill/2;
+            $nilai_ckp = 91 + $nilai_rill;
+        }
+        elseif ($nilai_point == 3.49)
+        {
+            $nilai_ckp = 90;
+        }
+        elseif ($nilai_point < 3.49  and $nilai_point >= 3)
+        {
+            $nilai_rill = $nilai_point - 3;
+            $nilai_rill = $nilai_rill/0.49;
+            $nilai_rill = $nilai_rill/2;
+            $nilai_ckp = 88 + $nilai_rill;
+        }
+        elseif ($nilai_point == 2.99)
+        {
+            $nilai_ckp = 87;
+        }
+        elseif ($nilai_point < 2.99  and $nilai_point >= 2.5)
+        {
+            $nilai_rill = $nilai_point - 2.5;
+            $nilai_rill = $nilai_rill/0.49;
+            $nilai_rill = $nilai_rill/2;
+            $nilai_ckp = 85 + $nilai_rill;
+        }
+        elseif ($nilai_point == 2.49)
+        {
+            $nilai_ckp = 84;
+        }
+        elseif ($nilai_point < 2.49 and $nilai_point > 0)
+        {
+            /*
+            5.0-4.5=0.5  (R1-R2=R) 2,49 – 2  = 0,49
+            99-97=2   (C1-C2=C)  84 – 80 = 4
+            4.7-4.5=0.2  (NS-R2 = A) 2 – 0 = 2
+            0.2/0.5=0.4   (A/R = B) 2 / 0,49
+            0.4/2=0.8  (B/C = D)
+            97+0.8=97.8  (C2+D = CKP)
+            */
+            $nilai_r = 2.49 - $nilai_point;
+            $nilai_a = $nilai_point;
+            $nilai_b = $nilai_a/$nilai_r;
+            $nilai_rill = $nilai_b/4;
+            $nilai_ckp = 80 + $nilai_rill;
+        }
+        else
+        {
+            $nilai_ckp = $nilai_point;
+        }
+        $nilai_ckp = number_format($nilai_ckp,2,",",".");
+        $nilai_point = number_format($nilai_point,2,",",".");
+        $arr = array(
+			'nilai_point'=>$nilai_point,
+			'nilai_ckp'=>$nilai_ckp,
+		);
+        return $arr;
+    }
 }

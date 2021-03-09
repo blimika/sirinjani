@@ -2,7 +2,7 @@
  //$unit_nama = Generate::ChartNilaiTahunan($tahun)['unit_nama'];
  foreach ($dataPeringkat as $item ) {
      $unit_nama[] = $item->unit_nama;
-     $nilai[]=number_format($item->point_rata,4,".",",");
+     $nilai[]=number_format($item->point_rata,2,".",",");
  }
  $unit_nama = json_encode($unit_nama);
  $nilai = json_encode($nilai);
@@ -12,13 +12,13 @@
     $data_unit = $dataUnitkerja->where('unit_kode','=',$unit)->first();
     $nama_unit = $data_unit->unit_nama;
  }
- else 
+ else
  {
      $nama_unit ='';
  }
 @endphp
 <script>
-    
+
     Highcharts.chart('nilai_bulanan', {
        chart: {
         type: 'bar'

@@ -38,13 +38,13 @@
                     @if (Auth::user()->level == 3 or Auth::user()->level > 4)
                     <div class="row">
                         <div class="col-lg-6 col-sm-12 col-xs-12">
-                        <a href="{{route('kegiatan.tambah')}}" class="btn btn-info btn-rounded waves-effect waves-light m-b-20">Tambah</a> 
-                        
+                        <a href="{{route('kegiatan.tambah')}}" class="btn btn-info btn-rounded waves-effect waves-light m-b-20">Tambah</a>
+
                         </div>
                     </div>
                     @endif
                 @endif
-                
+
                 <div class="row">
                     <div class="col-lg-12 col-sm-12 col-xs-12">
                         @include('kegiatan.filter')
@@ -61,6 +61,7 @@
                             <th>Mulai</th>
                             <th>Berakhir</th>
                             <th>Target</th>
+                            <th>Realisasi</th>
                             <th>Satuan</th>
                             <th>SPJ</th>
                             @if (Auth::user())
@@ -76,20 +77,22 @@
                                        <td>{{$loop->iteration}}</td>
                                        <td>
                                            <div class="text-info">
-                                            <a href="{{route('kegiatan.detil',$item->keg_id)}}" class="text-info">{{$item->keg_nama}}</a> 
+                                            <a href="{{route('kegiatan.detil',$item->keg_id)}}" class="text-info">{{$item->keg_nama}}</a>
                                            </div>
                                            <small class="badge badge-success">{{$item->JenisKeg->jkeg_nama}}</small>
                                            <div class="progress m-t-10">
-                                               <div class="progress-bar 
-                                               @if (($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100 > 85)
-                                               bg-success 
-                                               @elseif (($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100 > 68)
-                                               bg-warning 
+                                               <div class="progress-bar
+                                               @if (($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100 >= 100)
+                                               bg-info
+                                               @elseif (($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100 > 80)
+                                               bg-success
+                                               @elseif (($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100 > 50)
+                                               bg-warning
                                                @else
-                                               bg-danger 
+                                               bg-danger
                                                @endif
-                                                wow animated progress-animated" style="width: {{number_format(($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100,2,".",",")}}%; height:7px;" role="progressbar"> 
-                                                <span class="sr-only">{{number_format(($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100,2,".",",")}} Terkirim</span> 
+                                                wow animated progress-animated" style="width: {{number_format(($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100,2,".",",")}}%; height:7px;" role="progressbar">
+                                                <span class="sr-only">{{number_format(($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100,2,".",",")}} Terkirim</span>
                                                 </div>
                                             </div>
                                        </td>
@@ -97,6 +100,7 @@
                                        <td>{{Tanggal::Panjang($item->keg_start)}}</td>
                                        <td>{{Tanggal::Panjang($item->keg_end)}}</td>
                                        <td>{{$item->keg_total_target}}</td>
+                                       <td>{{$item->RealisasiTerima->sum('keg_r_jumlah')}}</td>
                                        <td>{{$item->keg_target_satuan}}</td>
                                        <td>@include('kegiatan.spj')</td>
                                        @if (Auth::user())
@@ -151,7 +155,7 @@
                 ],
                 "displayLength": 30,
                 responsive: true
-                
+
             });
             $('.buttons-copy, .buttons-csv, .buttons-print, .buttons-pdf, .buttons-excel').addClass('btn btn-primary mr-1');
         });

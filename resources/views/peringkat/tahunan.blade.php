@@ -60,7 +60,7 @@
                                      @endforeach
                                     </select>
                                 </div>
-                                
+
                                 <div class="col-md-2">
                                     <button type="submit" class="btn btn-success">Filter</button>
                                 </div>
@@ -90,7 +90,7 @@
                                         <td>{{$item->unit_nama}}</td>
                                         <td>{{$item->keg_jml}}</td>
                                         <td>{{$item->keg_jml_target}}</td>
-                                        <td>{{number_format($item->point_rata,4,".",",")}}</td>
+                                        <td>{{number_format($item->point_rata,2,".",",")}}</td>
                                     </tr>
                                 @endforeach
                                 </tbody>
@@ -144,7 +144,7 @@
                 ],
                 "displayLength": 30,
                 responsive: true
-                
+
             });
             $('.buttons-copy, .buttons-csv, .buttons-print, .buttons-pdf, .buttons-excel').addClass('btn btn-primary mr-1');
         });

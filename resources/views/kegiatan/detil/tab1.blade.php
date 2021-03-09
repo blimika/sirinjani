@@ -16,30 +16,34 @@
     <tr>
         <td>Progres Kegiatan</td>
         <td>
-            <div>Konfirmasi Pengiriman <span class="float-right">{{number_format(($dataKegiatan->RealisasiKirim->sum('keg_r_jumlah')/$dataKegiatan->keg_total_target)*100,2,",",".")}}%</span></div> 
+            <div>Konfirmasi Pengiriman <span class="float-right">{{number_format(($dataKegiatan->RealisasiKirim->sum('keg_r_jumlah')/$dataKegiatan->keg_total_target)*100,2,",",".")}}%</span></div>
             <div class="progress ">
-                <div class="progress-bar 
-                @if (($dataKegiatan->RealisasiKirim->sum('keg_r_jumlah')/$dataKegiatan->keg_total_target)*100 > 85)
-                bg-success 
-                @elseif (($dataKegiatan->RealisasiKirim->sum('keg_r_jumlah')/$dataKegiatan->keg_total_target)*100 > 68)
+                <div class="progress-bar
+                @if (($dataKegiatan->RealisasiKirim->sum('keg_r_jumlah')/$dataKegiatan->keg_total_target)*100 > 99)
+                bg-info
+                @elseif (($dataKegiatan->RealisasiKirim->sum('keg_r_jumlah')/$dataKegiatan->keg_total_target)*100 > 80)
+                bg-success
+                @elseif (($dataKegiatan->RealisasiKirim->sum('keg_r_jumlah')/$dataKegiatan->keg_total_target)*100 > 50)
                 bg-warning
-                @else 
+                @else
                 bg-danger
                 @endif
-                wow animated progress-animated" style="width: {{number_format(($dataKegiatan->RealisasiKirim->sum('keg_r_jumlah')/$dataKegiatan->keg_total_target)*100,2,".",",")}}%; height:20px;" role="progressbar"> 
-                <span class="sr-only">{{number_format(($dataKegiatan->RealisasiKirim->sum('keg_r_jumlah')/$dataKegiatan->keg_total_target)*100,2,",",".")}}% Terkirim</span> 
+                wow animated progress-animated" style="width: {{number_format(($dataKegiatan->RealisasiKirim->sum('keg_r_jumlah')/$dataKegiatan->keg_total_target)*100,2,".",",")}}%; height:20px;" role="progressbar">
+                <span class="sr-only">{{number_format(($dataKegiatan->RealisasiKirim->sum('keg_r_jumlah')/$dataKegiatan->keg_total_target)*100,2,",",".")}}% Terkirim</span>
                 </div>
             </div>
-            <div class="m-t-30">Konfirmasi Penerimaan 
+            <div class="m-t-30">Konfirmasi Penerimaan
                 <span class="float-right">{{number_format(($dataKegiatan->RealisasiTerima->sum('keg_r_jumlah')/$dataKegiatan->keg_total_target)*100,2,",",".")}}%</span>
             </div>
             <div class="progress">
-                <div class="progress-bar 
-                @if (($dataKegiatan->RealisasiTerima->sum('keg_r_jumlah')/$dataKegiatan->keg_total_target)*100 > 85)
+                <div class="progress-bar
+                @if (($dataKegiatan->RealisasiTerima->sum('keg_r_jumlah')/$dataKegiatan->keg_total_target)*100 > 99)
+                bg-info
+                @elseif (($dataKegiatan->RealisasiTerima->sum('keg_r_jumlah')/$dataKegiatan->keg_total_target)*100 > 80)
                 bg-success
-                @elseif (($dataKegiatan->RealisasiTerima->sum('keg_r_jumlah')/$dataKegiatan->keg_total_target)*100 > 68)
+                @elseif (($dataKegiatan->RealisasiTerima->sum('keg_r_jumlah')/$dataKegiatan->keg_total_target)*100 > 50)
                 bg-warning
-                @else 
+                @else
                 bg-danger
                 @endif
                 wow animated progress-animated" style="width: {{number_format(($dataKegiatan->RealisasiTerima->sum('keg_r_jumlah')/$dataKegiatan->keg_total_target)*100,2,".",",")}}%; height:20px;" role="progressbar"> <span class="sr-only">{{number_format(($dataKegiatan->RealisasiTerima->sum('keg_r_jumlah')/$dataKegiatan->keg_total_target)*100,2,",",".")}}% Complete</span> </div>
@@ -50,31 +54,31 @@
     <tr>
         <td>Progres SPJ</td>
         <td>
-            <div>Konfirmasi Pengiriman SPJ 
-                <span class="float-right">{{number_format(($dataKegiatan->RealisasiKirimSpj->sum('spj_r_jumlah')/$dataKegiatan->TargetSpj->sum('spj_t_target'))*100,2,",",".")}}%</span></div> 
+            <div>Konfirmasi Pengiriman SPJ
+                <span class="float-right">{{number_format(($dataKegiatan->RealisasiKirimSpj->sum('spj_r_jumlah')/$dataKegiatan->TargetSpj->sum('spj_t_target'))*100,2,",",".")}}%</span></div>
             <div class="progress ">
-                <div class="progress-bar 
+                <div class="progress-bar
                 @if (($dataKegiatan->RealisasiKirimSpj->sum('spj_r_jumlah')/$dataKegiatan->TargetSpj->sum('spj_t_target'))*100 > 85)
-                bg-success 
+                bg-success
                 @elseif (($dataKegiatan->RealisasiKirimSpj->sum('spj_r_jumlah')/$dataKegiatan->TargetSpj->sum('spj_t_target'))*100 > 68)
                 bg-warning
-                @else 
+                @else
                 bg-danger
                 @endif
-                wow animated progress-animated" style="width: {{number_format(($dataKegiatan->RealisasiKirimSpj->sum('spj_r_jumlah')/$dataKegiatan->TargetSpj->sum('spj_t_target'))*100,2,".",",")}}%; height:20px;" role="progressbar"> 
-                <span class="sr-only">{{number_format(($dataKegiatan->RealisasiKirimSpj->sum('spj_r_jumlah')/$dataKegiatan->TargetSpj->sum('spj_t_target'))*100,2,",",".")}}% Terkirim</span> 
+                wow animated progress-animated" style="width: {{number_format(($dataKegiatan->RealisasiKirimSpj->sum('spj_r_jumlah')/$dataKegiatan->TargetSpj->sum('spj_t_target'))*100,2,".",",")}}%; height:20px;" role="progressbar">
+                <span class="sr-only">{{number_format(($dataKegiatan->RealisasiKirimSpj->sum('spj_r_jumlah')/$dataKegiatan->TargetSpj->sum('spj_t_target'))*100,2,",",".")}}% Terkirim</span>
                 </div>
             </div>
             <div class="m-t-30">Konfirmasi Penerimaan SPJ
                 <span class="float-right">{{number_format(($dataKegiatan->RealisasiTerimaSpj->sum('spj_r_jumlah')/$dataKegiatan->TargetSpj->sum('spj_t_target'))*100,2,",",".")}}%</span>
             </div>
             <div class="progress">
-                <div class="progress-bar 
+                <div class="progress-bar
                 @if (($dataKegiatan->RealisasiTerimaSpj->sum('spj_r_jumlah')/$dataKegiatan->TargetSpj->sum('spj_t_target'))*100 > 85)
                 bg-success
                 @elseif (($dataKegiatan->RealisasiTerimaSpj->sum('spj_r_jumlah')/$dataKegiatan->TargetSpj->sum('spj_t_target'))*100 > 68)
                 bg-warning
-                @else 
+                @else
                 bg-danger
                 @endif
                 wow animated progress-animated" style="width: {{number_format(($dataKegiatan->RealisasiTerimaSpj->sum('spj_r_jumlah')/$dataKegiatan->TargetSpj->sum('spj_t_target'))*100,2,".",",")}}%; height:20px;" role="progressbar"> <span class="sr-only">{{number_format(($dataKegiatan->RealisasiTerimaSpj->sum('spj_r_jumlah')/$dataKegiatan->TargetSpj->sum('spj_t_target'))*100,2,",",".")}}% Complete</span> </div>
@@ -130,8 +134,8 @@
                     <button class="btn btn-danger hapuskegiatan" data-kegid="{{$dataKegiatan->keg_id}}" data-kegnama="{{$dataKegiatan->keg_nama}}"><i class="fas fa-trash"></i></button>
                 </div>
             </td>
-        </tr>    
+        </tr>
         @endif
     @endif
-    
+
 </table>

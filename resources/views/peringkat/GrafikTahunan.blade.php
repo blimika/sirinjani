@@ -2,14 +2,14 @@
  //$unit_nama = Generate::ChartNilaiTahunan($tahun)['unit_nama'];
  foreach ($dataPeringkat as $item ) {
      $unit_nama[] = $item->unit_nama;
-     $nilai[]=number_format($item->point_rata,4,".",",");
+     $nilai[]=number_format($item->point_rata,2,".",",");
  }
  $unit_nama = json_encode($unit_nama);
  $nilai = json_encode($nilai);
  $nilai = str_replace('"', '', $nilai);
 @endphp
 <script>
-    
+
     Highcharts.chart('nilai_tahunan', {
        chart: {
         type: 'bar'

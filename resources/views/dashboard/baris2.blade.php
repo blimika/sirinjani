@@ -28,12 +28,14 @@
                                             <div class="col-sm-6">
                                                 <h6>Pengiriman<span class="float-right">{{number_format(($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100,2,",",".")}}%</span></h6>
                                                 <div class="progress">
-                                                    <div class="progress-bar 
-                                                        @if (($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100 > 85)
-                                                        bg-success 
-                                                        @elseif (($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100 > 68)
+                                                    <div class="progress-bar
+                                                        @if (($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100 >= 100)
+                                                        bg-info
+                                                        @elseif (($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100 > 80)
+                                                        bg-success
+                                                        @elseif (($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100 > 50)
                                                         bg-warning
-                                                        @else 
+                                                        @else
                                                         bg-danger
                                                         @endif
                                                         wow animated progress-animated" role="progressbar" style="width: {{number_format(($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100,2,".",",")}}%; height: 15px;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
@@ -42,27 +44,29 @@
                                             <div class="col-sm-6">
                                                 <h6>Penerimaan<span class="float-right">{{number_format(($item->RealisasiTerima->sum('keg_r_jumlah')/$item->keg_total_target)*100,2,",",".")}}%</span></h6>
                                                 <div class="progress">
-                                                    
-                                                    <div class="progress-bar 
-                                                        @if (($item->RealisasiTerima->sum('keg_r_jumlah')/$item->keg_total_target)*100 > 85)
+
+                                                    <div class="progress-bar
+                                                        @if (($item->RealisasiTerima->sum('keg_r_jumlah')/$item->keg_total_target)*100 >= 100)
+                                                        bg-info
+                                                        @elseif (($item->RealisasiTerima->sum('keg_r_jumlah')/$item->keg_total_target)*100 > 80)
                                                         bg-success
-                                                        @elseif (($item->RealisasiTerima->sum('keg_r_jumlah')/$item->keg_total_target)*100 > 68)
+                                                        @elseif (($item->RealisasiTerima->sum('keg_r_jumlah')/$item->keg_total_target)*100 > 50)
                                                         bg-warning
-                                                        @else 
+                                                        @else
                                                         bg-danger
                                                         @endif
                                                         wow animated progress-animated" role="progressbar" style="width: {{number_format(($item->RealisasiTerima->sum('keg_r_jumlah')/$item->keg_total_target)*100,2,".",",")}}%; height: 15px;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
                                                 </div>
                                             </div>
                                         </div>
-                                       
+
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
-                @else 
+                @else
                     Belum ada kegiatan mendekati batas waktu
                 @endif
             </div>
@@ -94,8 +98,8 @@
                         <div id="nilai_rata"></div>
                     </div>
                 </div>
-                
-                
+
+
             </div>
         </div>
     </div>

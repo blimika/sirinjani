@@ -2,7 +2,7 @@
     $(".hapuskegiatan").click(function (e) {
     e.preventDefault();
     var id = $(this).data('kegid');
-    var nama = $(this).data('kegnama');    
+    var nama = $(this).data('kegnama');
     Swal.fire({
                 title: 'Akan dihapus?',
                 text: "Kegiatan "+nama+" akan dihapus permanen. semua target dan realisasi kegiatan akan terhapus juga.",
@@ -44,9 +44,9 @@
                                     'Error!',
                                     ''+data.hasil+'',
                                     'danger'
-                                ); 
+                                );
                             }
-                            
+
                         },
                         error: function(){
                             Swal.fire(
@@ -57,7 +57,7 @@
                         }
 
                     });
-                   
+
                 }
             })
 });
@@ -159,7 +159,7 @@ $(".tglkirim").datepicker({
 $(".hapuskirim").click(function (e) {
     e.preventDefault();
     var id = $(this).data('kegrid');
-    var nama = $(this).data('nama');    
+    var nama = $(this).data('nama');
     Swal.fire({
                 title: 'Akan dihapus?',
                 text: "Realisasi "+nama+" akan dihapus permanen. setelah dihapus tidak bisa dikembalikan.",
@@ -201,9 +201,9 @@ $(".hapuskirim").click(function (e) {
                                     'Error!',
                                     ''+data.hasil+'',
                                     'danger'
-                                ); 
+                                );
                             }
-                            
+
                         },
                         error: function(){
                             Swal.fire(
@@ -214,7 +214,7 @@ $(".hapuskirim").click(function (e) {
                         }
 
                     });
-                   
+
                 }
             })
 });
@@ -269,7 +269,7 @@ $(".tglterima").datepicker({
 $(".hapusterima").click(function (e) {
     e.preventDefault();
     var id = $(this).data('kegrid');
-    var nama = $(this).data('nama');    
+    var nama = $(this).data('nama');
     Swal.fire({
                 title: 'Akan dihapus?',
                 text: "Realisasi "+nama+" akan dihapus permanen. setelah dihapus tidak bisa dikembalikan.",
@@ -311,9 +311,9 @@ $(".hapusterima").click(function (e) {
                                     'Error!',
                                     ''+data.hasil+'',
                                     'danger'
-                                ); 
+                                );
                             }
-                            
+
                         },
                         error: function(){
                             Swal.fire(
@@ -324,7 +324,7 @@ $(".hapusterima").click(function (e) {
                         }
 
                     });
-                   
+
                 }
             })
 });
@@ -391,6 +391,7 @@ $('#EditInfoLanjutanModal').on('show.bs.modal', function (event) {
             $('#EditInfoLanjutanModal .modal-body #keg_start').text(data.keg_start_nama)
             $('#EditInfoLanjutanModal .modal-body #keg_end').text(data.keg_end_nama)
             $('#EditInfoLanjutanModal .modal-body #keg_target').text(data.keg_target+" "+data.keg_satuan)
+            $('#EditInfoLanjutanModal .modal-body #keg_info').wysihtml5();
             $('#EditInfoLanjutanModal .modal-body #keg_info').text(data.keg_info)
             $('#EditInfoLanjutanModal .modal-body #keg_id').val(kegid)
            }
