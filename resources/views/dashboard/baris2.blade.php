@@ -77,6 +77,31 @@
     <div class="col-lg-6 col-md-6">
         <div class="card">
             <div class="card-body">
+                <h4 class="card-title">Grafik Nilai</h4>
+                 <!-- Nav tabs -->
+                 <ul class="nav nav-tabs customtab2" role="tablist">
+                    <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#bulanan" role="tab"><span class="hidden-sm-up"><i class="ti-home"></i></span> <span class="hidden-xs-down">BULANAN</span></a> </li>
+                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#tahunan" role="tab"><span class="hidden-sm-up"><i class="ti-user"></i></span> <span class="hidden-xs-down">TAHUNAN</span></a> </li>
+                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#rata2" role="tab"><span class="hidden-sm-up"><i class="ti-user"></i></span> <span class="hidden-xs-down">RATA-RATA BULANAN</span></a> </li>
+                </ul>
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div class="tab-pane active" id="bulanan" role="tabpanel">
+                        <div class="p-20">
+                            <div id="nilai_bulanan"></div>
+                        </div>
+                    </div>
+                    <div class="tab-pane p-20" id="tahunan" role="tabpanel">
+                        <div id="nilai_tahunan"></div>
+                    </div>
+                    <div class="tab-pane p-20" id="rata2" role="tabpanel">
+                        <div id="nilai_rata"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
                 <h4 class="card-title">Rekap Kegiatan Bulan {{\Carbon\Carbon::now()->subMonth()->isoFormat('MMMM YYYY')}}</h4>
                 <table class="table color-bordered-table success-bordered-table">
                     <thead>
@@ -103,33 +128,6 @@
                     </tbody>
                 </table>
                 <a href="{{route('peringkat.rincian')}}" class="btn btn-sm btn-success">Selengkapnya</a>
-
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <h4 class="card-title">Grafik Nilai</h4>
-                 <!-- Nav tabs -->
-                 <ul class="nav nav-tabs customtab2" role="tablist">
-                    <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#bulanan" role="tab"><span class="hidden-sm-up"><i class="ti-home"></i></span> <span class="hidden-xs-down">BULANAN</span></a> </li>
-                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#tahunan" role="tab"><span class="hidden-sm-up"><i class="ti-user"></i></span> <span class="hidden-xs-down">TAHUNAN</span></a> </li>
-                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#rata2" role="tab"><span class="hidden-sm-up"><i class="ti-user"></i></span> <span class="hidden-xs-down">RATA-RATA BULANAN</span></a> </li>
-                </ul>
-                <!-- Tab panes -->
-                <div class="tab-content">
-                    <div class="tab-pane active" id="bulanan" role="tabpanel">
-                        <div class="p-20">
-                            <div id="nilai_bulanan"></div>
-                        </div>
-                    </div>
-                    <div class="tab-pane p-20" id="tahunan" role="tabpanel">
-                        <div id="nilai_tahunan"></div>
-                    </div>
-                    <div class="tab-pane p-20" id="rata2" role="tabpanel">
-                        <div id="nilai_rata"></div>
-                    </div>
-                </div>
-
 
             </div>
         </div>
