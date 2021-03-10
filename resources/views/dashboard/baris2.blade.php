@@ -77,6 +77,37 @@
     <div class="col-lg-6 col-md-6">
         <div class="card">
             <div class="card-body">
+                <h4 class="card-title">Rekap Kegiatan Bulan {{\Carbon\Carbon::now()->subMonth()->isoFormat('MMMM YYYY')}}</h4>
+                <table class="table color-bordered-table success-bordered-table">
+                    <thead>
+                        <tr>
+                            <th>Kabkota</th>
+                            <th>Kegiatan</th>
+                            <th>Target</th>
+                            <th>Dikirim</th>
+                            <th>Diterima</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if ($dataRekapKegiatan)
+                            @foreach ($dataRekapKegiatan as $item)
+                                <tr>
+                                    <td>{{$item->unit_nama}}</td>
+                                    <td class="text-right">{{$item->keg_jml}}</td>
+                                    <td class="text-right">{{$item->keg_jml_target}}</td>
+                                    <td class="text-right">{{$item->jumlah_dikirim}}</td>
+                                    <td class="text-right">{{$item->jumlah_diterima}}</td>
+                                </tr>
+                            @endforeach
+                        @endif
+                    </tbody>
+                </table>
+                <a href="{{route('peringkat.rincian')}}" class="btn btn-sm btn-success">Selengkapnya</a>
+
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
                 <h4 class="card-title">Grafik Nilai</h4>
                  <!-- Nav tabs -->
                  <ul class="nav nav-tabs customtab2" role="tablist">

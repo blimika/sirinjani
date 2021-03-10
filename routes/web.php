@@ -11,11 +11,13 @@
 |
 */
 Auth::routes();
+/*
 Route::get('/', function () {
     return view('depan');
 });
+*/
 
-
+Route::get('/', 'DepanController@depan')->name('depan');
 Route::get('/kegiatan/list', 'KegiatanController@index')->name('kegiatan.list');
 Route::get('/kegiatan/bidang', 'KegiatanController@bidang')->name('kegiatan.bidang');
 Route::get('/kegiatan/cari/{kegId}', 'KegiatanController@cariKegiatan')->name('kegiatan.cari');
@@ -59,6 +61,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/peringkat/rincian', 'PeringkatController@rincian')->name('peringkat.rincian');
     Route::get('/peringkat/export/{unitkerja}/{bulan}/{tahun}', 'PeringkatController@ExportExcel')->name('peringkat.export');
     Route::get('/peringkat/ckp', 'PeringkatController@Ckp')->name('peringkat.ckp');
+    Route::get('/ckp/export/{tahun}', 'PeringkatController@ExportCkpExcel')->name('ckp.export');
     Route::get('/laporan/bulanan', 'LaporanController@bulanan')->name('laporan.bulanan');
     Route::get('/laporan/tahunan', 'LaporanController@tahunan')->name('laporan.tahunan');
     Route::get('/db/list', 'DataController@index')->name('db.index');

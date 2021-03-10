@@ -7,6 +7,7 @@ use DB;
 use App\UnitKerja;
 use App\Exports\FormatViewExim;
 use Excel;
+use App\Helpers\Generate;
 
 class PeringkatController extends Controller
 {
@@ -223,6 +224,50 @@ class PeringkatController extends Controller
             );
         }
         $fileName = 'rincian-kegiatan-kabkota-';
+        $namafile = $fileName . date('Y-m-d_H-i-s') . '.xlsx';
+        //dd($anggaran_array);
+        return Excel::download(new FormatViewExim($rincian_array), $namafile);
+    }
+    public function ExportCkpExcel($tahun)
+    {
+        $data_bulan = array(
+            1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'
+        );
+        $Kabkota = UnitKerja::where([['unit_jenis','=','2'],['unit_eselon','=','3']])->get();
+        //dd($Kabkota);
+
+        foreach ($Kabkota as $item) {
+
+            $rincian_array[] = array(
+                'BPS KABKOTA' => $item->unit_nama,
+                'TAHUN' => $tahun,
+                'POIN JANUARI' => Generate::NilaiCkpBulan($item->unit_kode,1,$tahun)['nilai_point'],
+                'CKP JANUARI' => Generate::NilaiCkpBulan($item->unit_kode,1,$tahun)['nilai_ckp'],
+                'POIN FEBRUARI' => Generate::NilaiCkpBulan($item->unit_kode,2,$tahun)['nilai_point'],
+                'CKP FEBRUARI' => Generate::NilaiCkpBulan($item->unit_kode,2,$tahun)['nilai_ckp'],
+                'POIN MARET' => Generate::NilaiCkpBulan($item->unit_kode,3,$tahun)['nilai_point'],
+                'CKP MARET' => Generate::NilaiCkpBulan($item->unit_kode,3,$tahun)['nilai_ckp'],
+                'POIN APRIL' => Generate::NilaiCkpBulan($item->unit_kode,4,$tahun)['nilai_point'],
+                'CKP APRIL' => Generate::NilaiCkpBulan($item->unit_kode,4,$tahun)['nilai_ckp'],
+                'POIN MEI' => Generate::NilaiCkpBulan($item->unit_kode,5,$tahun)['nilai_point'],
+                'CKP MEI' => Generate::NilaiCkpBulan($item->unit_kode,5,$tahun)['nilai_ckp'],
+                'POIN JUNI' => Generate::NilaiCkpBulan($item->unit_kode,6,$tahun)['nilai_point'],
+                'CKP JUNI' => Generate::NilaiCkpBulan($item->unit_kode,6,$tahun)['nilai_ckp'],
+                'POIN JULI' => Generate::NilaiCkpBulan($item->unit_kode,7,$tahun)['nilai_point'],
+                'CKP JULI' => Generate::NilaiCkpBulan($item->unit_kode,7,$tahun)['nilai_ckp'],
+                'POIN AGUSTUS' => Generate::NilaiCkpBulan($item->unit_kode,8,$tahun)['nilai_point'],
+                'CKP AGUSTUS' => Generate::NilaiCkpBulan($item->unit_kode,8,$tahun)['nilai_ckp'],
+                'POIN SEPTEMBER' => Generate::NilaiCkpBulan($item->unit_kode,9,$tahun)['nilai_point'],
+                'CKP SEPTEMBER' => Generate::NilaiCkpBulan($item->unit_kode,9,$tahun)['nilai_ckp'],
+                'POIN OKTOBER' => Generate::NilaiCkpBulan($item->unit_kode,10,$tahun)['nilai_point'],
+                'CKP OKTOBER' => Generate::NilaiCkpBulan($item->unit_kode,10,$tahun)['nilai_ckp'],
+                'POIN NOVEMBER' => Generate::NilaiCkpBulan($item->unit_kode,11,$tahun)['nilai_point'],
+                'CKP NOVEMBER' => Generate::NilaiCkpBulan($item->unit_kode,11,$tahun)['nilai_ckp'],
+                'POIN DESEMBER' => Generate::NilaiCkpBulan($item->unit_kode,12,$tahun)['nilai_point'],
+                'CKP DESEMBER' => Generate::NilaiCkpBulan($item->unit_kode,12,$tahun)['nilai_ckp'],
+            );
+        }
+        $fileName = 'nilai-ckp-kabkota-';
         $namafile = $fileName . date('Y-m-d_H-i-s') . '.xlsx';
         //dd($anggaran_array);
         return Excel::download(new FormatViewExim($rincian_array), $namafile);

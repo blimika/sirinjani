@@ -1,6 +1,6 @@
 <div class="table-responsive">
     <h4 class="card-title text-center">Nilai CKP Kabupaten/Kota</h4>
-    <a href="#" class="btn btn-success m-t-10 m-b-20"><i class="fas fa-file-excel"></i> Export ke Excel</a>
+    <a href="{{route("ckp.export",$tahun)}}" class="btn btn-success m-t-10 m-b-20"><i class="fas fa-file-excel"></i> Export ke Excel</a>
     <table class="table table-bordered table-hover table-striped" cellspacing="0" width="100%">
         <thead>
         <tr>
