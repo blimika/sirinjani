@@ -79,8 +79,13 @@
     <div class="col-lg-12 col-sm-12 col-xs-12">
         <div class="card">
             <div class="card-body">
+                @if ($data->where('unit_parent',$unit)->count())
+                    <div class="col-lg-6 m-b-20">
+                        <a href="{{route('bulanan.export',["$unit","$bulan","$tahun"])}}" class="btn btn-success"><i class="fas fa-file-excel"></i> Export ke Excel</a>
+                    </div>
+                @endif
                 <div class="table-responsive">
-                    <h4 class="card-title">Laporan Kegiatan {{$unit_nama}} @if ($bulan > 0) Bulan {{$dataBulan[(int)$bulan]}} @else Tahun @endif {{ $tahun }}</h4>
+                    <h4 class="card-title">Laporan Kegiatan [{{$unit}}] {{$unit_nama}} @if ($bulan > 0) Bulan {{$dataBulan[(int)$bulan]}} @else Tahun @endif {{ $tahun }}</h4>
                     <table class="table color-bordered-table success-bordered-table table-striped table-bordered">
                         <thead>
                             <tr>
@@ -109,12 +114,16 @@
                                             <td align="right">
                                                 {{$detil->RealisasiKirim->sum('keg_r_jumlah')}}
                                                 <br />
-                                                ({{number_format(($detil->RealisasiKirim->sum('keg_r_jumlah')/$detil->Target->sum('keg_t_target'))*100,2,",",".")}})
+                                                ({{number_format(($detil->RealisasiKirim->sum('keg_r_jumlah')/$detil->Target->sum('keg_t_target'))*100,2,",",".")}}%)
                                             </td>
                                             <td align="right">
                                                 {{$detil->RealisasiTerima->sum('keg_r_jumlah')}}
                                                 <br />
-                                                ({{number_format(($detil->RealisasiTerima->sum('keg_r_jumlah')/$detil->RealisasiKirim->sum('keg_r_jumlah'))*100,2,",",".")}})
+                                                @if ($detil->RealisasiKirim->sum('keg_r_jumlah') > 0)
+                                                    ({{number_format(($detil->RealisasiTerima->sum('keg_r_jumlah')/$detil->RealisasiKirim->sum('keg_r_jumlah'))*100,2,",",".")}}%)
+                                                @else
+                                                    ({{number_format(0,2,",",".")}}%)
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach

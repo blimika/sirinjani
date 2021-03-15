@@ -140,10 +140,10 @@ class PeringkatController extends Controller
         ->groupBy('tahun')
         ->whereYear('keg_end','<=',NOW())
         ->orderBy('tahun','asc')
-          ->get();
+         ->get();
         if (request('bulan')<=0)
         {
-            $bulan_filter=(int) date('m');
+            $bulan_filter = (int) date('m');
         }
         else
         {
@@ -151,7 +151,7 @@ class PeringkatController extends Controller
         }
         if (request('tahun')<=0)
         {
-            $tahun_filter=date('Y');
+            $tahun_filter = date('Y');
         }
         else
         {

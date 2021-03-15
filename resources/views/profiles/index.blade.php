@@ -36,51 +36,33 @@
             <div class="card-body">
                     <h3><b>{{Auth::user()->nama}}</b></h3>
                     <hr>
-                    <div class="row">
-                        <div class="col-lg-2 col-md-2"><b>ID</b></div>
-                        <div class="col-lg-5 col-md-5">#{{Auth::user()->id}}</div>
-                        <div class="col-lg-5 col-md-5"></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-2 col-md-2"><b>Username</b></div>
-                        <div class="col-lg-5 col-md-5">{{Auth::user()->username}}</div>
-                        <div class="col-lg-5 col-md-5"></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-2 col-md-2"><b>Email</b></div>
-                        <div class="col-lg-5 col-md-5">{{Auth::user()->email}}</div>
-                        <div class="col-lg-5 col-md-5"></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-2 col-md-2"><b>Nomor WhatsApp</b></div>
-                        <div class="col-lg-5 col-md-5">{{Auth::user()->nohp}}</div>
-                        <div class="col-lg-5 col-md-5"></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-2 col-md-2"><b>Level</b></div>
-                        <div class="col-lg-5 col-md-5">{{Auth::user()->Level->level_nama}}</div>
-                        <div class="col-lg-5 col-md-5"></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-2 col-md-2"><b>Unit Kerja</b></div>
-                        <div class="col-lg-5 col-md-5">{{Auth::user()->Unitkerja->unit_nama}}</div>
-                        <div class="col-lg-5 col-md-5"></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-2 col-md-2"><b>Register Tanggal</b></div>
-                        <div class="col-lg-5 col-md-5">{{Tanggal::LengkapHariPanjang(Auth::user()->created_at)}}</div>
-                        <div class="col-lg-5 col-md-5"></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-2 col-md-2"><b>Terakhir Login</b></div>
-                        <div class="col-lg-5 col-md-5">{{Tanggal::LengkapHariPanjang(Auth::user()->lastlogin)}}</div>
-                        <div class="col-lg-5 col-md-5"></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-2 col-md-2"><b>Dari IP</b></div>
-                        <div class="col-lg-5 col-md-5">{{Auth::user()->lastip}}</div>
-                        <div class="col-lg-5 col-md-5"></div>
-                    </div>
+                    <dl class="row">
+                        <dt class="col-lg-2 col-md-2">ID</dt>
+                        <dd class="col-lg-10 col-sm-10">#{{Auth::user()->id}}</dd>
+                        <dt class="col-lg-2 col-md-2">Username</dt>
+                        <dd class="col-lg-10 col-sm-10">{{Auth::user()->username}}</dd>
+                        <dt class="col-lg-2 col-md-2">Email</dt>
+                        <dd class="col-lg-10 col-sm-10">{{Auth::user()->email}}</dd>
+                        <dt class="col-lg-2 col-md-2">Nomor WhatsApp</dt>
+                        <dd class="col-lg-10 col-sm-10">
+                            @if (Auth::user()->nohp)
+                                {{Auth::user()->nohp}}    
+                            @else
+                                -
+                            @endif
+                        </dd>
+                        <dt class="col-lg-2 col-md-2">Level</dt>
+                        <dd class="col-lg-10 col-sm-10">[{{Auth::user()->level}}] {{Auth::user()->Level->level_nama}}</dd>
+                        <dt class="col-lg-2 col-md-2">Unit Kerja</dt>
+                        <dd class="col-lg-10 col-sm-10">[{{Auth::user()->Unitkerja->unit_kode}}] {{Auth::user()->Unitkerja->unit_nama}}</dd>
+                        <dt class="col-lg-2 col-md-2">Register Tanggal</dt>
+                        <dd class="col-lg-10 col-sm-10">{{Tanggal::LengkapHariPanjang(Auth::user()->created_at)}}</dd>
+                        <dt class="col-lg-2 col-md-2">Terakhir Login</dt>
+                        <dd class="col-lg-10 col-sm-10">{{Tanggal::LengkapHariPanjang(Auth::user()->lastlogin)}}</dd>
+                        <dt class="col-lg-2 col-md-2">Dari IP</dt>
+                        <dd class="col-lg-10 col-sm-10">{{Auth::user()->lastip}}</dd>
+                    </dl>
+                   
                     <div class="row">
                         <div class="col-lg-4 m-t-30">
                             <button class="btn btn-rounded btn-success" data-toggle="modal" data-target="#EditModal" data-id="{{Auth::user()->id}}" data-nama="{{Auth::user()->nama}}" data-email="{{Auth::user()->email}}"><i class="fas fa-pencil-alt" data-toggle="tooltip" title="Edit Data"></i> EDIT</button>

@@ -63,7 +63,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/peringkat/ckp', 'PeringkatController@Ckp')->name('peringkat.ckp');
     Route::get('/ckp/export/{tahun}', 'PeringkatController@ExportCkpExcel')->name('ckp.export');
     Route::get('/laporan/bulanan', 'LaporanController@bulanan')->name('laporan.bulanan');
+    Route::get('/laporan/bulanan/export/{unitkerja}/{bulan}/{tahun}', 'LaporanController@bulananExport')->name('bulanan.export');
     Route::get('/laporan/tahunan', 'LaporanController@tahunan')->name('laporan.tahunan');
+    Route::get('/laporan/tahunan/export/{unitkerja}/{tahun}', 'LaporanController@tahunanExport')->name('tahunan.export');
     Route::get('/db/list', 'DataController@index')->name('db.index');
     Route::get('/db/sinkron', 'DataController@Sinkron')->name('db.sinkron');
     Route::get('/db/kosongkan', 'DataController@Kosongkan')->name('db.kosongkan');
