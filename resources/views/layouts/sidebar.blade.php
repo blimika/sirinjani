@@ -38,7 +38,7 @@
                 <li><a href="{{route('peringkat.bulanan')}}">Peringkat Bulanan</a></li>
                 <li><a href="{{route('peringkat.tahunan')}}">Peringkat Tahunan</a></li>
                 <li><a href="{{route('peringkat.rincian')}}">Rincian Perkabkota</a></li>
-                <li><a href="{{route('peringkat.ckp')}}">Rekap Nilai CKP</a></li>
+                <!---<li><a href="{{route('peringkat.ckp')}}">Rekap Nilai CKP</a></li>--->
             </ul>
         </li>
         <li class="nav-small-cap">--- LAPORAN</li>
