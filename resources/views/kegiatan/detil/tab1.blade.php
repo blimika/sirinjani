@@ -106,7 +106,7 @@
     </tr>
     <tr>
         <td>Info Lanjutan</td>
-        <td>{{$dataKegiatan->keg_info}}</td>
+        <td>{!! $dataKegiatan->keg_info !!}</td>
     </tr>
     <tr>
         <td>Dibuat oleh</td>
