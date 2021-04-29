@@ -38,7 +38,11 @@
                 <li><a href="{{route('peringkat.bulanan')}}">Peringkat Bulanan</a></li>
                 <li><a href="{{route('peringkat.tahunan')}}">Peringkat Tahunan</a></li>
                 <li><a href="{{route('peringkat.rincian')}}">Rincian Perkabkota</a></li>
-                <!---<li><a href="{{route('peringkat.ckp')}}">Rekap Nilai CKP</a></li>--->
+                @if (Auth::user())
+                    @if (Auth::user()->flag_liatckp == 1 or Auth::user()->level > 5)
+                        <li><a href="{{route('peringkat.ckp')}}">Rekap Nilai CKP</a></li>
+                    @endif
+                @endif
             </ul>
         </li>
         <li class="nav-small-cap">--- LAPORAN</li>

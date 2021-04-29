@@ -8,6 +8,10 @@ use App\UnitKerja;
 use App\Exports\FormatViewExim;
 use Excel;
 use App\Helpers\Generate;
+use Illuminate\Support\Facades\Auth;
+use App\User;
+use Carbon\Carbon;
+use Session;
 
 class PeringkatController extends Controller
 {
@@ -99,34 +103,42 @@ class PeringkatController extends Controller
     }
     public function Ckp()
     {
-        $data_bulan = array(
-            1=>'Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'
-        );
-        $Kabkota = UnitKerja::where([['unit_jenis','=','2'],['unit_eselon','=','3']])->get();
-        $data_tahun = DB::table('m_keg')
-        ->selectRaw('year(keg_end) as tahun')
-        ->groupBy('tahun')
-        ->whereYear('keg_end','<=',NOW())
-        ->orderBy('tahun','asc')
-          ->get();
-        if (request('tahun')<=0)
+        if (Auth::user()->level > 5 or Auth::user()->flag_liatckp == 1)
         {
-        $tahun_filter=date('Y');
+            $data_bulan = array(
+                1=>'Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'
+            );
+            $Kabkota = UnitKerja::where([['unit_jenis','=','2'],['unit_eselon','=','3']])->get();
+            $data_tahun = DB::table('m_keg')
+            ->selectRaw('year(keg_end) as tahun')
+            ->groupBy('tahun')
+            ->whereYear('keg_end','<=',NOW())
+            ->orderBy('tahun','asc')
+              ->get();
+            if (request('tahun')<=0)
+            {
+            $tahun_filter=date('Y');
+            }
+            else
+            {
+            $tahun_filter = request('tahun');
+            }
+            if (request('bulan')<=0)
+            {
+                $bulan_filter=date('m');
+            }
+            else
+            {
+                $bulan_filter = request('bulan');
+            }
+    
+            return view('peringkat.ckp',['dataKabkota'=>$Kabkota,'dataTahun'=>$data_tahun,'tahun'=>$tahun_filter,'unit'=>request('unit'),'dataBulan'=>$data_bulan]);
         }
-        else
+        else 
         {
-        $tahun_filter = request('tahun');
+            return view('error.aksesditolak');
         }
-        if (request('bulan')<=0)
-        {
-            $bulan_filter=date('m');
-        }
-        else
-        {
-            $bulan_filter = request('bulan');
-        }
-
-        return view('peringkat.ckp',['dataKabkota'=>$Kabkota,'dataTahun'=>$data_tahun,'tahun'=>$tahun_filter,'unit'=>request('unit'),'dataBulan'=>$data_bulan]);
+        
     }
     public function rincian()
     {

@@ -58,6 +58,9 @@
                             <th>WhatsApp</th>
                             <th>Lastlogin</th>
                             <th>Status</th>
+                            @if (Auth::user()->level > 5)
+                            <th>Flag CKP</th>
+                            @endif
                             <th>Aksi</th>
                             </tr>
                             </thead>
@@ -88,7 +91,15 @@
                                             <span class="label label-rounded label-danger">Tidak aktif</span>
                                             @endif
                                         </td>
-
+                                        @if (Auth::user()->level > 5)
+                                        <td>
+                                            @if ($item->flag_liatckp==1)
+                                            <span class="label label-rounded label-info">Aktif</span>
+                                            @else
+                                            <span class="label label-rounded label-danger">Tidak aktif</span>
+                                            @endif
+                                        </td>
+                                        @endif
                                         <td>
                                             <button class="btn btn-circle btn-sm btn-success waves-light waves-effect" data-toggle="modal" data-target="#DetilModal" data-idop="{{$item->id}}"><i class="fas fa-search" data-toggle="tooltip" title="View Operator"></i></button>
                                             @if (Auth::user()->level > 3)

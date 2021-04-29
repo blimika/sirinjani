@@ -74,6 +74,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/operator/cek/{username}', 'OperatorController@cekOperator')->name('operator.cek');
     Route::post('/operator/hapus', 'OperatorController@OperatorHapus')->name('operator.hapus');
     Route::post('/operator/flag', 'OperatorController@FlagOperator')->name('operator.flag');
+    Route::post('/operator/flagliatckp', 'OperatorController@FlagLiatCkp')->name('operator.flagliatckp');
     Route::post('/operator/supersimpan', 'OperatorController@SuperSimpan')->name('operator.supersimpan');
     Route::post('/operator/superupdate', 'OperatorController@SuperUpdate')->name('operator.superupdate');
     Route::post('/operator/adminprovsimpan', 'OperatorController@AdminProvSimpan')->name('operator.adminprovsimpan');

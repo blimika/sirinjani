@@ -154,6 +154,33 @@ class OperatorController extends Controller
         }
         return Response()->json($arr);
     }
+    public function FlagLiatCkp(Request $request)
+    {
+        $count = User::where('id','=',$request->id)->count();
+        $arr = array(
+            'status'=>false,
+            'hasil'=>'Data operator tidak tersedia'
+        );
+        if ($count>0)
+        {
+            $data=User::where('id','=',$request->id)->first();
+            if ($request->flag==1)
+            {
+                $aktif = 0;
+            }
+            else
+            {
+                $aktif = 1;
+            }
+            $data->flag_liatckp = $aktif;
+            $data->update();
+            $arr = array(
+                'status'=>true,
+                'hasil'=>'Flag Liat CKP sudah diubah'
+            );
+        }
+        return Response()->json($arr);
+    }
     public function SuperSimpan(Request $request)
     {
         //dd($request->all());

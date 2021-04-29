@@ -6,13 +6,13 @@
 <!-- ============================================================== -->
 <div class="row page-titles">
     <div class="col-md-5 align-self-center">
-        <h4 class="text-themecolor">Usulan Nilai CKP</h4>
+        <h4 class="text-themecolor">AKSES DITOLAK</h4>
     </div>
     <div class="col-md-7 align-self-center text-right">
         <div class="d-flex justify-content-end align-items-center">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="javascript:void(0)">Dashboard</a></li>
-                <li class="breadcrumb-item active">Usulan Nilai CKP</li>
+                <li class="breadcrumb-item active">Akses di Tolak</li>
             </ol>
         </div>
     </div>
@@ -30,55 +30,12 @@
 <!-- ============================================================== -->
 <!-- Start Page Content -->
 <!-- ============================================================== -->
-<div class="row">
-    <div class="col-lg-12">
-        <div class="card">
-            <div class="card-body">
-                <form class="form-horizontal">
-                              <div class="form-group row">
-                                <label for="unit" class="col-sm-2 control-label">Nilai berdasarkan Tahun</label>
-                                <div class="col-md-2">
-                                    <select name="tahun" id="tahun" class="form-control">
-                                     @foreach ($dataTahun as $iTahun)
-                                     <option value="{{$iTahun->tahun}}" @if (request('tahun')==$iTahun->tahun or $tahun==$iTahun->tahun)
-                                     selected
-                                    @endif>{{$iTahun->tahun}}</option>
-                                     @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="col-md-2">
-                                    <button type="submit" class="btn btn-success">Filter</button>
-                                </div>
-                              </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 
 <div class="row">
     <div class="col-lg-12 col-sm-12 col-xs-12">
         <div class="card">
             <div class="card-body">
-                <!-- Nav tabs -->
-            <ul class="nav nav-tabs customtab" role="tablist">
-                <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#nilaickp" role="tab"><span class="hidden-sm-up"><i class="ti-home"></i></span> <span class="hidden-xs-down">Nilai CKP</span></a> </li>
-                <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#nilaipoin" role="tab"><span class="hidden-sm-up"><i class="ti-user"></i></span> <span class="hidden-xs-down">Nilai Poin</span></a> </li>
-            </ul>
-            <!-- Tab panes -->
-            <div class="tab-content">
-                <div class="tab-pane active" id="nilaickp" role="tabpanel">
-                    <div class="p-10">
-                       @include('peringkat.ckp1')
-                    </div>
-                </div>
-                <div class="tab-pane" id="nilaipoin" role="tabpanel">
-                    <div class="p-10">
-                        @include('peringkat.ckp2')
-                     </div>
-                </div>
-            </div>
+                <h2 class="text-center">Anda tidak memiliki hak akses pada halaman ini</h2>           
             </div>
         </div>
     </div>

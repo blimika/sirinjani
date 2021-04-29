@@ -181,4 +181,78 @@ $('#EditModal').on('show.bs.modal', function (event) {
 $('#EditModal').on('hidden.bs.modal', function(e) {
   $(this).find('.modal-body #formEditOperator')[0].reset();
 });
+
+$(".flagliatckp").click(function (e) {
+    e.preventDefault();
+    var id = $(this).data('id');
+    var flag = $(this).data('flag');
+    if (flag == 1)
+    {
+        var flagtext = 'Tidak Aktif?';
+    }
+    else
+    {
+        var flagtext = 'Aktif?';
+    }
+
+    Swal.fire({
+                title: 'Edit Flag Liat CKP?',
+                text: "Flag akan dibuah ke "+flagtext,
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Ubah'
+            }).then((result) => {
+                if (result.value) {
+                    //response ajax disini
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    });
+                    $.ajax({
+                        url : '{{route('operator.flagliatckp')}}',
+                        method : 'post',
+                        data: {
+                            id: id,
+                            flag: flag
+                        },
+                        cache: false,
+                        dataType: 'json',
+                        success: function(data){
+                            if (data.status == true)
+                            {
+                                Swal.fire(
+                                    'Berhasil!',
+                                    ''+data.hasil+'',
+                                    'success'
+                                ).then(function() {
+                                    location.reload();
+                                });
+                            }
+                            else
+                            {
+                                Swal.fire(
+                                    'Error!',
+                                    ''+data.hasil+'',
+                                    'danger'
+                                );
+                            }
+
+                        },
+                        error: function(){
+                            Swal.fire(
+                                'Error',
+                                'Koneksi Error',
+                                'danger'
+                            );
+                        }
+
+                    });
+
+                }
+            })
+});
+   
 </script>
