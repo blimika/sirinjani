@@ -1,5 +1,5 @@
 <!-- Row -->
-<div class="row">
+<div class="row hidden-sm-down">
     <!-- Column -->
     <div class="col-lg-3 col-md-6">
         <div class="card">

@@ -101,7 +101,7 @@
             </div>
         </div>
         <div class="card">
-            <div class="card-body">
+            <div class="card-body table-responsive">
                 <h4 class="card-title">Rekap Kegiatan Bulan {{\Carbon\Carbon::now()->subMonth()->isoFormat('MMMM YYYY')}}</h4>
                 <table class="table color-bordered-table success-bordered-table">
                     <thead>

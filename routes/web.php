@@ -23,6 +23,7 @@ Route::get('/kegiatan/bidang', 'KegiatanController@bidang')->name('kegiatan.bida
 Route::get('/kegiatan/cari/{kegId}', 'KegiatanController@cariKegiatan')->name('kegiatan.cari');
 Route::get('/realisasi/cari/{kegrid}', 'KegiatanController@CariRealisasi')->name('realisasi.cari');
 Route::get('/spj/realisasi/cari/{spjrid}', 'SpjController@CariSpj')->name('spjrealisasi.cari');
+Route::post(env('TELEGRAM_HASH_URL') . '/webhook', 'NotifikasiController@WebHook')->name('webhook');
 
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/kegiatan/tambah', 'KegiatanController@tambah')->name('kegiatan.tambah');
@@ -84,6 +85,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/operator/gantipasswd', 'OperatorController@GantiPassword')->name('operator.gantipasswd');
     Route::get('/myprofile', 'MyProfileController@MyProfile')->name('my.profile');
     Route::post('/profile/update', 'MyProfileController@UpdateProfile')->name('profile.update');
+    Route::post('/profile/generatetoken', 'MyProfileController@GenerateToken')->name('profile.newtoken');
     Route::post('/profile/gantipasswd', 'MyProfileController@GantiPassword')->name('profile.gantipassword');
 });
 Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout')->name('logout');

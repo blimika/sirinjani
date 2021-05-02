@@ -14,6 +14,7 @@ use App\UnitKerja;
 use Excel;
 use App\Helpers\Generate;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class MyProfileController extends Controller
 {
@@ -59,5 +60,27 @@ class MyProfileController extends Controller
             Session::flash('message_type', 'danger');
         }
         return redirect()->route('my.profile');
+    }
+    public function GenerateToken(Request $request)
+    {
+
+        $count = User::where('id','=',$request->id)->count();
+        $arr = array(
+            'status'=>false,
+            'hasil'=>'Data operator tidak tersedia'
+        );
+        if ($count>0)
+        {
+            $data=User::where('id','=',$request->id)->first();
+            //generate token
+            $token = Str::random(60);
+            $data->token_tg = $token;
+            $data->update();
+            $arr = array(
+                'status'=>true,
+                'hasil'=>'Token baru sudah disimpan'
+            );
+        }
+        return Response()->json($arr);
     }
 }

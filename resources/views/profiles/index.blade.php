@@ -46,7 +46,7 @@
                         <dt class="col-lg-2 col-md-2">Nomor WhatsApp</dt>
                         <dd class="col-lg-10 col-sm-10">
                             @if (Auth::user()->nohp)
-                                {{Auth::user()->nohp}}    
+                                {{Auth::user()->nohp}}
                             @else
                                 -
                             @endif
@@ -61,12 +61,38 @@
                         <dd class="col-lg-10 col-sm-10">{{Tanggal::LengkapHariPanjang(Auth::user()->lastlogin)}}</dd>
                         <dt class="col-lg-2 col-md-2">Dari IP</dt>
                         <dd class="col-lg-10 col-sm-10">{{Auth::user()->lastip}}</dd>
+                        <dt class="col-lg-2 col-md-2">Username Telegram</dt>
+                        <dd class="col-lg-10 col-sm-10">
+                            @if (Auth::user()->user_tg)
+                            {{Auth::user()->user_tg}}
+                            @else
+                                -belum tersedia-
+                            @endif
+
+                        </dd>
+                        <dt class="col-lg-2 col-md-2">ChatID Telegram</dt>
+                        <dd class="col-lg-10 col-sm-10">
+                            @if (Auth::user()->chatid_tg)
+                            {{Auth::user()->chatid_tg}}
+                            @else
+                                <b>-belum tersedia-</b>
+                            @endif
+                        </dd>
+                        <dt class="col-lg-2 col-md-2">Token Telegram</dt>
+                        <dd class="col-lg-10 col-sm-10">
+                            @if (Auth::user()->token_tg)
+                            {{Auth::user()->token_tg}}
+                            @else
+                                Silakan generate token baru
+                            @endif
+                        </dd>
                     </dl>
-                   
+
                     <div class="row">
-                        <div class="col-lg-4 m-t-30">
+                        <div class="col-lg-8 m-t-30">
                             <button class="btn btn-rounded btn-success" data-toggle="modal" data-target="#EditModal" data-id="{{Auth::user()->id}}" data-nama="{{Auth::user()->nama}}" data-email="{{Auth::user()->email}}"><i class="fas fa-pencil-alt" data-toggle="tooltip" title="Edit Data"></i> EDIT</button>
                             <button class="btn btn-rounded btn-danger" data-toggle="modal" data-target="#GantiPasswordModal" data-id="{{Auth::user()->id}}" data-nama="{{Auth::user()->nama}}" data-email="{{Auth::user()->email}}"><i class="fas fa-key" data-toggle="tooltip" title="Ganti Password"></i> GANTI PASSWORD</button>
+                            <button class="btn btn-rounded btn-warning generatetoken" data-id="{{Auth::user()->id}}" data-nama="{{Auth::user()->nama}}"><i class="fas fa-key" data-toggle="tooltip" title="Generate Token Telegram Baru"></i> GENERATE TOKEN BARU</button>
                         </div>
                     </div>
             </div>
