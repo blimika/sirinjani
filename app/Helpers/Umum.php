@@ -822,7 +822,7 @@ Class Generate {
             {
                 $nilai_rill = $nilai_point - 4.5;
                 $nilai_rill = $nilai_rill/0.5;
-                $nilai_rill = $nilai_rill/2;
+                $nilai_rill = $nilai_rill*2;
                 $nilai_ckp = 97 + $nilai_rill;
             }
         elseif ($nilai_point == 4.49)
@@ -832,8 +832,8 @@ Class Generate {
         elseif ($nilai_point < 4.49  and $nilai_point >= 4)
         {
             $nilai_rill = $nilai_point - 4;
-            $nilai_rill = $nilai_rill/0.49;
-            $nilai_rill = $nilai_rill/2;
+            $nilai_rill = $nilai_rill/0.4;
+            $nilai_rill = $nilai_rill*2;
             $nilai_ckp = 94 + $nilai_rill;
         }
         elseif ($nilai_point == 3.99)
@@ -843,8 +843,8 @@ Class Generate {
         elseif ($nilai_point < 3.99  and $nilai_point >= 3.50)
         {
             $nilai_rill = $nilai_point - 3.5;
-            $nilai_rill = $nilai_rill/0.49;
-            $nilai_rill = $nilai_rill/2;
+            $nilai_rill = $nilai_rill/0.4;
+            $nilai_rill = $nilai_rill*2;
             $nilai_ckp = 91 + $nilai_rill;
         }
         elseif ($nilai_point == 3.49)
@@ -854,8 +854,8 @@ Class Generate {
         elseif ($nilai_point < 3.49  and $nilai_point >= 3)
         {
             $nilai_rill = $nilai_point - 3;
-            $nilai_rill = $nilai_rill/0.49;
-            $nilai_rill = $nilai_rill/2;
+            $nilai_rill = $nilai_rill/0.4;
+            $nilai_rill = $nilai_rill*2;
             $nilai_ckp = 88 + $nilai_rill;
         }
         elseif ($nilai_point == 2.99)
@@ -865,8 +865,8 @@ Class Generate {
         elseif ($nilai_point < 2.99  and $nilai_point >= 2.5)
         {
             $nilai_rill = $nilai_point - 2.5;
-            $nilai_rill = $nilai_rill/0.49;
-            $nilai_rill = $nilai_rill/2;
+            $nilai_rill = $nilai_rill/0.4;
+            $nilai_rill = $nilai_rill*2;
             $nilai_ckp = 85 + $nilai_rill;
         }
         elseif ($nilai_point == 2.49)
@@ -883,10 +883,9 @@ Class Generate {
             0.4/2=0.8  (B/C = D)
             97+0.8=97.8  (C2+D = CKP)
             */
-            $nilai_r = 2.49 - $nilai_point;
-            $nilai_a = $nilai_point;
-            $nilai_b = $nilai_a/$nilai_r;
-            $nilai_rill = $nilai_b/4;
+            $nilai_rill = $nilai_point;
+            $nilai_rill = $nilai_rill/2.49;
+            $nilai_rill = $nilai_rill*4;
             $nilai_ckp = 80 + $nilai_rill;
         }
         else

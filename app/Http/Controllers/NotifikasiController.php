@@ -60,4 +60,8 @@ class NotifikasiController extends Controller
         //return $response;
         return view('admin.setwebhook',['respon'=>$response]);
     }
+    public function list()
+    {
+        return view('notif.list');
+    }
 }

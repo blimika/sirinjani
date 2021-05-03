@@ -48,7 +48,6 @@
                                 </div>
                                 <div class="col-md-2">
                                     <select name="bulan" id="bulan" class="form-control">
-                                    <option value="0">Semua Bulan</option>
                                      @for ($i = 1; $i <= 12; $i++)
                                          <option value="{{$i}}" @if (request('bulan')==$i or $bulan==$i)
                                              selected
@@ -113,19 +112,33 @@
                                         <td><a href="{{route('kegiatan.detil',$item->keg_id)}}" class="text-info">{{$loop->iteration}}. {{$item->keg_nama}}</a></td>
                                         <td align="right">{{Tanggal::Pendek($item->keg_start)}}</td>
                                         <td align="right">{{Tanggal::Pendek($item->keg_end)}}</td>
-                                        <td align="right">{{$item->keg_t_target}}</td>
+                                        <td align="right">
+                                            <h4><span class="badge badge-info">{{$item->keg_t_target}}</span></h4>
+                                        </td>
                                         <td align="right">
                                             @if ($item->jumlah_dikirim)
-                                            {{$item->jumlah_dikirim}}
+                                                @if ($item->keg_t_target > $item->jumlah_dikirim)
+                                                    <h4><span class="badge badge-danger">{{$item->jumlah_dikirim}}</span></h4>
+                                                @else
+                                                    <h4><span class="badge badge-success">{{$item->jumlah_dikirim}}</span></h4>
+                                                @endif
+
                                             @else
-                                             0
+                                                <h4><span class="badge badge-danger">0</span></h4>
                                             @endif
                                         </td>
                                         <td align="right">
                                             @if ($item->jumlah_diterima)
-                                            {{$item->jumlah_diterima}}
+                                                @if ($item->keg_t_target > $item->jumlah_diterima)
+                                                <h4><span class="badge badge-danger">
+                                                    {{$item->jumlah_diterima}}</span></h4>
+                                                @else
+                                                    <h4><span class="badge badge-success">
+                                                        {{$item->jumlah_diterima}}</span></h4>
+                                                @endif
+
                                             @else
-                                             0
+                                                <h4><span class="badge badge-danger">0</span></h4>
                                             @endif
                                         </td>
                                         <td align="right" @if ((float) $item->keg_t_point < 3) bgcolor="red" style="color:white;" @else bgcolor="green" style="color:white;" @endif>{{number_format($item->keg_t_point,2,",",".")}}</td>
@@ -135,19 +148,33 @@
                                         <td><a href="{{route('kegiatan.detil',$item->keg_id)}}" class="text-info">{{$loop->iteration}}. {{$item->keg_nama}}</a></td>
                                         <td align="right">{{Tanggal::Pendek($item->keg_start)}}</td>
                                         <td align="right">{{Tanggal::Pendek($item->keg_end)}}</td>
-                                        <td align="right">{{$item->keg_t_target}}</td>
+                                        <td align="right">
+                                            <h4><span class="badge badge-info">{{$item->keg_t_target}}</span></h4>
+                                        </td>
                                         <td align="right">
                                             @if ($item->jumlah_dikirim)
-                                            {{$item->jumlah_dikirim}}
+                                                @if ($item->keg_t_target > $item->jumlah_dikirim)
+                                                    <h4><span class="badge badge-danger">{{$item->jumlah_dikirim}}</span></h4>
+                                                @else
+                                                    <h4><span class="badge badge-success">{{$item->jumlah_dikirim}}</span></h4>
+                                                @endif
+
                                             @else
-                                             0
+                                                <h4><span class="badge badge-danger">0</span></h4>
                                             @endif
                                         </td>
                                         <td align="right">
                                             @if ($item->jumlah_diterima)
-                                            {{$item->jumlah_diterima}}
+                                                @if ($item->keg_t_target > $item->jumlah_diterima)
+                                                <h4><span class="badge badge-danger">
+                                                    {{$item->jumlah_diterima}}</span></h4>
+                                                @else
+                                                    <h4><span class="badge badge-success">
+                                                        {{$item->jumlah_diterima}}</span></h4>
+                                                @endif
+
                                             @else
-                                             0
+                                                <h4><span class="badge badge-danger">0</span></h4>
                                             @endif
                                         </td>
                                         <td align="right" @if ((float) $item->keg_t_point < 3) bgcolor="red" style="color:white;" @else bgcolor="green" style="color:white;" @endif>{{number_format($item->keg_t_point,2,",",".")}}</td>

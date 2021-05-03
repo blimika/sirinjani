@@ -22,7 +22,12 @@
                             @if ((int) Generate::NilaiCkpBulan($item->unit_kode,$i,$tahun)['nilai_ckp'] == 0)
                                 -
                             @else
+                                @if (date('Y')==$tahun && $i >= date('m'))
+                                    -
+                                @else
                                 {{Generate::NilaiCkpBulan($item->unit_kode,$i,$tahun)['nilai_ckp']}}
+                                @endif
+
                             @endif
                         </td>
                     @endfor
