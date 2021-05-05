@@ -27,10 +27,19 @@ class PeringkatController extends Controller
         if (request('tahun')<=0)
         {
             $tahun_filter=date('Y');
+            $bulan_filter = date('m');
         }
         else
         {
             $tahun_filter = request('tahun');
+            if ($tahun_filter == date('Y'))
+            {
+                $bulan_filter = date('m');
+            }
+            else 
+            {
+                $bulan_filter = 12;
+            }
         }
         $dataUnit = UnitKerja::where([['unit_jenis','=','1'],['unit_eselon','=','3']])->get();
         $data = DB::table('m_keg')
@@ -40,6 +49,7 @@ class PeringkatController extends Controller
                 ->when(request('unit'),function ($query){
                     return $query->where('unit_prov.unit_parent_prov','=',request('unit'));
                 })
+                ->whereMonth('m_keg.keg_end','<=',$bulan_filter)
 				->whereYear('m_keg.keg_end','=',$tahun_filter)
 				->where('m_keg_target.keg_t_target','>','0')
 				->select(DB::raw("m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_jumlah, sum(m_keg_target.keg_t_point) as point_total, avg(m_keg_target.keg_t_point) as point_rata, count(*) as keg_jml"))
