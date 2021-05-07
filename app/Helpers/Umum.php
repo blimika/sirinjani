@@ -713,9 +713,18 @@ Class Generate {
 		/*
 		select keg_t_unitkerja, count(*) as keg_jml, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_jumlah, sum(m_keg_target.keg_t_point) as point_total, avg(m_keg_target.keg_t_point) as point_rata from m_keg_target,m_keg where m_keg.keg_id=m_keg_target.keg_id and year(m_keg.keg_end)='2019' and m_keg_target.keg_t_target>0 group by keg_t_unitkerja order by point_rata desc, point_total desc
 		*/
+		if ($tahun == date('Y'))
+		{
+			$bulan_filter = date('m');
+		}
+		else 
+		{
+			$bulan_filter = 12;
+		}
 		$data = \DB::table('m_keg')
 				->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
 				->leftJoin('t_unitkerja','m_keg_target.keg_t_unitkerja','=','t_unitkerja.unit_kode')
+				->whereMonth('m_keg.keg_end','<=',$bulan_filter)
 				->whereYear('m_keg.keg_end','=',$tahun)
 				->where('m_keg_target.keg_t_target','>','0')
 				->select(\DB::raw("m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_jumlah, sum(m_keg_target.keg_t_point) as point_total, avg(m_keg_target.keg_t_point) as point_rata, count(*) as keg_jml"))

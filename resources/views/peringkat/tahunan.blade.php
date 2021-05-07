@@ -103,7 +103,6 @@
                         @if ($tahun == date('Y'))
                         <div class="text-danger"><i>*) Keadaan sampai bulan berjalan tahun {{$tahun}}</i></div>
                         @endif
-
                     </div>
                 </div>
             </div>
