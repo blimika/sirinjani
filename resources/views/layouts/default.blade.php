@@ -101,14 +101,20 @@
                         <!-- ============================================================== -->
 
                         @if (Auth::user())
-                        <!--<li class="nav-item dropdown">
+                         @if (Auth::user()->level > 1)
+                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle waves-effect waves-dark" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="ti-email"></i>
-                                <div class="notify"> <span class="heartbit"></span> <span class="point"></span> </div>
+                                <div class="notify">
+                                    @if (Generate::NotifikasiBelumRead(Auth::user()->username) > 0)
+                                    <span class="heartbit"></span> <span class="point"></span>
+                                    @endif
+                                </div>
                             </a>
                             <div class="dropdown-menu dropdown-menu-right mailbox animated bounceInDown">
-                                include('layouts.notif')
+                                @include('layouts.notif')
                             </div>
                         </li>
+                         @endif
                         @endif
                         <!-- ============================================================== -->
                         <!-- End Comment -->

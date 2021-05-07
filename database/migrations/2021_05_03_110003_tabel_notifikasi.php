@@ -16,8 +16,8 @@ class TabelNotifikasi extends Migration
         Schema::create('t_notifikasi', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('keg_id')->nullable();
-            $table->string('notif_dari',10);
-            $table->string('notif_untuk',10);
+            $table->string('notif_dari');
+            $table->string('notif_untuk');
             $table->text('notif_isi');
             $table->boolean('notif_flag')->nullable()->default(0);
             $table->tinyInteger('notif_jenis')->unsigned();

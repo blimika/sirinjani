@@ -100,6 +100,10 @@
                     <div class="col-lg-6 col-sm-12 col-xs-12">
                         <h4 class="card-title">Grafik Nilai</h4>
                         <div id="nilai_tahunan"></div>
+                        @if ($tahun == date('Y'))
+                        <div class="text-danger"><i>*) Keadaan sampai bulan berjalan tahun {{$tahun}}</i></div>
+                        @endif
+
                     </div>
                 </div>
             </div>

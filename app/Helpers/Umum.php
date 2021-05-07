@@ -900,6 +900,16 @@ Class Generate {
 		);
         return $arr;
     }
+    public static function NotifikasiBelumRead($username)
+	{
+		$data_count = \App\Notifikasi::where([['notif_untuk',$username],['notif_flag','0']])->count();
+		return $data_count;
+	}
+    public static function Notifikasi5Terakhir($username)
+	{
+		$data = \App\Notifikasi::where('notif_untuk',$username)->orderBy('notif_flag','asc')->orderBy('created_at','desc')->take(5)->get();
+		return $data;
+	}
 }
 
 class WebAkses

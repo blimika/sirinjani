@@ -232,6 +232,7 @@ return [
         'CommunityBPS' => App\Helpers\CommunityBPS::class,
         'Tanggal' => App\Helpers\Tanggal::class,
         'Generate' => App\Helpers\Generate::class,
+        'WebAkses' => App\Helpers\WebAkses::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
         'PDF' => Barryvdh\DomPDF\Facade::class,
 

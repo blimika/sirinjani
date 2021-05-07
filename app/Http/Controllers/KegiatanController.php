@@ -22,6 +22,8 @@ use App\SpjTarget;
 use App\Helpers\Generate;
 use App\Helpers\Tanggal;
 use App\SpjRealisasi;
+use App\Notifikasi;
+use App\JenisNotifikasi;
 
 class KegiatanController extends Controller
 {
@@ -121,7 +123,7 @@ class KegiatanController extends Controller
                 //peringatan tidak bisa mengakses halaman ini
                 return view('kegiatan.warning',['keg_id'=>0]);
             }
-            else 
+            else
             {
                 if (Auth::user()->level == 3)
                 {
@@ -143,7 +145,7 @@ class KegiatanController extends Controller
             }
 
         }
-        else 
+        else
         {
             //operator kabkota dan pemantau tidak bisa mengakses ini
             //beri info warning
@@ -164,7 +166,7 @@ class KegiatanController extends Controller
             $pesan_error='Nama kegiatan (ini) sudah ada';
             $pesan_warna='danger';
         }
-        else 
+        else
         {
             $data = new Kegiatan();
             $data->keg_nama = trim($request->keg_nama);
@@ -183,12 +185,12 @@ class KegiatanController extends Controller
             //target masing2 kabkota
             foreach ($request->keg_kabkota as $key => $v)
             {
-                if ($v > 0) 
+                if ($v > 0)
                 {
                     //ada isian targetnya
                     $target = $v;
                 }
-                else 
+                else
                 {
                     //target tetep di set nol
                     $target = 0;
@@ -203,38 +205,63 @@ class KegiatanController extends Controller
                 $dataTarget->keg_t_dibuat_oleh = Auth::user()->username;
                 $dataTarget->keg_t_diupdate_oleh = Auth::user()->username;
                 $dataTarget->save();
-                
+
+                //jika target lebih besar 0 (nol)
+                //kirim notif
+                if ($target > 0)
+                {
+                    //jenisnotif kegiatan = 3
+                    //cari dulu operator kabkotanya
+                    $count_op = User::where([['kodeunit',$key],['level','>','1']])->count();
+                    if ($count_op > 0)
+                    {
+                        //ada operator kabkotanya
+                        //level > 1 (pemantau)
+                        $nofif_isi = 'Kegiatan Baru ['.$keg_id.'] <i>'.trim($request->keg_nama).'</i> mulai tanggal '.Tanggal::HariPanjang($request->keg_start).' s.d. tanggal '.Tanggal::HariPanjang($request->keg_end).' dengan target '.$target.' '.$request->keg_satuan;
+                        $data = User::where([['kodeunit',$key],['level','>','1']])->get();
+                        foreach ($data as $item)
+                        {
+                            $notif = new Notifikasi();
+                            $notif->keg_id = $keg_id;
+                            $notif->notif_dari = Auth::user()->username;
+                            $notif->notif_untuk = $item->username;
+                            $notif->notif_isi = $nofif_isi;
+                            $notif->notif_jenis = '3';
+                            $notif->save();
+                        }
+                    }
+                }
+
             }
             if ($request->keg_spj == 1)
             {
-                //ada permintaan spj 
+                //ada permintaan spj
                 //data spj di insert
                 //spj_kabkota
 
                 foreach ($request->spj_kabkota as $key => $v)
-            {
-                if ($v > 0) 
                 {
-                    //ada isian targetnya
-                    $target = $v;
+                    if ($v > 0)
+                    {
+                        //ada isian targetnya
+                        $target = $v;
+                    }
+                    else
+                    {
+                        //target tetep di set nol
+                        $target = 0;
+                    }
+                    $dataSpj = new SpjTarget();
+                    $dataSpj->keg_id = $keg_id;
+                    $dataSpj->spj_t_unitkerja = $key;
+                    $dataSpj->spj_t_target = $target;
+                    $dataSpj->spj_t_point_waktu = 0;
+                    $dataSpj->spj_t_point_jumlah = 0;
+                    $dataSpj->spj_t_point = 0;
+                    $dataSpj->spj_t_dibuat_oleh = Auth::user()->username;
+                    $dataSpj->spj_t_diupdate_oleh = Auth::user()->username;
+                    $dataSpj->save();
                 }
-                else 
-                {
-                    //target tetep di set nol
-                    $target = 0;
-                }
-                $dataSpj = new SpjTarget();
-                $dataSpj->keg_id = $keg_id;
-                $dataSpj->spj_t_unitkerja = $key;
-                $dataSpj->spj_t_target = $target;
-                $dataSpj->spj_t_point_waktu = 0;
-                $dataSpj->spj_t_point_jumlah = 0;
-                $dataSpj->spj_t_point = 0;
-                $dataSpj->spj_t_dibuat_oleh = Auth::user()->username;
-                $dataSpj->spj_t_diupdate_oleh = Auth::user()->username;
-                $dataSpj->save();
-                
-            }
             }
             $pesan_error='Kegiatan ini sudah di simpan';
             $pesan_warna='success';
@@ -265,12 +292,12 @@ class KegiatanController extends Controller
             //target masing2 kabkota
             foreach ($request->keg_kabkota as $key => $v)
             {
-                if ($v > 0) 
+                if ($v > 0)
                 {
                     //ada isian targetnya
                     $target = $v;
                 }
-                else 
+                else
                 {
                     //target tetep di set nol
                     $target = 0;
@@ -284,7 +311,7 @@ class KegiatanController extends Controller
                     $dataTarget->keg_t_diupdate_oleh = Auth::user()->username;
                     $dataTarget->update();
                 }
-                else 
+                else
                 {
                     //unitkerja belum ada target input
                     $dataTarget = new KegTarget();
@@ -298,23 +325,23 @@ class KegiatanController extends Controller
                     $dataTarget->keg_t_diupdate_oleh = Auth::user()->username;
                     $dataTarget->save();
                 }
-                
-                
+
+
             }
             if ($request->keg_spj == 1)
             {
-                //ada permintaan spj 
+                //ada permintaan spj
                 //data spj di insert
                 //spj_kabkota
 
                 foreach ($request->spj_kabkota as $key => $v)
                 {
-                    if ($v > 0) 
+                    if ($v > 0)
                     {
                         //ada isian targetnya
                         $target = $v;
                     }
-                    else 
+                    else
                     {
                         //target tetep di set nol
                         $target = 0;
@@ -328,7 +355,7 @@ class KegiatanController extends Controller
                         $dataSpj->spj_t_diupdate_oleh = Auth::user()->username;
                         $dataSpj->update();
                     }
-                    else 
+                    else
                     {
                         $dataSpj = new SpjTarget();
                         $dataSpj->keg_id = $request->keg_id;
@@ -343,7 +370,7 @@ class KegiatanController extends Controller
                     }
                 }
             }
-            else 
+            else
             {
                 //hapus semua target SPJ
                 $dataSpj = SpjTarget::where('keg_id',$request->keg_id)->delete();
@@ -357,7 +384,7 @@ class KegiatanController extends Controller
             $pesan_error='Nama kegiatan (ini) tidak ada';
             $pesan_warna='danger';
         }
-        
+
         Session::flash('message', $pesan_error);
         Session::flash('message_type', $pesan_warna);
         return redirect()->route('kegiatan.list');
@@ -395,7 +422,7 @@ class KegiatanController extends Controller
                         'hasil'=>'Data kegiatan '.$nama.' dari '.$unit_nama.' berhasil dihapus beserta target dan realisasinya'
                     );
                 }
-                else 
+                else
                 {
                     //error selain unitkode yg beda
                     $arr = array(
@@ -404,8 +431,8 @@ class KegiatanController extends Controller
                     );
                 }
             }
-            
-            
+
+
         }
         return Response()->json($arr);
     }
@@ -420,7 +447,7 @@ class KegiatanController extends Controller
             //$dataTarget = KegTarget::where([['keg_id',$kegId],['keg_t_target','>',0]])->get();
             //$dataRealisasi = KegRealisasi::where('keg_id',$kegId)->get();
         }
-        else 
+        else
         {
             //kegiatan tidak ada
             //tampilan error 404
@@ -441,7 +468,7 @@ class KegiatanController extends Controller
                 //peringatan tidak bisa mengakses halaman ini
                 return view('kegiatan.warning',['keg_id'=>$kegId]);
             }
-            else 
+            else
             {
                 $dataKegiatan = Kegiatan::where('keg_id',$kegId)->first();
                 if (Auth::user()->level == 3)
@@ -470,7 +497,7 @@ class KegiatanController extends Controller
             }
 
         }
-        else 
+        else
         {
             //operator kabkota dan pemantau tidak bisa mengakses ini
             //beri info warning
@@ -484,7 +511,7 @@ class KegiatanController extends Controller
             'status'=>false,
             'hasil'=>'Data kegiatan ini tidak tersedia'
         );
-        if ($count > 0) 
+        if ($count > 0)
         {
             //unitkerja
             $data = Kegiatan::where('keg_id',$kegId)->first();
@@ -510,13 +537,13 @@ class KegiatanController extends Controller
                 'keg_end_nama'=>Tanggal::HariPanjang($data->keg_end),
                 'keg_jenis'=>$data->keg_jenis,
                 'keg_jenis_nama'=>$data->JenisKeg->jkeg_nama,
-                'keg_spj'=>$data->keg_spj,  
+                'keg_spj'=>$data->keg_spj,
                 'keg_spj_nama'=>$spj,
                 'keg_info'=>$data->keg_info,
                 'keg_dibuat_oleh'=>$data->keg_dibuat_oleh,
                 'keg_diupdate_oleh'=>$data->keg_diupdate_oleh,
                 'created_at'=>$data->created_at,
-                'updated_at'=>$data->updated_at         
+                'updated_at'=>$data->updated_at
             );
         }
         return Response()->json($arr);
@@ -528,7 +555,7 @@ class KegiatanController extends Controller
             'status'=>false,
             'hasil'=>'Realisasi kegiatan ini tidak tersedia'
         );
-        if ($count > 0) 
+        if ($count > 0)
         {
             //unitkerja
             $data = KegRealisasi::where('keg_r_id',$kegrid)->first();
@@ -554,7 +581,7 @@ class KegiatanController extends Controller
                 'keg_end_nama'=>Tanggal::HariPanjang($data->MasterKegiatan->keg_end),
                 'keg_jenis'=>$data->MasterKegiatan->keg_jenis,
                 'keg_jenis_nama'=>$data->MasterKegiatan->JenisKeg->jkeg_nama,
-                'keg_spj'=>$data->MasterKegiatan->keg_spj,  
+                'keg_spj'=>$data->MasterKegiatan->keg_spj,
                 'keg_spj_nama'=>$spj,
                 'keg_dibuat_oleh'=>$data->MasterKegiatan->keg_dibuat_oleh,
                 'keg_diupdate_oleh'=>$data->MasterKegiatan->keg_diupdate_oleh,
@@ -573,7 +600,7 @@ class KegiatanController extends Controller
                 'keg_r_dibuat_oleh'=>$data->keg_r_dibuat_oleh,
                 'keg_r_diupdate_oleh'=>$data->keg_r_diupdate_oleh,
                 'created_at'=>$data->created_at,
-                'updated_at'=>$data->updated_at   
+                'updated_at'=>$data->updated_at
             );
         }
         return Response()->json($arr);
@@ -597,10 +624,24 @@ class KegiatanController extends Controller
             $data->keg_r_diupdate_oleh = Auth::user()->username;
             $data->save();
 
+            $data_keg = Kegiatan::where('keg_id',$request->keg_id)->first();
+            $nofif_isi = '['.$request->keg_id.'] ada pengiriman dari '.Auth::user()->username .' sebanyak '. $request->keg_r_jumlah .' '.$data_keg->keg_target_satuan.' dengan keterangan '.$request->keg_r_ket;
+            $data_user = User::where([['kodeunit',$data_keg->Unitkerja->unit_parent],['level','>','1']])->get();
+            foreach ($data_user as $item)
+            {
+                $notif = new Notifikasi();
+                $notif->keg_id = $request->keg_id;
+                $notif->notif_dari = Auth::user()->username;
+                $notif->notif_untuk = $item->username;
+                $notif->notif_isi = $nofif_isi;
+                $notif->notif_jenis = '1';
+                $notif->save();
+            }
+
             $pesan_error="Pengiriman oleh ". $data->Unitkerja->unit_nama.' sudah disimpan';
             $pesan_warna="success";
         }
-        else 
+        else
         {
             //kegiatan ini tidak ada
             $pesan_error="Kegiatan ini tidak ada";
@@ -628,7 +669,7 @@ class KegiatanController extends Controller
             $pesan_error="Konfirmasi pengiriman oleh ". $data->Unitkerja->unit_nama.' sudah diupdate';
             $pesan_warna="success";
         }
-        else 
+        else
         {
             //realiasi kegiatan ini tidak ada
             $pesan_error="Realiasi kegiatan ini tidak ada";
@@ -665,7 +706,7 @@ class KegiatanController extends Controller
         if ($count > 0)
         {
             //kegiatan ini ada
-            //buat realisasi 
+            //buat realisasi
             //dan nilai di tabel keg_target
             $data = new KegRealisasi();
             $data->keg_id = $request->keg_id;
@@ -689,10 +730,26 @@ class KegiatanController extends Controller
             $dataNilai->keg_t_diupdate_oleh = Auth::user()->username;
             $dataNilai->update();
 
+            $data_keg = Kegiatan::where('keg_id',$request->keg_id)->first();
+            $nofif_isi = '['.$request->keg_id.'] ada penerimaan oleh '.Auth::user()->username .' sebanyak '. $request->keg_r_jumlah .' '.$data_keg->keg_target_satuan;
+            $data_user = User::where([['kodeunit',$request->keg_r_unitkerja],['level','>','1']])->get();
+            foreach ($data_user as $item)
+            {
+                $notif = new Notifikasi();
+                $notif->keg_id = $request->keg_id;
+                $notif->notif_dari = Auth::user()->username;
+                $notif->notif_untuk = $item->username;
+                $notif->notif_isi = $nofif_isi;
+                $notif->notif_jenis = '2';
+                $notif->save();
+            }
+
             $pesan_error="Konfirmasi penerimaan dari ". $data->Unitkerja->unit_nama.' sudah disimpan';
             $pesan_warna="success";
+
+
         }
-        else 
+        else
         {
             //kegiatan ini tidak ada
             $pesan_error="Kegiatan ini tidak ada";
@@ -765,7 +822,7 @@ class KegiatanController extends Controller
             $pesan_error="Konfirmasi penerimaan dari ". $data->Unitkerja->unit_nama.' sudah diupdate';
             $pesan_warna="success";
         }
-        else 
+        else
         {
             //realiasi kegiatan ini tidak ada
             $pesan_error="Realisasi konfirmasi penerimaan tidak ada";
@@ -795,7 +852,7 @@ class KegiatanController extends Controller
             $pesan_error='Nama kegiatan (ini) tidak ada';
             $pesan_warna='danger';
         }
-        
+
         Session::flash('message', $pesan_error);
         Session::flash('message_type', $pesan_warna);
         return redirect()->route('kegiatan.detil',$request->keg_id);

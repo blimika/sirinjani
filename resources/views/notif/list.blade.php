@@ -43,12 +43,21 @@
                             <th>Dari</th>
                             <th>Jenis Notif</th>
                             <th>ISI</th>
-                            <th>Flag</th>
+                            <th>Tanggal</th>
                             <th>Aksi</th>
                             </tr>
                             </thead>
                             <tbody>
-
+                                @foreach ($dataNotif as $item)
+                                    <tr>
+                                        <td>{{$loop->iteration}}</td>
+                                        <td>{{$item->notif_dari}}</td>
+                                        <td>{{$item->JenisNotif->jnotif_nama}}</td>
+                                        <td>{!! $item->notif_isi !!}</td>
+                                        <td>{{Tanggal::LengkapPanjang($item->created_at)}}</td>
+                                        <td></td>
+                                    </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>

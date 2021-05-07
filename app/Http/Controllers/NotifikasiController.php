@@ -14,10 +14,27 @@ use App\User;
 use Illuminate\Support\Facades\Validator;
 use Telegram\Bot\FileUpload\InputFile;
 use App\Helpers\WebAkses;
+use App\Notifikasi;
+use App\JenisNotifikasi;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class NotifikasiController extends Controller
 {
     //
+    /*
+    Notifikasi dikirim ke email dan telegram operator
+    1. Kegiatan Baru
+    kirim ke operator kabkota dan admin kabkota
+    2. Pengiriman
+    kirim ke operator provinsi SM nya
+    3. Penerimaan
+    kirim ke operator kabkota dan admin kabkota yang mengirim
+    4. Update Kegiatan
+    kirim ke operator kabkota yang di update targetnya
+    5. Lainnya
+    Operator Provinsi hapus kegiatan
+    */
     protected $telegram;
     protected $chat_id;
     protected $username;
@@ -62,6 +79,10 @@ class NotifikasiController extends Controller
     }
     public function list()
     {
-        return view('notif.list');
+        $data = Notifikasi::where('notif_untuk',Auth::user()->username)->orderBy('notif_flag','asc')->orderBy('created_at','desc')->get();
+        //dd($data);
+        return view('notif.list',[
+            'dataNotif'=>$data
+        ]);
     }
 }
