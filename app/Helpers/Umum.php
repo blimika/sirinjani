@@ -682,6 +682,8 @@ Class Generate {
 				->select(\DB::raw("m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_jumlah, sum(m_keg_target.keg_t_point) as point_total, avg(m_keg_target.keg_t_point) as point_rata, count(*) as keg_jml"))
 				->groupBy('m_keg_target.keg_t_unitkerja')
 				->orderBy('point_rata','desc')
+				->orderBy('keg_jml_target','desc')
+                ->orderBy('keg_jml','desc')
 				->get();
 		//return $data; number_format($k->point_rata,4,".",",");
 		//dd($data);
@@ -730,6 +732,8 @@ Class Generate {
 				->select(\DB::raw("m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_jumlah, sum(m_keg_target.keg_t_point) as point_total, avg(m_keg_target.keg_t_point) as point_rata, count(*) as keg_jml"))
 				->groupBy('m_keg_target.keg_t_unitkerja')
 				->orderBy('point_rata','desc')
+				->orderBy('keg_jml_target','desc')
+                ->orderBy('keg_jml','desc')
 				->get();
 		//return $data; number_format($k->point_rata,4,".",",");
 		//dd($data);

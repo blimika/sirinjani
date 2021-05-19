@@ -55,6 +55,8 @@ class PeringkatController extends Controller
 				->select(DB::raw("m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_jumlah, sum(m_keg_target.keg_t_point) as point_total, avg(m_keg_target.keg_t_point) as point_rata, count(*) as keg_jml"))
 				->groupBy('m_keg_target.keg_t_unitkerja')
 				->orderBy('point_rata','desc')
+                ->orderBy('keg_jml_target','desc')
+                ->orderBy('keg_jml','desc')
                 ->get();
         //dd($data);
         return view('peringkat.tahunan',['dataUnitkerja'=>$dataUnit,'dataTahun'=>$data_tahun,'tahun'=>$tahun_filter,'dataPeringkat'=>$data,'unit'=>request('unit')]);
@@ -106,6 +108,8 @@ class PeringkatController extends Controller
 				->select(DB::raw("month(m_keg.keg_end) as bulan, year(m_keg.keg_end) as tahun,m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_jumlah, sum(m_keg_target.keg_t_point) as point_total, avg(m_keg_target.keg_t_point) as point_rata, count(*) as keg_jml"))
 				->groupBy('m_keg_target.keg_t_unitkerja')
 				->orderBy('point_rata','desc')
+                ->orderBy('keg_jml_target','desc')
+                ->orderBy('keg_jml','desc')
                 ->get();
         //dd($data);
         $dataUnit = UnitKerja::where([['unit_jenis','=','1'],['unit_eselon','=','3']])->get();
