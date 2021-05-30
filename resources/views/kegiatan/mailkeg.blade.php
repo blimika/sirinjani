@@ -22,6 +22,6 @@
 </div>
 <br/>
 <p><i>Silakan Masuk ke sistem <a href="{{route('kegiatan.detil',$objEmail->keg_id)}}" target="_blank">SiRinjani v2.0</a> untuk lebih detil.</i></p>
-<p><img src="{{ asset('images/logo-sirinjani.png')}}"  height="40px" /></p>
+<p><img src="{{ asset('assets/images/logo-sirinjani.png')}}"  height="40px" /></p>
 <br/>
 Terimakasih,
