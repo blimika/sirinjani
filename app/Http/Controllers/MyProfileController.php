@@ -75,6 +75,8 @@ class MyProfileController extends Controller
             //generate token
             $token = Str::random(60);
             $data->token_tg = $token;
+            $data->user_tg = NULL;
+            $data->chatid_tg = NULL;
             $data->update();
             $arr = array(
                 'status'=>true,

@@ -684,6 +684,7 @@ Class Generate {
 				->orderBy('point_rata','desc')
 				->orderBy('keg_jml_target','desc')
                 ->orderBy('keg_jml','desc')
+                ->orderBy('m_keg_target.keg_t_unitkerja','asc')
 				->get();
 		//return $data; number_format($k->point_rata,4,".",",");
 		//dd($data);
@@ -719,7 +720,7 @@ Class Generate {
 		{
 			$bulan_filter = date('m');
 		}
-		else 
+		else
 		{
 			$bulan_filter = 12;
 		}
@@ -734,6 +735,7 @@ Class Generate {
 				->orderBy('point_rata','desc')
 				->orderBy('keg_jml_target','desc')
                 ->orderBy('keg_jml','desc')
+                ->orderBy('m_keg_target.keg_t_unitkerja','desc')
 				->get();
 		//return $data; number_format($k->point_rata,4,".",",");
 		//dd($data);
@@ -923,6 +925,40 @@ Class Generate {
 		$data = \App\Notifikasi::where('notif_untuk',$username)->orderBy('notif_flag','asc')->orderBy('created_at','desc')->take(5)->get();
 		return $data;
 	}
+    public static function GetIpAddress()
+    {
+        $ipaddress = '';
+        if (isset($_SERVER['HTTP_CLIENT_IP']))
+            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+        else if(isset($_SERVER['HTTP_X_REAL_IP']))
+            $ipaddress = $_SERVER['HTTP_X_REAL_IP'];
+        else if(isset($_SERVER['HTTP_X_FORWARDED_FOR']))
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        else if(isset($_SERVER['HTTP_X_FORWARDED']))
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+        else if(isset($_SERVER['HTTP_FORWARDED_FOR']))
+            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+        else if(isset($_SERVER['HTTP_FORWARDED']))
+            $ipaddress = $_SERVER['HTTP_FORWARDED'];
+        else if(isset($_SERVER['REMOTE_ADDR']))
+            $ipaddress = $_SERVER['REMOTE_ADDR'];
+        else
+            $ipaddress = 'UNKNOWN';
+        return $ipaddress;
+    }
+    public static function GetUserAgent()
+    {
+        $user_agent = '';
+        if (isset($_SERVER['HTTP_USER_AGENT']))
+        {
+            $user_agent = $_SERVER['HTTP_USER_AGENT'];
+        }
+        else
+        {
+            $user_agent = 'TIDAK TAHU';
+        }
+        return $user_agent;
+    }
 }
 
 class WebAkses

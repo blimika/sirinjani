@@ -18,6 +18,10 @@ use App\Notifikasi;
 use App\JenisNotifikasi;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\Generate;
+use App\Helpers\Tanggal;
+use Illuminate\Support\Str;
+use App\Kegiatan;
 
 class NotifikasiController extends Controller
 {
@@ -84,5 +88,79 @@ class NotifikasiController extends Controller
         return view('notif.list',[
             'dataNotif'=>$data
         ]);
+    }
+    public function getNotif($id)
+    {
+        $count = Notifikasi::where('id',$id)->count();
+        $arr = array(
+            'status'=>false,
+            'hasil'=>'Data notifikasi tidak tersedia'
+        );
+        if ($count > 0)
+        {
+            $data = Notifikasi::where('id',$id)->first();
+            if ($data->notif_flag == 0)
+            {
+                $notif_flag = 'Belum terbaca';
+            }
+            else
+            {
+                $notif_flag = 'Sudah dibaca';
+            }
+            $cek_keg = Kegiatan::where('keg_id',$data->keg_id)->count();
+            if ($cek_keg > 0)
+            {
+                $keg_nama = $data->Kegiatan->keg_nama;
+            }
+            else
+            {
+                $keg_nama = 'Kegiatan ini telah terhapus';
+            }
+            $arr = array(
+                'status'=>true,
+                'notif_id'=>$data->id,
+                'notif_dari'=>$data->notif_dari,
+                'notif_untuk'=>$data->notif_untuk,
+                'notif_keg_id'=>$data->keg_id,
+                'notif_keg_nama'=>$keg_nama,
+                'notif_isi'=>$data->notif_isi,
+                'notif_isi_pendek'=>Str::limit($data->notif_isi, 50, ' (...)'),
+                'notif_created_at_nama'=>Tanggal::LengkapHariPanjang($data->created_at),
+                'notif_updated_at_nama'=>Tanggal::LengkapHariPanjang($data->updated_at),
+                'notif_flag'=>$data->notif_flag,
+                'notif_flag_nama'=>$notif_flag,
+                'notif_jenis'=>$data->notif_jenis,
+                'notif_jenis_nama'=>$data->JenisNotif->jnotif_nama,
+                'created_at'=>$data->created_at,
+                'updated_at'=>$data->updated_at
+            );
+            //set notifikasi terbaca
+            $data->notif_flag = 1;
+            $data->update();
+        }
+        return Response()->json($arr);
+    }
+    public function HapusNotif(Request $request)
+    {
+        $count = Notifikasi::where('id',$request->id)->count();
+        $arr = array(
+            'status'=>false,
+            'hasil'=>'Data notifikasi tidak tersedia'
+        );
+        if ($count>0)
+        {
+            $data = Notifikasi::where('id',$request->id)->first();
+            $notif_dari = $data->notif_dari;
+            $data->delete();
+            $arr = array(
+                'status'=>true,
+                'hasil'=>'Data notifikasi dari '.$notif_dari.' berhasil dihapus'
+            );
+        }
+        return Response()->json($arr);
+    }
+    public function BotListTelegram()
+    {
+        return view('telegram.index');
     }
 }

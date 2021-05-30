@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use Session;
 use App\User;
 use App\Helpers\CommunityBPS;
+use App\LogAktivitas;
+use App\Helpers\Generate;
 class LoginController extends Controller
 {
     /*
@@ -64,14 +66,14 @@ class LoginController extends Controller
         else if(isset($_SERVER['REMOTE_ADDR']))
             $ipaddress = $_SERVER['REMOTE_ADDR'];
         else
-            $ipaddress = 'UNKNOWN';    
+            $ipaddress = 'UNKNOWN';
         return $ipaddress;
      }
     public function showLoginForm()
     {
         return view('login.index');
     }
-    
+
     protected function authenticate(Request $request)
     {
         $count = User::where([['username','=',$request->username],['aktif','=',1]])->count();
@@ -83,12 +85,12 @@ class LoginController extends Controller
                 $this->username() => 'required|string',
                 'password' => 'required|string',
             ]);
-            
+
             if (auth()->attempt(['username' => $request->username, 'password' => $request->password, 'aktif' => 1])) {
                 //JIKA BERHASIL, MAKA REDIRECT KE HALAMAN HOME
                 return view('depan');
             }
-            //JIKA SALAH, MAKA KEMBALI KE LOGIN DAN TAMPILKAN NOTIFIKASI 
+            //JIKA SALAH, MAKA KEMBALI KE LOGIN DAN TAMPILKAN NOTIFIKASI
             return redirect()->route('login')->withErrors('Password tidak benar!');
         }
         else {
@@ -96,7 +98,7 @@ class LoginController extends Controller
             //return view('login.index')->withError('Username tidak terdaftar');
             return redirect()->route('login')->withErrors('Username tidak terdaftar atau tidak aktif');
         }
-        
+
     }
     protected function validateLogin(Request $request)
     {
@@ -116,8 +118,8 @@ class LoginController extends Controller
     {
         //return $request->only($this->username(), 'password', 'aktif' => 1);
         return ['username' => $request->{$this->username()}, 'password' => $request->password, 'aktif' => 1];
-    }    
-    
+    }
+
     protected function sendFailedLoginResponse(Request $request)
     {
         $errors = [$this->username() => trans('auth.failed')];
@@ -138,13 +140,37 @@ class LoginController extends Controller
             ->withInput($request->only($this->username(), 'remember'))
             ->withErrors($errors);
     }
-    
+
     public function authenticated(Request $request, $user)
     {
-        //catat lastlogin dan ip   
+        //catat lastlogin dan ip
         $user->lastlogin = Carbon::now()->toDateTimeString();
         $user->lastip = $this->getUserIpAddr();
-        $user->save();        
+        $user->save();
+
+        //save tabel aktivitas
+        $data = new LogAktivitas();
+        $data->log_username = $request->username;
+        $data->log_ip = Generate::GetIpAddress();
+        $data->log_jenis = 1;
+        $data->log_useragent = Generate::GetUserAgent();
+        $data->log_pesan = 'berhasil masuk ke sistem';
+        $data->save();
     }
-    
+    public function logout(Request $request)
+    {
+        $data = new LogAktivitas();
+        $data->log_username = Auth::user()->username;
+        $data->log_ip = Generate::GetIpAddress();
+        $data->log_jenis = 2;
+        $data->log_useragent = Generate::GetUserAgent();
+        $data->log_pesan = 'berhasil logout dari sistem';
+        $data->save();
+
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/');
+    }
+
 }

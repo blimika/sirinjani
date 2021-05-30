@@ -169,6 +169,7 @@
         <!-- ============================================================== -->
         <!-- End footer -->
         <!-- ============================================================== -->
+        @include('notif.modal_notif')
     </div>
     <!-- ============================================================== -->
     <!-- End Wrapper -->
@@ -191,8 +192,10 @@
     <script src="{{asset('assets/node_modules/sparkline/jquery.sparkline.min.js')}}"></script>
     <!--Custom JavaScript -->
     <script src="{{asset('dist/js/custom.min.js')}}"></script>
+    @include('notif.js_notif')
     @section('js')
 
     @show
+
 </body>
 </html>

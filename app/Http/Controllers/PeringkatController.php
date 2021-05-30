@@ -57,6 +57,7 @@ class PeringkatController extends Controller
 				->orderBy('point_rata','desc')
                 ->orderBy('keg_jml_target','desc')
                 ->orderBy('keg_jml','desc')
+                ->orderBy('m_keg_target.keg_t_unitkerja','asc')
                 ->get();
         //dd($data);
         return view('peringkat.tahunan',['dataUnitkerja'=>$dataUnit,'dataTahun'=>$data_tahun,'tahun'=>$tahun_filter,'dataPeringkat'=>$data,'unit'=>request('unit')]);
@@ -110,6 +111,7 @@ class PeringkatController extends Controller
 				->orderBy('point_rata','desc')
                 ->orderBy('keg_jml_target','desc')
                 ->orderBy('keg_jml','desc')
+                ->orderBy('m_keg_target.keg_t_unitkerja','asc')
                 ->get();
         //dd($data);
         $dataUnit = UnitKerja::where([['unit_jenis','=','1'],['unit_eselon','=','3']])->get();

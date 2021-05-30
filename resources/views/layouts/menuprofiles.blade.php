@@ -13,8 +13,10 @@
     <div class="dropdown-menu dropdown-menu-right animated flipInY">
          @if (Auth::user())
          <!-- text-->
-        <a href="{{route('my.profile')}}" class="dropdown-item"><i class="ti-user"></i> Profilku</a>
+        <a href="{{route('notif.list')}}" class="dropdown-item"><i class="ti-email"></i> Notifikasi</a>
+        <div class="dropdown-divider"></div>
         <!-- text-->
+        <a href="{{route('my.profile')}}" class="dropdown-item"><i class="ti-user"></i> Profilku</a>
         <div class="dropdown-divider"></div>
         <!-- text-->
         <a href="{{route('logout')}}" class="dropdown-item"><i class="fa fa-power-off"></i> Logout</a>

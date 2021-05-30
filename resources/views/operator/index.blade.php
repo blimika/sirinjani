@@ -54,12 +54,14 @@
                             <th>No</th>
                             <th>Nama</th>
                             <th>Username</th>
-                            <th>Level</th>
                             <th>WhatsApp</th>
                             <th>Lastlogin</th>
                             <th>Status</th>
                             @if (Auth::user()->level > 5)
                             <th>Flag CKP</th>
+                            <th>UserTG</th>
+                            <th>ChatTG</th>
+                            <th>TokenTG</th>
                             @endif
                             <th>Aksi</th>
                             </tr>
@@ -70,13 +72,14 @@
                                         <td>{{$loop->iteration}}</td>
                                         <td>
                                             {{$item->nama}}
+                                            <br />
+                                            <span class="label label-rounded label-info">{{$item->Level->level_nama}}</span>
                                         </td>
                                         <td>{{$item->username}}</td>
-                                        <td>{{$item->Level->level_nama}}</td>
                                         <td>
                                             @if ($item->nohp)
                                             <a href="http://wa.me/62{{substr($item->nohp,1)}}" target="_blank" class="btn waves-effect btn-success btn-xs waves-light"><i class="fab fa-whatsapp fa-2x"></i></a>
-                                            {{$item->nohp}}
+                                            <!--{{$item->nohp}}-->
                                             @endif
                                         </td>
                                         <td>
@@ -96,7 +99,16 @@
                                             @if ($item->flag_liatckp==1)
                                             <span class="label label-rounded label-info">Aktif</span>
                                             @else
-                                            <span class="label label-rounded label-danger">Tidak aktif</span>
+                                            <span class="label label-rounded label-danger">NonAktif</span>
+                                            @endif
+                                        </td>
+                                        <td>{{$item->user_tg}}</td>
+                                        <td>{{$item->chatid_tg}}</td>
+                                        <td>
+                                            @if ($item->token_tg)
+                                            <span class="label label-rounded label-info">Aktif</span>
+                                            @else
+                                            <span class="label label-rounded label-danger">NonAktif</span>
                                             @endif
                                         </td>
                                         @endif

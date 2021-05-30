@@ -6,7 +6,7 @@
         <div class="message-center">
            @foreach (Generate::Notifikasi5Terakhir(Auth::user()->username) as $item)
                 <!-- Message -->
-                <a href="javascript:void(0)">
+                <a href="javascript:void(0)" data-toggle="modal" data-target="#ViewNotifikasi" data-idnotif="{{$item->id}}">
                     @if ($item->notif_jenis == 1)
                         <div class="btn btn-info btn-circle"><i class="fa fa-link"></i></div>
                     @elseif ($item->notif_jenis == 2)

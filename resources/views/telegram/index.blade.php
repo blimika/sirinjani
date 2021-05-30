@@ -6,13 +6,13 @@
 <!-- ============================================================== -->
 <div class="row page-titles">
     <div class="col-md-5 align-self-center">
-        <h4 class="text-themecolor">Notifikasi</h4>
+        <h4 class="text-themecolor">Bot Telegram Setting</h4>
     </div>
     <div class="col-md-7 align-self-center text-right">
         <div class="d-flex justify-content-end align-items-center">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="javascript:void(0)">Dashboard</a></li>
-                <li class="breadcrumb-item active">Notifikasi List</li>
+                <li class="breadcrumb-item active">Bot Telegram</li>
             </ol>
         </div>
     </div>
@@ -35,41 +35,7 @@
         <div class="card">
             <div class="card-body">
                 <div class="row">
-                    <div class="table-responsive">
-                        <table id="notif" class="table table-bordered table-hover table-striped" cellspacing="0" width="100%">
-                            <thead>
-                            <tr>
-                            <th>No</th>
-                            <th>Dari</th>
-                            <th>Jenis Notif</th>
-                            <th>ISI</th>
-                            <th>Tanggal dibuat</th>
-                            <th>Tanggal diupdate</th>
-                            <th>Aksi</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($dataNotif as $item)
-                                    <tr>
-                                        <td>{{$loop->iteration}}</td>
-                                        <td>{{$item->notif_dari}}</td>
-                                        <td>{{$item->JenisNotif->jnotif_nama}}</td>
-                                        <td>
-                                            <a href="#" class="text-success" data-toggle="modal" data-target="#ViewNotifikasi" data-idnotif="{{$item->id}}">
-                                                {!! \Str::limit($item->notif_isi, 50, ' (...)') !!}
-                                            </a>
-                                            </td>
-                                        <td>{{Tanggal::LengkapPanjang($item->created_at)}}</td>
-                                        <td>{{Tanggal::LengkapPanjang($item->updated_at)}}</td>
-                                        <td>
-                                            <!--<button class="btn btn-sm btn-success" data-toggle="modal" data-target="#ViewNotifikasi" data-idnotif="{{$item->id}}"><i class="fas fa-search" data-toggle="tooltip" title="View Notifikasi"></i></button>---->
-                                            <button class="btn btn-sm btn-danger hapusnotif" data-idnotif="{{$item->id}}" data-notifdari="{{$item->notif_dari}}"><i class="fas fa-trash" class="fas fa-key" data-toggle="tooltip" title="Hapus Notifikasi"></i></button>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -118,5 +84,5 @@
     </script>
     <!-- Sweet-Alert  -->
     <script src="{{asset('assets/node_modules/sweetalert2/dist/sweetalert2.all.min.js')}}"></script>
-    @include('notif.js')
+
 @endsection

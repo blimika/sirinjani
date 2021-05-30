@@ -88,5 +88,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/profile/generatetoken', 'MyProfileController@GenerateToken')->name('profile.newtoken');
     Route::post('/profile/gantipasswd', 'MyProfileController@GantiPassword')->name('profile.gantipassword');
     Route::get('/notifikasi/list', 'NotifikasiController@list')->name('notif.list');
+    Route::get('/notifikasi/get/{id}', 'NotifikasiController@getNotif')->name('notif.get');
+    Route::post('/notifikasi/hapus', 'NotifikasiController@HapusNotif')->name('notif.hapus');
+    Route::get('/bot/telegram', 'NotifikasiController@BotListTelegram')->name('bot.telegram');
 });
 Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout')->name('logout');

@@ -24,6 +24,11 @@ use App\Helpers\Tanggal;
 use App\SpjRealisasi;
 use App\Notifikasi;
 use App\JenisNotifikasi;
+use App\LogAktivitas;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\MailKegiatan;
+use App\Mail\MailPenerimaan;
+use App\Mail\MailPengiriman;
 
 class KegiatanController extends Controller
 {
@@ -182,6 +187,7 @@ class KegiatanController extends Controller
             $data->save();
 
             $keg_id = $data->keg_id;
+            $unit_nama = $data->Unitkerja->unit_nama;
             //target masing2 kabkota
             foreach ($request->keg_kabkota as $key => $v)
             {
@@ -217,9 +223,9 @@ class KegiatanController extends Controller
                     {
                         //ada operator kabkotanya
                         //level > 1 (pemantau)
-                        $nofif_isi = 'Kegiatan Baru ['.$keg_id.'] <i>'.trim($request->keg_nama).'</i> mulai tanggal '.Tanggal::HariPanjang($request->keg_start).' s.d. tanggal '.Tanggal::HariPanjang($request->keg_end).' dengan target '.$target.' '.$request->keg_satuan;
-                        $data = User::where([['kodeunit',$key],['level','>','1']])->get();
-                        foreach ($data as $item)
+                        $nofif_isi = 'Kegiatan Baru ['.$keg_id.'] <i>'.trim($request->keg_nama).'</i> mulai tanggal '.Tanggal::HariPanjang($request->keg_start).' s.d. '.Tanggal::HariPanjang($request->keg_end).' dengan target '.$target.' '.$request->keg_satuan;
+                        $data_notif = User::where([['kodeunit',$key],['level','>','1']])->get();
+                        foreach ($data_notif as $item)
                         {
                             $notif = new Notifikasi();
                             $notif->keg_id = $keg_id;
@@ -228,6 +234,39 @@ class KegiatanController extends Controller
                             $notif->notif_isi = $nofif_isi;
                             $notif->notif_jenis = '3';
                             $notif->save();
+
+                            //testing notif ke email
+                            if (env('APP_MAIL_MODE') == true)
+                            {
+                                $data_keg = Kegiatan::where('keg_id',$keg_id)->first();
+                                if ($data_keg->keg_spj == 1)
+                                {
+                                    $keg_spj = 'Ada';
+                                }
+                                else
+                                {
+                                    $keg_spj = 'Tidak';
+                                }
+                                $objEmail = new \stdClass();
+                                $objEmail->keg_id = $keg_id;
+                                $objEmail->keg_nama = $data_keg->keg_nama;
+                                $objEmail->keg_jenis = $data_keg->JenisKeg->jkeg_nama;
+                                $objEmail->keg_target = $target;
+                                $objEmail->keg_satuan = $data_keg->keg_target_satuan;
+                                $objEmail->keg_tgl_mulai = Tanggal::HariPanjang($data_keg->keg_start);
+                                $objEmail->keg_tgl_selesai = Tanggal::HariPanjang($data_keg->keg_end);
+                                $objEmail->keg_sm = $data_keg->Unitkerja->unit_nama;
+                                $objEmail->keg_spj = $keg_spj;
+                                $objEmail->keg_total_target = $data_keg->keg_total_target;
+                                $objEmail->keg_tgl_dibuat = Tanggal::LengkapHariPanjang($data_keg->created_at);
+                                $objEmail->keg_operator = $data_keg->keg_dibuat_oleh;
+                                //coba email
+                                $dataemail = $item->email;
+                                //$dataemail = "pdyatmika@gmail.com";
+                                Mail::to($dataemail)->send(new MailKegiatan($objEmail));
+
+                            }
+                            //batas testing
                         }
                     }
                 }
@@ -265,7 +304,18 @@ class KegiatanController extends Controller
             }
             $pesan_error='Kegiatan ini sudah di simpan';
             $pesan_warna='success';
-
+            if (env('APP_AKTIVITAS_MODE') == true)
+            {
+                //catat aktivitas tambah kegiatan operator prov
+                $data_log = new LogAktivitas();
+                $data_log->log_username = Auth::user()->username;
+                $data_log->log_ip = Generate::GetIpAddress();
+                $data_log->log_jenis = 3;
+                $data_log->log_useragent = Generate::GetUserAgent();
+                $data_log->log_pesan = 'berhasil menambah kegiatan ['.$keg_id.'] '. trim($request->keg_nama) .' dengan SM ['. $request->keg_unitkerja .'] '. $unit_nama;
+                $data_log->save();
+                //batas catat aktivitas tambah kegiatan
+            }
         }
         Session::flash('message', $pesan_error);
         Session::flash('message_type', $pesan_warna);
@@ -399,7 +449,7 @@ class KegiatanController extends Controller
         );
         if ($count>0)
         {
-            if (Auth::user()->level > 4 or Auth::user()->level ==3)
+            if (Auth::user()->level > 4 or Auth::user()->level == 3)
             {
                 //user admin atau operator provinsi
                 $data = Kegiatan::where('keg_id',$request->keg_id)->first();
@@ -407,6 +457,7 @@ class KegiatanController extends Controller
                 {
                     //admin atau operator provinsi sesuai unitkodenya
                     $nama = $data->keg_nama;
+                    $unit_kode = $data->keg_unitkerja;
                     $unit_nama = $data->Unitkerja->unit_nama;
                     $keg_spj = $data->keg_spj;
                     $data->delete();
@@ -417,10 +468,25 @@ class KegiatanController extends Controller
                         $spj = SpjTarget::where('keg_id',$request->keg_id)->delete();
                         $spjrealisasi = SpjRealisasi::where('keg_id',$request->keg_id)->delete();
                     }
+                    //hapus notifikasi juga
+                    Notifikasi::where('keg_id',$request->keg_id)->delete();
+                    //batas hapus
                     $arr = array(
                         'status'=>true,
                         'hasil'=>'Data kegiatan '.$nama.' dari '.$unit_nama.' berhasil dihapus beserta target dan realisasinya'
                     );
+                    if (env('APP_AKTIVITAS_MODE') == true)
+                    {
+                        //catat aktivitas hapus kegiatan operator prov
+                        $data_log = new LogAktivitas();
+                        $data_log->log_username = Auth::user()->username;
+                        $data_log->log_ip = Generate::GetIpAddress();
+                        $data_log->log_jenis = 3;
+                        $data_log->log_useragent = Generate::GetUserAgent();
+                        $data_log->log_pesan = 'berhasil menghapus kegiatan ['.$request->keg_id.'] '. trim($nama) .' dengan SM ['. $unit_kode .'] '. $unit_nama;
+                        $data_log->save();
+                        //batas catat aktivitas hapus kegiatan
+                    }
                 }
                 else
                 {
@@ -625,7 +691,7 @@ class KegiatanController extends Controller
             $data->save();
 
             $data_keg = Kegiatan::where('keg_id',$request->keg_id)->first();
-            $nofif_isi = '['.$request->keg_id.'] ada pengiriman dari '.Auth::user()->username .' sebanyak '. $request->keg_r_jumlah .' '.$data_keg->keg_target_satuan.' dengan keterangan '.$request->keg_r_ket;
+            $nofif_isi = '['.$request->keg_id.'] ada pengiriman dari '.Auth::user()->username .' sebanyak '. $request->keg_r_jumlah .' '.$data_keg->keg_target_satuan.' tanggal '.Tanggal::HariPanjang($request->keg_r_tgl).' dengan keterangan '.$request->keg_r_ket;
             $data_user = User::where([['kodeunit',$data_keg->Unitkerja->unit_parent],['level','>','1']])->get();
             foreach ($data_user as $item)
             {
@@ -638,6 +704,18 @@ class KegiatanController extends Controller
                 $notif->save();
             }
 
+            if (env('APP_AKTIVITAS_MODE') == true)
+            {
+                //catat pengiriman oleh operator kabkota
+                $data_log = new LogAktivitas();
+                $data_log->log_username = Auth::user()->username;
+                $data_log->log_ip = Generate::GetIpAddress();
+                $data_log->log_jenis = 4;
+                $data_log->log_useragent = Generate::GetUserAgent();
+                $data_log->log_pesan = 'berhasil menambah pengiriman untuk kegiatan ['.$request->keg_id.'] '. trim($data_keg->keg_nama) .' tanggal '.Tanggal::HariPanjang($request->keg_r_tgl).' sebanyak '. $request->keg_r_jumlah .' '.$data_keg->keg_target_satuan;
+                $data_log->save();
+                //batas pengiriman oleh operator kabkota
+            }
             $pesan_error="Pengiriman oleh ". $data->Unitkerja->unit_nama.' sudah disimpan';
             $pesan_warna="success";
         }
@@ -689,6 +767,8 @@ class KegiatanController extends Controller
         if ($count>0)
         {
             $data = KegRealisasi::where('keg_r_id','=',$request->id)->first();
+            $data_keg = Kegiatan::where('keg_id',$data->keg_id)->first();
+            $keg_r_jumlah = $data->keg_r_jumlah;
             $nama = $data->Unitkerja->unit_nama;
             $tgl = Tanggal::Panjang($data->keg_r_tgl);
             $data->delete();
@@ -696,6 +776,18 @@ class KegiatanController extends Controller
                 'status'=>true,
                 'hasil'=>'Data pengiriman oleh '.$nama.' tanggal '.$tgl.' berhasil dihapus'
             );
+            if (env('APP_AKTIVITAS_MODE') == true)
+            {
+                //catat hapus pengiriman
+                $data_log = new LogAktivitas();
+                $data_log->log_username = Auth::user()->username;
+                $data_log->log_ip = Generate::GetIpAddress();
+                $data_log->log_jenis = 4;
+                $data_log->log_useragent = Generate::GetUserAgent();
+                $data_log->log_pesan = 'berhasil menghapus pengiriman untuk kegiatan ['.$data_keg->keg_id.'] '. trim($data_keg->keg_nama) .' tanggal '.$tgl.' sebanyak '. $keg_r_jumlah .' '.$data_keg->keg_target_satuan;
+                $data_log->save();
+                //batas hapus pengiriman
+            }
         }
         return Response()->json($arr);
     }
@@ -731,7 +823,7 @@ class KegiatanController extends Controller
             $dataNilai->update();
 
             $data_keg = Kegiatan::where('keg_id',$request->keg_id)->first();
-            $nofif_isi = '['.$request->keg_id.'] ada penerimaan oleh '.Auth::user()->username .' sebanyak '. $request->keg_r_jumlah .' '.$data_keg->keg_target_satuan;
+            $nofif_isi = '['.$request->keg_id.'] ada penerimaan oleh '.Auth::user()->username .' tanggal '.Tanggal::HariPanjang($request->keg_r_tgl).' sebanyak '. $request->keg_r_jumlah .' '.$data_keg->keg_target_satuan;
             $data_user = User::where([['kodeunit',$request->keg_r_unitkerja],['level','>','1']])->get();
             foreach ($data_user as $item)
             {
@@ -743,7 +835,18 @@ class KegiatanController extends Controller
                 $notif->notif_jenis = '2';
                 $notif->save();
             }
-
+            if (env('APP_AKTIVITAS_MODE') == true)
+            {
+                //catat penerimaan oleh operator provinsi
+                $data_log = new LogAktivitas();
+                $data_log->log_username = Auth::user()->username;
+                $data_log->log_ip = Generate::GetIpAddress();
+                $data_log->log_jenis = 5;
+                $data_log->log_useragent = Generate::GetUserAgent();
+                $data_log->log_pesan = 'berhasil menambah penerimaan untuk kegiatan ['.$request->keg_id.'] '. trim($data_keg->keg_nama) .' tanggal '.Tanggal::HariPanjang($request->keg_r_tgl).' sebanyak '. $request->keg_r_jumlah .' '.$data_keg->keg_target_satuan;
+                $data_log->save();
+                //batas penerimaan oleh operator provinsi
+            }
             $pesan_error="Konfirmasi penerimaan dari ". $data->Unitkerja->unit_nama.' sudah disimpan';
             $pesan_warna="success";
 
@@ -773,6 +876,7 @@ class KegiatanController extends Controller
             $nama = $data->Unitkerja->unit_nama;
             $keg_id = $data->keg_id;
             $keg_r_unitkerja = $data->keg_r_unitkerja;
+            $keg_r_jumlah = $data->keg_r_jumlah;
             $tgl = Tanggal::Panjang($data->keg_r_tgl);
             $data->delete();
 
@@ -791,6 +895,19 @@ class KegiatanController extends Controller
                 'status'=>true,
                 'hasil'=>'Data konfirmasi penerimaan oleh '.$nama.' tanggal '.$tgl.' berhasil dihapus'
             );
+            if (env('APP_AKTIVITAS_MODE') == true)
+            {
+                $data_keg = Kegiatan::where('keg_id',$keg_id)->first();
+                //catat hapus penerimaan oleh operator provinsi
+                $data_log = new LogAktivitas();
+                $data_log->log_username = Auth::user()->username;
+                $data_log->log_ip = Generate::GetIpAddress();
+                $data_log->log_jenis = 5;
+                $data_log->log_useragent = Generate::GetUserAgent();
+                $data_log->log_pesan = 'berhasil menghapus penerimaan untuk kegiatan ['.$keg_id.'] '. trim($data_keg->keg_nama) .' tanggal '.$tgl.' sebanyak '. $keg_r_jumlah .' '.$data_keg->keg_target_satuan;
+                $data_log->save();
+                //batas hapus penerimaan oleh operator provinsi
+            }
         }
         return Response()->json($arr);
     }
