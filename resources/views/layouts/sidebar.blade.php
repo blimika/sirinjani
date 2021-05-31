@@ -56,11 +56,11 @@
         </li>
         <li> <a class="has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false"><i class="ti-settings"></i><span class="hide-menu">Master</span></a>
             <ul aria-expanded="false" class="collapse">
-                <li><a href="{{route('operator.list')}}">Operator</a></li>
-
+                    <li><a href="{{route('operator.list')}}">Operator</a></li>
                 @if (Auth::user()->level == 9)
-                <li><a href="{{route('bot.telegram')}}">Bot Telegram</a></li>
-                <li><a href="{{route('db.index')}}">Database</a></li>
+                    <li><a href="{{route('bot.telegram')}}">Bot Telegram</a></li>
+                    <li><a href="{{route('aktivitas.list')}}">Log Aktivitas</a></li>
+                    <!--<li><a href="{{route('db.index')}}">Database</a></li>-->
                 @endif
             </ul>
         </li>
