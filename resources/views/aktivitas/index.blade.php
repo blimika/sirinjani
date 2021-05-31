@@ -34,6 +34,7 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
+                @include('aktivitas.filter')
                 <div class="row">
                     <div class="table-responsive">
                         <table id="logaktivitas" class="table table-bordered table-hover table-striped" cellspacing="0" width="100%">
@@ -52,7 +53,7 @@
                                 @foreach ($dataLog as $item)
                                     <tr>
                                         <td>{{$loop->iteration}}</td>
-                                        <td>{{$item->log_username}}</td>
+                                        <td>[{{$item->log_username}}] {{$item->Operator->nama}}</td>
                                         <td>{{$item->log_pesan}}</td>
                                         <td>{{$item->log_ip}}</td>
                                         <td>{{$item->log_useragent}}</td>

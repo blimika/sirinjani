@@ -810,6 +810,7 @@ class KegiatanController extends Controller
             $data->keg_r_dibuat_oleh = Auth::user()->username;
             $data->keg_r_diupdate_oleh = Auth::user()->username;
             $data->save();
+            $waktu_simpan_penerimaan = $data->created_at;
             $nilai = Generate::NilaiKegRealiasi($request->keg_id,$request->keg_r_unitkerja);
             //update nilai KegTarget
             $dataNilai = KegTarget::where([
@@ -821,7 +822,7 @@ class KegiatanController extends Controller
             $dataNilai->keg_t_point = $nilai['nilai_total'];
             $dataNilai->keg_t_diupdate_oleh = Auth::user()->username;
             $dataNilai->update();
-
+            $target_kabkota = $dataNilai->keg_t_target;
             $data_keg = Kegiatan::where('keg_id',$request->keg_id)->first();
             $nofif_isi = '['.$request->keg_id.'] ada penerimaan oleh '.Auth::user()->username .' tanggal '.Tanggal::HariPanjang($request->keg_r_tgl).' sebanyak '. $request->keg_r_jumlah .' '.$data_keg->keg_target_satuan;
             $data_user = User::where([['kodeunit',$request->keg_r_unitkerja],['level','>','1']])->get();
@@ -834,6 +835,47 @@ class KegiatanController extends Controller
                 $notif->notif_isi = $nofif_isi;
                 $notif->notif_jenis = '2';
                 $notif->save();
+                //testing notif ke email
+                if (env('APP_MAIL_MODE') == true)
+                {
+                    /*
+                    <p>Detil Kegiatan yang diterima :<br/>
+                    <b>ID :</b>&nbsp;{{ $objEmail->keg_id}}<br/>
+                    <b>Judul :</b>&nbsp;{{ $objEmail->keg_nama }}<br/>
+                    <b>Jenis :</b>&nbsp;{{ $objEmail->keg_jenis }}<br/>
+                    <b>Target diterima :</b>&nbsp;{{ $objEmail->keg_diterima }} &nbsp;{{ $objEmail->keg_satuan }}<br/>
+                    <b>Tgl diterima :</b>&nbsp;{{ $objEmail->keg_tgl_diterima }}<br/>
+                    <b>Subject Matter :</b>&nbsp;{{ $objEmail->keg_sm }}<br/>
+                    </p>
+                    </div>
+                    <div>
+                        <p>Info Tambahan :<br/>
+                        <b>Target Kabkota :</b>&nbsp;{{ $objEmail->keg_target_kabkota}} &nbsp;{{ $objEmail->keg_satuan }}<br/>
+                        <b>Tanggal dibuat :</b>&nbsp;{{ $objEmail->keg_tgl_dibuat }}<br/>
+                        <b>Operator Penerima :</b>&nbsp;{{ $objEmail->keg_operator }}<br/>
+                    </p>
+                    </div>
+                    <br/>
+                    */
+                    //$data_keg = Kegiatan::where('keg_id',$keg_id)->first();
+                    $objEmail = new \stdClass();
+                    $objEmail->keg_id = $data_keg->keg_id;
+                    $objEmail->keg_nama = $data_keg->keg_nama;
+                    $objEmail->keg_jenis = $data_keg->JenisKeg->jkeg_nama;
+                    $objEmail->keg_diterima = $request->keg_r_jumlah;
+                    $objEmail->keg_satuan = $data_keg->keg_target_satuan;
+                    $objEmail->keg_tgl_diterima = Tanggal::HariPanjang($request->keg_r_tgl);
+                    $objEmail->keg_sm = $data_keg->Unitkerja->unit_nama;
+                    $objEmail->keg_target_kabkota = $target_kabkota;
+                    $objEmail->keg_tgl_dibuat = Tanggal::LengkapHariPanjang($waktu_simpan_penerimaan);
+                    $objEmail->keg_operator = Auth::user()->username;
+                    //coba email
+                    $dataemail = $item->email;
+                    //$dataemail = "pdyatmika@gmail.com";
+                    Mail::to($dataemail)->send(new MailPenerimaan($objEmail));
+
+                }
+                //batas testing
             }
             if (env('APP_AKTIVITAS_MODE') == true)
             {
