@@ -16,9 +16,12 @@ class MailPengiriman extends Mailable
      *
      * @return void
      */
-    public function __construct()
+    public $objEmail;
+
+    public function __construct($objEmail)
     {
         //
+        $this->objEmail = $objEmail;
     }
 
     /**
@@ -28,6 +31,8 @@ class MailPengiriman extends Mailable
      */
     public function build()
     {
-        return $this->view('view.name');
+        return $this->from('noreply@sirinjani.bpsntb.id','SiRinjani')
+        ->subject('[NOREPLY] Pengiriman oleh '.$this->objEmail->keg_kabkota)
+        ->view('kegiatan.mailkirim');
     }
 }
