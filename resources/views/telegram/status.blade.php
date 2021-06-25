@@ -38,7 +38,28 @@
                     @include('telegram.tombol')
                 </div>
                 <div class="row m-t-30">
-                    <h2>SiRinjani BOT TELEGRAM Manajemen</h2>
+                    <div class="col-lg-12 col-xs-12 col-md-12">
+                        <h2 class="m-b-20">BOT STATUS</h2>
+                    </div>
+                    <div class="col-lg-12 col-xs-12 col-md-12">
+                        @if ($respon['ok'] == 'true')
+                        <dl>
+                            <dt>url</dt>
+                            <dd>{{$respon['result']['url']}}</dd>
+                            <dt>has_custom_certificate</dt>
+                            <dd>{{$respon['result']['has_custom_certificate']}}</dd>
+                            <dt>pending_update_count</dt>
+                            <dd>{{$respon['result']['pending_update_count']}}</dd>
+                            <dt>max_connections</dt>
+                            <dd>{{$respon['result']['max_connections']}}</dd>
+                        </dl>
+                        @else
+                            ERROR
+                        @endif
+                    </div>
+                    
+                        
+                   
                 </div>
             </div>
         </div>

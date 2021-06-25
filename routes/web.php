@@ -87,10 +87,17 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/profile/update', 'MyProfileController@UpdateProfile')->name('profile.update');
     Route::post('/profile/generatetoken', 'MyProfileController@GenerateToken')->name('profile.newtoken');
     Route::post('/profile/gantipasswd', 'MyProfileController@GantiPassword')->name('profile.gantipassword');
+    //notifikasi
     Route::get('/notifikasi/list', 'NotifikasiController@list')->name('notif.list');
     Route::get('/notifikasi/get/{id}', 'NotifikasiController@getNotif')->name('notif.get');
     Route::post('/notifikasi/hapus', 'NotifikasiController@HapusNotif')->name('notif.hapus');
+    //bot telegram
     Route::get('/bot/telegram', 'NotifikasiController@BotListTelegram')->name('bot.telegram');
+    Route::get('/bot/telegram/status', 'NotifikasiController@BotStatus')->name('bot.status');
+    Route::get('/bot/telegram/setwebhook', 'NotifikasiController@setWebHook')->name('bot.setwebhook');
+    Route::get('/bot/telegram/offwebhook', 'NotifikasiController@OffWebHook')->name('bot.offwebhook');
+    Route::get('/bot/telegram/getme', 'NotifikasiController@GetMeBot')->name('bot.getme');
+    //aktivitas
     Route::get('/aktivitas/list', 'LogAktivitasController@ListLog')->name('aktivitas.list');
 });
 Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout')->name('logout');

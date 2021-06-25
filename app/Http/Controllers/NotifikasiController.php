@@ -52,26 +52,26 @@ class NotifikasiController extends Controller
     {
 
     }
-    public function getMe()
+    public function GetMeBot()
     {
         $response = $this->telegram->getMe();
         //return $response;
-        return view('admin.getme',['respon'=>$response]);
+        return view('telegram.getme',['respon'=>$response]);
     }
-    public function WebhookInfo()
+    public function BotStatus()
     {
         $h = new WebAkses();
         $response = $h->webinfo();
 
         //return $response;
-        return view('admin.botstatus',['respon'=>$response]);
+        return view('telegram.status',['respon'=>$response]);
     }
     public function setWebHook()
     {
         $url = env('TELEGRAM_WEBHOOK_URL') . '/' . env('TELEGRAM_HASH_URL') . '/webhook';
         $response = $this->telegram->setWebhook(['url' => $url]);
         //dd($response);
-        return view('admin.setwebhook',['respon'=>$response]);
+        return view('telegram.setwebhook',['respon'=>$response]);
     }
     public function OffWebHook()
     {
@@ -79,7 +79,7 @@ class NotifikasiController extends Controller
         $response = $h->resetwebhook();
 
         //return $response;
-        return view('admin.setwebhook',['respon'=>$response]);
+        return view('telegram.offwebhook',['respon'=>$response]);
     }
     public function list()
     {

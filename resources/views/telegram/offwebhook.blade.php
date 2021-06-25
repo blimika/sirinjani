@@ -38,7 +38,19 @@
                     @include('telegram.tombol')
                 </div>
                 <div class="row m-t-30">
-                    <h2>SiRinjani BOT TELEGRAM Manajemen</h2>
+                    <div class="col-lg-12 col-xs-12 col-md-12">
+                        <h2 class="m-b-20">SET OFF WEBHOOK</h2>
+                    </div>
+                    <div class="col-lg-12 col-xs-12 col-md-12">
+                        @if ($respon['ok'] == 'true')
+                        <h3>Webhook sudah dinonaktifkan</h3>
+                        @else
+                            ERROR
+                        @endif
+                    </div>
+                    
+                        
+                   
                 </div>
             </div>
         </div>
