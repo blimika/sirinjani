@@ -22,6 +22,7 @@ use App\Helpers\Generate;
 use App\Helpers\Tanggal;
 use Illuminate\Support\Str;
 use App\Kegiatan;
+use App\LogPosisi;
 
 class NotifikasiController extends Controller
 {
@@ -42,34 +43,281 @@ class NotifikasiController extends Controller
     protected $telegram;
     protected $chat_id;
     protected $username;
+    protected $user_tg;
     protected $text;
+    protected $nama;
+    protected $first_name;
+    protected $keyboard;
+    protected $message_id;
+    protected $msg_id;
+    protected $update_id;
     public function __construct()
     {
         $this->telegram = new Api(env('TELEGRAM_BOT_TOKEN'));
+        $this->keyboard_awal = [
+            ['💾 Binding']
+        ];
+        $this->keyboard_menu = [
+            ['Deadline Kegiatan','Cari Kegiatan','Detil Kegiatan'],
+            ['📺 Profil','Ganti Password','Unbinding']
+        ];
     }
 
     public function WebHook(Request $request)
     {
+        $update = $this->telegram->getWebhookUpdate();
+        if ($update->isType('callback_query'))
+        {
+            //calback_query
+        }
+        else
+        {
+            //tanpa callback_query
+            if (isset($request['edited_message']))
+            {
+                //cek apakah message ini di edit
+                $this->chat_id = $request['edited_message']['chat']['id'];
+                $this->first_name = $request['edited_message']['from']['first_name'];
+                $this->text = $request['edited_message']['text'];
+                $this->message_id = $request['edited_message']['message_id'];
+                $this->waktu_kirim = $request['edited_message']['date'];
+                $this->update_id = $request['update_id'];
+                if (isset($request['edited_message']['reply_to_message']['forward_date']))
+                {
+                    $this->forward_date = $request['edited_message']['reply_to_message']['forward_date'];
+                }
+                else
+                {
+                    $this->forward_date = $request['edited_message']['date'];
+                }
+                if (array_key_exists("username",$request['edited_message']['from']))
+                {
+                    $this->user_tg = $request['edited_message']['from']['username'];
+                }
+                else
+                {
+                    $this->user_tg = $this->first_name;
+                }
+            }
+            else
+            {
+                //tanpa edited_message
+                //message biasa
+                $this->chat_id = $request['message']['chat']['id'];
+                $this->first_name = $request['message']['from']['first_name'];
+                $this->text = $request['message']['text'];
+                $this->message_id = $request['message']['message_id'];
+                $this->waktu_kirim = $request['message']['date'];
+                $this->update_id = $request['update_id'];
+
+                if (isset($request['message']['reply_to_message']['forward_date']))
+                {
+                    $this->forward_date = $request['message']['reply_to_message']['forward_date'];
+                }
+                else
+                {
+                    $this->forward_date = $request['message']['date'];
+                }
+                if (array_key_exists("username",$request['message']['from']))
+                {
+                    $this->user_tg = $request['message']['from']['username'];
+                }
+                else
+                {
+                    $this->user_tg = $this->first_name;
+                }
+            }
+            //cek test commandnya
+
+            switch ($this->text) {
+                case '/start':
+                    $this->MenuDepan();
+                    break;
+                case '💾 Binding':
+                    $this->BindingAkun();
+                    break;
+                case '📺 Profil':
+                    $this->ProfilAkun();
+                    break;
+                default:
+                    $this->CekInputan();
+                    break;
+            }
+        }
 
     }
+    //cek telegram
+    public function MenuDepan()
+    {
+        //cek dulu chat_id sudah terbinding dengan operator / tidak
+        $count = User::where('chatid_tg','=',$this->chat_id)->count();
+        if ($count > 0)
+        {
+            //sudah terbinding
+            $message = '### 🔎 SiRinjani Bot Telegram 🔍 ###' .chr(10);
+            $message .= '<b>BPS Provinsi Nusa Tenggara Barat</b>' .chr(10) .chr(10);
+            $reply_markup = Keyboard::make([
+                'keyboard' => $this->keyboard_menu,
+                'resize_keyboard' => true,
+                'one_time_keyboard' => true
+            ]);
+            $response = Telegram::sendMessage([
+                'chat_id' => $this->chat_id,
+                'text' => $message,
+                'parse_mode'=> 'HTML',
+                'reply_markup' => $reply_markup
+            ]);
+            $messageId = $response->getMessageId();
+        }
+        else
+        {
+            //belum terbinding
+            $message = '### 🔎 SiRinjani Bot Telegram 🔍 ###' .chr(10);
+            $message .= '<b>BPS Provinsi Nusa Tenggara Barat</b>' .chr(10) .chr(10);
+            $message .= 'Untuk dapat menggunakan bot ini silakan terlebih dahulu melakukan koneksi antara telegram dengan sistem <b>SiRinjani v2.0</b> dengan menekan tombol <b>Binding</b>' .chr(10);
+
+            $reply_markup = Keyboard::make([
+                'keyboard' => $this->keyboard_awal,
+                'resize_keyboard' => true,
+                'one_time_keyboard' => true
+            ]);
+            $response = Telegram::sendMessage([
+                'chat_id' => $this->chat_id,
+                'text' => $message,
+                'parse_mode'=> 'HTML',
+                'reply_markup' => $reply_markup
+            ]);
+            $messageId = $response->getMessageId();
+        }
+    }
+    public function BindingAkun()
+    {
+        $message = '### 💾 Binding ###' .chr(10);
+        $message .= 'Silakan masukkan Token Telegram dari aplikasi <b>SiRinjani v.2</b>' .chr(10);
+        $message .= 'dari menu Profil > Token Telegram' .chr(10);
+
+        LogPosisi::create([
+            'user_tg' => $this->user_tg,
+            'chatid_tg' => $this->chat_id,
+            'command' => __FUNCTION__,
+            'msg_id' => $this->message_id,
+            'update_id' => $this->update_id,
+            'waktu_tg' => $this->waktu_kirim
+        ]);
+
+        $response = Telegram::sendMessage([
+            'chat_id' => $this->chat_id,
+            'text' => $message,
+            'parse_mode'=> 'HTML',
+        ]);
+        $messageId = $response->getMessageId();
+    }
+    public function ProfilAkun()
+    {
+
+    }
+    public function CekInputan()
+    {
+        //cek logposisi dulu
+        $cek = LogPosisi::where('chatid_tg','=',$this->chat_id)->count();
+        if ($cek > 0)
+        {
+            //ambil komen terakhir
+            $tg = LogPosisi::where('chatid_tg','=',$this->chat_id)->latest("updated_at")->first();
+            if ($tg->command == 'Profil')
+            {
+
+            }
+            elseif ($tg->command == 'BindingAkun')
+            {
+                //cek dulu token dgn user
+                $count = User::where('token_tg',$this->text)->count();
+                if ($count > 0)
+                {
+                    //ada dan langsung update user_tg dan chat_id
+                    $data = User::where('token_tg',$this->text)->first();
+                    $data->user_tg = $this->user_tg;
+                    $data->chatid_tg = $this->chat_id;
+                    $data->update();
+
+                    LogPosisi::create([
+                        'user_tg' => $this->user_tg,
+                        'chatid_tg' => $this->chat_id,
+                        'command' => 'MenuDepan',
+                        'msg_id' => $this->message_id,
+                        'update_id' => $this->update_id,
+                        'waktu_tg' => $this->waktu_kirim
+                    ]);
+
+                    $message ='';
+                    $message .='<b>Token telegram valid.</b> akun telegram dan akun <b>SiRinjani</b> sudah terhubung. anda akan menerima notifikasi pemberitahuan dari aplikasi <b>SiRinjani</b>.' . chr(10) .chr(10);
+                    $reply_markup = Keyboard::make([
+                        'keyboard' => $this->keyboard_menu,
+                        'resize_keyboard' => true,
+                        'one_time_keyboard' => true
+                    ]);
+                    $response = Telegram::sendMessage([
+                        'chat_id' => $this->chat_id,
+                        'text' => $message,
+                        'parse_mode'=> 'HTML',
+                        'reply_markup' => $reply_markup
+                    ]);
+                    $messageId = $response->getMessageId();
+                }
+                else
+                {
+                    //token tidak valid silakan ulangi
+                    $message ='';
+                    $message .='<b>Token telegram tidak valid.</b> 😁' . chr(10) .chr(10);
+
+                    $response = Telegram::sendMessage([
+                        'chat_id' => $this->chat_id,
+                        'text' => $message,
+                        'parse_mode'=> 'HTML'
+                    ]);
+                    $this->BindingAkun();
+                }
+            }
+            else
+            {
+                //command tidak dikenal
+                $message ='';
+                $message .='Permintaan kamu tidak diproses 😁' . chr(10);
+
+                $response = Telegram::sendMessage([
+                    'chat_id' => $this->chat_id,
+                    'text' => $message,
+                    'parse_mode'=> 'HTML'
+                ]);
+            }
+        }
+        else
+        {
+            $this->MenuDepan();
+        }
+    }
+    //batas telegram
     public function GetMeBot()
     {
         $response = $this->telegram->getMe();
         //return $response;
+        //dd($response);
         return view('telegram.getme',['respon'=>$response]);
     }
     public function BotStatus()
     {
         $h = new WebAkses();
         $response = $h->webinfo();
-
+        //dd($response);
         //return $response;
         return view('telegram.status',['respon'=>$response]);
     }
     public function setWebHook()
     {
-        $url = env('TELEGRAM_WEBHOOK_URL') . '/' . env('TELEGRAM_HASH_URL') . '/webhook';
-        $response = $this->telegram->setWebhook(['url' => $url]);
+        $url_site = env('TELEGRAM_WEBHOOK_URL') . '/' . env('TELEGRAM_HASH_URL') . '/webhook';
+        $h = new WebAkses();
+        $response = $h->setwebhook($url_site);
+        //$response = $this->telegram->setWebhook(['url' => $url]);
         //dd($response);
         return view('telegram.setwebhook',['respon'=>$response]);
     }

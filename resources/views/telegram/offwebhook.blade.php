@@ -43,14 +43,14 @@
                     </div>
                     <div class="col-lg-12 col-xs-12 col-md-12">
                         @if ($respon['ok'] == 'true')
-                        <h3>Webhook sudah dinonaktifkan</h3>
+                            <h3>{{$respon['description']}}</h3>
                         @else
                             ERROR
                         @endif
                     </div>
-                    
-                        
-                   
+
+
+
                 </div>
             </div>
         </div>
