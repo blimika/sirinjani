@@ -13,6 +13,8 @@ use App\User;
 use App\Helpers\CommunityBPS;
 use App\LogAktivitas;
 use App\Helpers\Generate;
+use Telegram\Bot\Laravel\Facades\Telegram;
+use Telegram\Bot\Api;
 class LoginController extends Controller
 {
     /*
@@ -40,9 +42,18 @@ class LoginController extends Controller
      *
      * @return void
      */
+    protected $telegram;
+    protected $chat_id;
+    protected $message_id;
+    protected $msg_id;
+    protected $chan_notif_id;
+    protected $chan_log_id;
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
+        $this->telegram = new Api(env('TELEGRAM_BOT_TOKEN'));
+        $this->chan_notif_id = env('TELEGRAM_CHAN_NOTIF');
+        $this->chan_log_id = env('TELEGRAM_CHAN_LOG');
     }
     public function username()
     {
@@ -156,6 +167,21 @@ class LoginController extends Controller
         $data->log_useragent = Generate::GetUserAgent();
         $data->log_pesan = 'berhasil masuk ke sistem';
         $data->save();
+        //kirim ke channel log
+        $message = '### LOGIN  ###' .chr(10);
+        $message .= '-----------------------'.chr(10);
+        $message .= '🟢 Username : '.$request->username .chr(10);
+        $message .= '🟢 IP Address : '. Generate::GetIpAddress() .chr(10);
+        $message .= '🟢 Useragent : '. Generate::GetUserAgent() .chr(10);
+        $message .= '🟢 Pesan : Berhasil masuk ke Sistem SiRinjani'.chr(10);
+        $message .= '-----------------------'.chr(10);
+
+        $response = Telegram::sendMessage([
+            'chat_id' => $this->chan_log_id,
+            'text' => $message,
+            'parse_mode'=> 'HTML'
+        ]);
+        $messageId = $response->getMessageId();
     }
     public function logout(Request $request)
     {
@@ -166,6 +192,22 @@ class LoginController extends Controller
         $data->log_useragent = Generate::GetUserAgent();
         $data->log_pesan = 'berhasil logout dari sistem';
         $data->save();
+
+        //kirim ke channel log
+        $message = '### LOGOUT  ###' .chr(10);
+        $message .= '-----------------------'.chr(10);
+        $message .= '🟢 Username : '.Auth::user()->username .chr(10);
+        $message .= '🟢 IP Address : '. Generate::GetIpAddress() .chr(10);
+        $message .= '🟢 Useragent : '. Generate::GetUserAgent() .chr(10);
+        $message .= '🟢 Pesan : Berhasil logout dari Sistem SiRinjani'.chr(10);
+        $message .= '-----------------------'.chr(10);
+
+        $response = Telegram::sendMessage([
+            'chat_id' => $this->chan_log_id,
+            'text' => $message,
+            'parse_mode'=> 'HTML'
+        ]);
+        $messageId = $response->getMessageId();
 
         Auth::logout();
         $request->session()->invalidate();

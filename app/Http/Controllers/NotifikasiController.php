@@ -51,15 +51,29 @@ class NotifikasiController extends Controller
     protected $message_id;
     protected $msg_id;
     protected $update_id;
+    protected $chan_notif_id;
+    protected $chan_log_id;
     public function __construct()
     {
         $this->telegram = new Api(env('TELEGRAM_BOT_TOKEN'));
+        $this->chan_notif_id = env('TELEGRAM_CHAN_NOTIF');
+        $this->chan_log_id = env('TELEGRAM_CHAN_LOG');
         $this->keyboard_awal = [
-            ['💾 Binding']
+            ['🔐 Binding']
         ];
         $this->keyboard_menu = [
-            ['Deadline Kegiatan','Cari Kegiatan','Detil Kegiatan'],
-            ['📺 Profil','Ganti Password','Unbinding']
+            ['📃 Deadline Kegiatan','📊 Peringkat','🎗 Informasi'],
+            ['📺 Profil','🔑 Putuskan Koneksi']
+        ];
+        $this->keyboard_peringkat = [
+            ['📅 Bulan Berjalan','📚 Tahunan'],
+            ['🚫 Kembali']
+        ];
+        $this->keyboard_unbind = [
+            ['👍 Yakin','🚫 Kembali']
+        ];
+        $this->keyboard_batal = [
+            ['🚫 Kembali']
         ];
     }
 
@@ -133,11 +147,26 @@ class NotifikasiController extends Controller
                 case '/start':
                     $this->MenuDepan();
                     break;
-                case '💾 Binding':
+                case '🔐 Binding':
                     $this->BindingAkun();
+                    break;
+                case '🔑 Putuskan Koneksi':
+                    $this->UnbindAkun();
                     break;
                 case '📺 Profil':
                     $this->ProfilAkun();
+                    break;
+                case '📊 Peringkat':
+                    $this->PilihPeringkat();
+                    break;
+                case '🎗 Informasi':
+                    $this->InformasiBot();
+                    break;
+                case '📃 Deadline Kegiatan':
+                    $this->DeadlineKegiatan();
+                    break;
+                case '🚫 Kembali':
+                    $this->Batalkan();
                     break;
                 default:
                     $this->CekInputan();
@@ -156,6 +185,8 @@ class NotifikasiController extends Controller
             //sudah terbinding
             $message = '### 🔎 SiRinjani Bot Telegram 🔍 ###' .chr(10);
             $message .= '<b>BPS Provinsi Nusa Tenggara Barat</b>' .chr(10) .chr(10);
+            $message .= '---------------------------------' .chr(10);
+            $message .= 'Saluran notifikasi : @sirinjani' .chr(10);
             $reply_markup = Keyboard::make([
                 'keyboard' => $this->keyboard_menu,
                 'resize_keyboard' => true,
@@ -212,9 +243,195 @@ class NotifikasiController extends Controller
         ]);
         $messageId = $response->getMessageId();
     }
+    public function DeadlineKegiatan()
+    {
+        $message = '<b>📑📑📑 KEGIATAN MENDEKATI BATAS WAKTU 📑📑📑</b>' .chr(10);
+        $message .= '----------------------------------------------------------------------' .chr(10);
+        if (Generate::KegiatanDeadline())
+        {
+
+            foreach (Generate::KegiatanDeadline() as $item)
+            {
+                $message .= '🗂 <b>'. $item->keg_nama .'</b>'.chr(10);
+                $message .= '🗓 Tanggal : <i>'.Tanggal::Panjang($item->keg_end).'</i>'.chr(10);
+                $message .= '✉️ Pengiriman : '.number_format(($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100,2,",",".").'%' .chr(10);
+                $message .= '📨 Penerimaan : '.number_format(($item->RealisasiTerima->sum('keg_r_jumlah')/$item->keg_total_target)*100,2,",",".").'%' .chr(10);
+                $message .= '📎 Link : <a href="'.route('kegiatan.detil',$item->keg_id).'"> Kegiatan detil</a>' .chr(10);
+                $message .= '---------------------------------------------'.chr(10);
+            }
+        }
+        else
+        {
+            $message .= '<b>Belum ada kegiatan yang mendekati batas waktu</b>' .chr(10);
+        }
+        LogPosisi::create([
+            'user_tg' => $this->user_tg,
+            'chatid_tg' => $this->chat_id,
+            'command' => __FUNCTION__,
+            'msg_id' => $this->message_id,
+            'update_id' => $this->update_id,
+            'waktu_tg' => $this->waktu_kirim
+        ]);
+
+        $reply_markup = Keyboard::make([
+            'keyboard' => $this->keyboard_menu,
+            'resize_keyboard' => true,
+            'one_time_keyboard' => true
+        ]);
+        $response = Telegram::sendMessage([
+            'chat_id' => $this->chat_id,
+            'text' => $message,
+            'parse_mode'=> 'HTML',
+            'disable_web_page_preview'=>true,
+            'reply_markup' => $reply_markup
+        ]);
+        $messageId = $response->getMessageId();
+    }
+    public function InformasiBot()
+    {
+        $message = '### INFORMASI ###' .chr(10);
+        $message .= 'Bot ini merupakan Bot telegram dari aplikasi <b>SiRinjani</b>' .chr(10);
+        $message .= 'Saluran notifikasi : @sirinjani' .chr(10);
+
+        LogPosisi::create([
+            'user_tg' => $this->user_tg,
+            'chatid_tg' => $this->chat_id,
+            'command' => __FUNCTION__,
+            'msg_id' => $this->message_id,
+            'update_id' => $this->update_id,
+            'waktu_tg' => $this->waktu_kirim
+        ]);
+
+        $reply_markup = Keyboard::make([
+            'keyboard' => $this->keyboard_menu,
+            'resize_keyboard' => true,
+            'one_time_keyboard' => true
+        ]);
+        $response = Telegram::sendMessage([
+            'chat_id' => $this->chat_id,
+            'text' => $message,
+            'parse_mode'=> 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+        $messageId = $response->getMessageId();
+    }
+    public function UnbindAkun()
+    {
+        LogPosisi::create([
+            'user_tg' => $this->user_tg,
+            'chatid_tg' => $this->chat_id,
+            'command' => __FUNCTION__,
+            'msg_id' => $this->message_id,
+            'update_id' => $this->update_id,
+            'waktu_tg' => $this->waktu_kirim
+        ]);
+        $message = '### UNBIND AKUN ###' .chr(10);
+        $message .= 'Apakah anda yakin?, Pilih menu' .chr(10);
+
+        $reply_markup = Keyboard::make([
+            'keyboard' => $this->keyboard_unbind,
+            'resize_keyboard' => true,
+            'one_time_keyboard' => true
+        ]);
+        $response = Telegram::sendMessage([
+            'chat_id' => $this->chat_id,
+            'text' => $message,
+            'parse_mode'=> 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+        $messageId = $response->getMessageId();
+    }
     public function ProfilAkun()
     {
+        //tampilkan profil akun
+        //sudah terbinding
+        LogPosisi::create([
+            'user_tg' => $this->user_tg,
+            'chatid_tg' => $this->chat_id,
+            'command' => __FUNCTION__,
+            'msg_id' => $this->message_id,
+            'update_id' => $this->update_id,
+            'waktu_tg' => $this->waktu_kirim
+        ]);
+        $cek = User::where('chatid_tg',$this->chat_id)->count();
+        if ($cek > 0)
+        {
+            //ada dan sudah terbinding
+            $data = User::where('chatid_tg',$this->chat_id)->first();
+            $message = '<b>### PROFIL AKUN ###</b>' .chr(10);
+            $message .= '🆔 ID Telegram : <b>'.$this->chat_id.'</b>'.chr(10);
+            $message .= '👤 User Telegram : <b>'.$this->user_tg.'</b>' .chr(10);
+            $message .= '🟢 username : <b>'.$data->username.'</b>' .chr(10);
+            $message .= '🟢 Nama : <b>'.$data->nama.'</b>' .chr(10);
+            $message .= '🟢 Email : <b>'.$data->email.'</b>'.chr(10);
+            $message .= '🟢 Unitkerja : <b>'.$data->Unitkerja->unit_nama.'</b>'.chr(10);
+            $message .= '🟢 Level : <b>'.$data->Level->level_nama.'</b>'.chr(10);
+            $message .= '🟢 Last login : <b>'.$data->lastlogin.'</b>'.chr(10);
+            $reply_markup = Keyboard::make([
+                'keyboard' => $this->keyboard_menu,
+                'resize_keyboard' => true,
+                'one_time_keyboard' => true
+            ]);
+            $response = Telegram::sendMessage([
+                'chat_id' => $this->chat_id,
+                'text' => $message,
+                'parse_mode'=> 'HTML',
+                'reply_markup' => $reply_markup
+            ]);
+            $messageId = $response->getMessageId();
+        }
+        else
+        {
+            $this->MenuDepan();
+        }
 
+    }
+    public function PilihPeringkat()
+    {
+        LogPosisi::create([
+            'user_tg' => $this->user_tg,
+            'chatid_tg' => $this->chat_id,
+            'command' => __FUNCTION__,
+            'msg_id' => $this->message_id,
+            'update_id' => $this->update_id,
+            'waktu_tg' => $this->waktu_kirim
+        ]);
+
+        $message ='';
+        $message .= 'Silakan pilih menu' .chr(10);
+
+
+        $reply_markup = Keyboard::make([
+            'keyboard' => $this->keyboard_peringkat,
+            'resize_keyboard' => true,
+            'one_time_keyboard' => true
+        ]);
+        $response = Telegram::sendMessage([
+            'chat_id' => $this->chat_id,
+            'text' => $message,
+            'parse_mode'=> 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+        $messageId = $response->getMessageId();
+    }
+    public function Batalkan()
+    {
+        $message ='';
+        $message .= 'Okay..Kembali ke awal 😢' .chr(10);
+
+        LogPosisi::where('chatid_tg',$this->chat_id)->delete();
+        $reply_markup = Keyboard::make([
+            'keyboard' => $this->keyboard_menu,
+            'resize_keyboard' => true,
+            'one_time_keyboard' => true
+        ]);
+        $response = Telegram::sendMessage([
+            'chat_id' => $this->chat_id,
+            'text' => $message,
+            'parse_mode'=> 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+        $messageId = $response->getMessageId();
     }
     public function CekInputan()
     {
@@ -224,8 +441,202 @@ class NotifikasiController extends Controller
         {
             //ambil komen terakhir
             $tg = LogPosisi::where('chatid_tg','=',$this->chat_id)->latest("updated_at")->first();
-            if ($tg->command == 'Profil')
+            if ($tg->command == 'PilihPeringkat')
             {
+                //peringkat bulan
+                //peringkat tahunan
+                $data_bulan = array(
+                    1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'
+                );
+                if ($this->text == '📚 Tahunan')
+                {
+                    //tahunan
+                    /*
+                    +"keg_t_unitkerja": "52720"
+                    +"unit_nama": "BPS Kota Bima"
+                    +"keg_jml_target": "2819"
+                    +"point_waktu": "1014.0000"
+                    +"point_jumlah": "1015.0000"
+                    +"point_total": "1014.7000"
+                    +"point_rata": "4.55022422"
+                    +"keg_jml": 223
+                    */
+                    $bulan_filter=(int) date('m');
+                    $tahun_filter=date('Y');
+                    $data = DB::table('m_keg')
+                    ->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
+                    ->leftJoin(DB::raw("(select unit_kode as unit_kode_prov, unit_nama as unit_nama_prov, unit_parent as unit_parent_prov from t_unitkerja where unit_jenis='1') as unit_prov"),'m_keg.keg_unitkerja','=','unit_prov.unit_kode_prov')
+                    ->leftJoin('t_unitkerja','m_keg_target.keg_t_unitkerja','=','t_unitkerja.unit_kode')
+                    ->when(request('unit'),function ($query){
+                        return $query->where('unit_prov.unit_parent_prov','=',request('unit'));
+                    })
+                    ->whereMonth('m_keg.keg_end','<=',$bulan_filter)
+                    ->whereYear('m_keg.keg_end','=',$tahun_filter)
+                    ->where('m_keg_target.keg_t_target','>','0')
+                    ->select(DB::raw("m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_jumlah, sum(m_keg_target.keg_t_point) as point_total, avg(m_keg_target.keg_t_point) as point_rata, count(*) as keg_jml"))
+                    ->groupBy('m_keg_target.keg_t_unitkerja')
+                    ->orderBy('point_rata','desc')
+                    ->orderBy('keg_jml_target','desc')
+                    ->orderBy('keg_jml','desc')
+                    ->orderBy('m_keg_target.keg_t_unitkerja','asc')
+                    ->get();
+                    LogPosisi::create([
+                        'user_tg' => $this->user_tg,
+                        'chatid_tg' => $this->chat_id,
+                        'command' => 'PilihPeringkat',
+                        'msg_id' => $this->message_id,
+                        'update_id' => $this->update_id,
+                        'waktu_tg' => $this->waktu_kirim
+                    ]);
+
+                    $message ='';
+                    $message .= '<b>🏆🏆🏆 Peringkat Tahunan sampai bulan '.$data_bulan[$bulan_filter].' '.$tahun_filter.' 🏆🏆🏆</b>' .chr(10);
+                    $message .= '----------------------------------------------------------' .chr(10);
+                    $message .= 'Keadaan : '. Tanggal::LengkapHariPanjang(\Carbon\Carbon::now()) .chr(10);
+                    $message .= '----------------------------------------------------------' .chr(10);
+                    $i = 1;
+                    foreach ($data as $item)
+                    {
+                        if ($i == 1)
+                        {
+                            $message .= '🥇 <b>'.$item->unit_nama.'</b>'.chr(10);
+                            $message .= '🗳 Kegiatan : '.$item->keg_jml .chr(10);
+                            $message .= '📂 Target : '. $item->keg_jml_target .chr(10);
+                            $message .= '🎖 Poin : '. number_format($item->point_rata,2,".",",") .chr(10);
+                            $message .= '----------------------------------------------------------' .chr(10);
+                        }
+                        elseif ($i == 2)
+                        {
+                            $message .= '🥈 <b>'.$item->unit_nama.'</b>' .chr(10);
+                            $message .= '🗳 Kegiatan : '.$item->keg_jml .chr(10);
+                            $message .= '📂 Target : '. $item->keg_jml_target .chr(10);
+                            $message .= '🎖 Poin : '. number_format($item->point_rata,2,".",",") .chr(10);
+                            $message .= '----------------------------------------------------------' .chr(10);
+                        }
+                        elseif ($i == 3)
+                        {
+                            $message .= '🥉 <b>'.$item->unit_nama.'</b>' .chr(10);
+                            $message .= '🗳 Kegiatan : '.$item->keg_jml .chr(10);
+                            $message .= '📂 Target : '. $item->keg_jml_target .chr(10);
+                            $message .= '🎖 Poin : '. number_format($item->point_rata,2,".",",") .chr(10);
+                            $message .= '----------------------------------------------------------' .chr(10);
+                        }
+                        else
+                        {
+                            $message .= '🎗 <b>'.$item->unit_nama.'</b>' .chr(10);
+                            $message .= '🗳 Kegiatan : '.$item->keg_jml .chr(10);
+                            $message .= '📂 Target : '. $item->keg_jml_target .chr(10);
+                            $message .= '🎖 Poin : '. number_format($item->point_rata,2,".",",") .chr(10);
+                            $message .= '----------------------------------------------------------' .chr(10);
+                        }
+                        $i++;
+                    }
+                    $reply_markup = Keyboard::make([
+                        'keyboard' => $this->keyboard_peringkat,
+                        'resize_keyboard' => true,
+                        'one_time_keyboard' => true
+                    ]);
+                    $response = Telegram::sendMessage([
+                        'chat_id' => $this->chat_id,
+                        'text' => $message,
+                        'parse_mode'=> 'HTML',
+                        'reply_markup' => $reply_markup
+                    ]);
+                    $messageId = $response->getMessageId();
+                }
+                else
+                {
+                    //bulanan
+                    /*
+                    0 => {#1334 ▼
+                    +"bulan": 6
+                    +"tahun": 2021
+                    +"keg_t_unitkerja": "52720"
+                    +"unit_nama": "BPS Kota Bima"
+                    +"keg_jml_target": "333"
+                    +"point_waktu": "30.0000"
+                    +"point_jumlah": "30.0000"
+                    +"point_total": "30.0000"
+                    +"point_rata": "1.25000000"
+                    +"keg_jml": 24
+                    */
+                    //set bulan dan tahun sekarang
+                    $bulan_filter=(int) date('m');
+                    $tahun_filter=date('Y');
+                    $data = DB::table('m_keg')
+                    ->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
+                    ->leftJoin(DB::raw("(select unit_kode as unit_kode_prov, unit_nama as unit_nama_prov, unit_parent as unit_parent_prov from t_unitkerja where unit_jenis='1') as unit_prov"),'m_keg.keg_unitkerja','=','unit_prov.unit_kode_prov')
+                    ->leftJoin('t_unitkerja','m_keg_target.keg_t_unitkerja','=','t_unitkerja.unit_kode')
+                    ->when(request('unit'),function ($query){
+                        return $query->where('unit_prov.unit_parent_prov','=',request('unit'));
+                    })
+                    ->whereMonth('m_keg.keg_end','=',$bulan_filter)
+                    ->whereYear('m_keg.keg_end','=',$tahun_filter)
+                    ->where('m_keg_target.keg_t_target','>','0')
+                    ->select(DB::raw("month(m_keg.keg_end) as bulan, year(m_keg.keg_end) as tahun,m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_jumlah, sum(m_keg_target.keg_t_point) as point_total, avg(m_keg_target.keg_t_point) as point_rata, count(*) as keg_jml"))
+                    ->groupBy('m_keg_target.keg_t_unitkerja')
+                    ->orderBy('point_rata','desc')
+                    ->orderBy('keg_jml_target','desc')
+                    ->orderBy('keg_jml','desc')
+                    ->orderBy('m_keg_target.keg_t_unitkerja','asc')
+                    ->get();
+
+                    $message ='';
+                    $message .= '<b>🏆🏆🏆 Peringkat Bulan '.$data_bulan[$bulan_filter].' '.$tahun_filter.' 🏆🏆🏆</b>' .chr(10);
+                    $message .= '----------------------------------------------------------' .chr(10);
+                    $message .= 'Keadaan : '. Tanggal::LengkapHariPanjang(\Carbon\Carbon::now()) .chr(10);
+                    $message .= '----------------------------------------------------------' .chr(10);
+                    $i = 1;
+                    foreach ($data as $item)
+                    {
+                        if ($i == 1)
+                        {
+                            $message .= '🥇 <b>'.$item->unit_nama.'</b>'.chr(10);
+                            $message .= '🗳 Kegiatan : '.$item->keg_jml .chr(10);
+                            $message .= '📂 Target : '. $item->keg_jml_target .chr(10);
+                            $message .= '🎖 Poin : '. number_format($item->point_rata,2,".",",") .chr(10);
+                            $message .= '----------------------------------------------------------' .chr(10);
+                        }
+                        elseif ($i == 2)
+                        {
+                            $message .= '🥈 <b>'.$item->unit_nama.'</b>' .chr(10);
+                            $message .= '🗳 Kegiatan : '.$item->keg_jml .chr(10);
+                            $message .= '📂 Target : '. $item->keg_jml_target .chr(10);
+                            $message .= '🎖 Poin : '. number_format($item->point_rata,2,".",",") .chr(10);
+                            $message .= '----------------------------------------------------------' .chr(10);
+                        }
+                        elseif ($i == 3)
+                        {
+                            $message .= '🥉 <b>'.$item->unit_nama.'</b>' .chr(10);
+                            $message .= '🗳 Kegiatan : '.$item->keg_jml .chr(10);
+                            $message .= '📂 Target : '. $item->keg_jml_target .chr(10);
+                            $message .= '🎖 Poin : '. number_format($item->point_rata,2,".",",") .chr(10);
+                            $message .= '----------------------------------------------------------' .chr(10);
+                        }
+                        else
+                        {
+                            $message .= '🎗 <b>'.$item->unit_nama.'</b>' .chr(10);
+                            $message .= '🗳 Kegiatan : '.$item->keg_jml .chr(10);
+                            $message .= '📂 Target : '. $item->keg_jml_target .chr(10);
+                            $message .= '🎖 Poin : '. number_format($item->point_rata,2,".",",") .chr(10);
+                            $message .= '----------------------------------------------------------' .chr(10);
+                        }
+                        $i++;
+                    }
+
+                    $reply_markup = Keyboard::make([
+                        'keyboard' => $this->keyboard_peringkat,
+                        'resize_keyboard' => true,
+                        'one_time_keyboard' => true
+                    ]);
+                    $response = Telegram::sendMessage([
+                        'chat_id' => $this->chat_id,
+                        'text' => $message,
+                        'parse_mode'=> 'HTML',
+                        'reply_markup' => $reply_markup
+                    ]);
+                    $messageId = $response->getMessageId();
+                }
 
             }
             elseif ($tg->command == 'BindingAkun')
@@ -250,7 +661,7 @@ class NotifikasiController extends Controller
                     ]);
 
                     $message ='';
-                    $message .='<b>Token telegram valid.</b> akun telegram dan akun <b>SiRinjani</b> sudah terhubung. anda akan menerima notifikasi pemberitahuan dari aplikasi <b>SiRinjani</b>.' . chr(10) .chr(10);
+                    $message .='<b>Token telegram valid.</b> akun telegram dan akun <b>SiRinjani</b> sudah terhubung. anda dapat menggunakan menu dibawah ini untuk terkoneksi dengan aplikasi <b>SiRinjani</b>.' . chr(10) .chr(10);
                     $reply_markup = Keyboard::make([
                         'keyboard' => $this->keyboard_menu,
                         'resize_keyboard' => true,
@@ -278,9 +689,62 @@ class NotifikasiController extends Controller
                     $this->BindingAkun();
                 }
             }
+            elseif ($tg->command == 'UnbindAkun')
+            {
+                LogPosisi::create([
+                    'user_tg' => $this->user_tg,
+                    'chatid_tg' => $this->chat_id,
+                    'command' => 'MenuDepan',
+                    'msg_id' => $this->message_id,
+                    'update_id' => $this->update_id,
+                    'waktu_tg' => $this->waktu_kirim
+                ]);
+                $count = User::where('chatid_tg',$this->chat_id)->count();
+                if ($count > 0)
+                {
+                    $data = User::where('chatid_tg',$this->chat_id)->first();
+                    $data->user_tg = NULL;
+                    $data->chatid_tg = NULL;
+                    $data->token_tg = NULL;
+                    $data->save();
+                    LogPosisi::where('chatid_tg',$this->chat_id)->delete();
+                    $message ='';
+                    $message .='<b>akun sudah di unbind</b>. silakan generate ulang token telegram di Aplikasi <b>SiRinjani</b> kembali untuk menggunakan bot telegram ini' .chr(10);
+                    $reply_markup = Keyboard::make([
+                        'keyboard' => $this->keyboard_awal,
+                        'resize_keyboard' => true,
+                        'one_time_keyboard' => true
+                    ]);
+                }
+                else
+                {
+                    $message ='';
+                    $message .='<b>error waktu unbind</b>. silakan pilih menu' .chr(10);
+                    $reply_markup = Keyboard::make([
+                        'keyboard' => $this->keyboard_menu,
+                        'resize_keyboard' => true,
+                        'one_time_keyboard' => true
+                    ]);
+                }
+                $response = Telegram::sendMessage([
+                    'chat_id' => $this->chat_id,
+                    'text' => $message,
+                    'parse_mode'=> 'HTML',
+                    'reply_markup' => $reply_markup
+                ]);
+                $messageId = $response->getMessageId();
+            }
             else
             {
                 //command tidak dikenal
+                LogPosisi::create([
+                    'user_tg' => $this->user_tg,
+                    'chatid_tg' => $this->chat_id,
+                    'command' => 'MenuDepan',
+                    'msg_id' => $this->message_id,
+                    'update_id' => $this->update_id,
+                    'waktu_tg' => $this->waktu_kirim
+                ]);
                 $message ='';
                 $message .='Permintaan kamu tidak diproses 😁' . chr(10);
 
@@ -293,7 +757,30 @@ class NotifikasiController extends Controller
         }
         else
         {
-            $this->MenuDepan();
+            //command tidak dikenal
+            LogPosisi::create([
+                'user_tg' => $this->user_tg,
+                'chatid_tg' => $this->chat_id,
+                'command' => 'MenuDepan',
+                'msg_id' => $this->message_id,
+                'update_id' => $this->update_id,
+                'waktu_tg' => $this->waktu_kirim
+            ]);
+            $message ='';
+            $message .='Permintaan kamu tidak diproses 😁' . chr(10);
+
+            $reply_markup = Keyboard::make([
+                'keyboard' => $this->keyboard_menu,
+                'resize_keyboard' => true,
+                'one_time_keyboard' => true
+            ]);
+            $response = Telegram::sendMessage([
+                'chat_id' => $this->chat_id,
+                'text' => $message,
+                'parse_mode'=> 'HTML',
+                'reply_markup' => $reply_markup
+            ]);
+            $messageId = $response->getMessageId();
         }
     }
     //batas telegram

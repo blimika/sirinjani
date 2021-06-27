@@ -29,10 +29,24 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\MailKegiatan;
 use App\Mail\MailPenerimaan;
 use App\Mail\MailPengiriman;
+use Telegram\Bot\Laravel\Facades\Telegram;
+use Telegram\Bot\Api;
 
 class KegiatanController extends Controller
 {
     //
+    protected $telegram;
+    protected $chat_id;
+    protected $message_id;
+    protected $msg_id;
+    protected $chan_notif_id;
+    protected $chan_log_id;
+    public function __construct()
+    {
+        $this->telegram = new Api(env('TELEGRAM_BOT_TOKEN'));
+        $this->chan_notif_id = env('TELEGRAM_CHAN_NOTIF');
+        $this->chan_log_id = env('TELEGRAM_CHAN_LOG');
+    }
     public function index()
     {
         $data_bulan = array(
@@ -189,6 +203,43 @@ class KegiatanController extends Controller
             $keg_id = $data->keg_id;
             $unit_nama = $data->Unitkerja->unit_nama;
             //target masing2 kabkota
+            //pesan notif ke channel notif
+            /*
+            $objEmail->keg_nama = $data_keg->keg_nama;
+            $objEmail->keg_jenis = $data_keg->JenisKeg->jkeg_nama;
+            $objEmail->keg_target = $target;
+            $objEmail->keg_satuan = $data_keg->keg_target_satuan;
+            $objEmail->keg_tgl_mulai = Tanggal::HariPanjang($data_keg->keg_start);
+            $objEmail->keg_tgl_selesai = Tanggal::HariPanjang($data_keg->keg_end);
+            $objEmail->keg_sm = $data_keg->Unitkerja->unit_nama;
+            $objEmail->keg_spj = $keg_spj;
+            $objEmail->keg_total_target = $data_keg->keg_total_target;
+            $objEmail->keg_tgl_dibuat = Tanggal::LengkapHariPanjang($data_keg->created_at);
+            $objEmail->keg_operator = $data_keg->keg_dibuat_oleh
+            */
+            if ($data->keg_spj == 1)
+            {
+                $kegspj = 'Ada';
+            }
+            else
+            {
+                $kegspj = 'Tidak ada';
+            }
+            $message = '<b>♻️♻️♻️ ADA KEGIATAN BARU ♻️♻️♻️</b>' .chr(10);
+            $message .= '-----------------------'.chr(10);
+            $message .= '🟢 ID : <b>#'.$keg_id.'</b>'.chr(10);
+            $message .= '🟢 NAMA KEGIATAN : <b>'. trim($request->keg_nama).'</b>' .chr(10);
+            $message .= '🟢 SM : <b>'. $data->Unitkerja->unit_nama.'</b>' .chr(10);
+            $message .= '🟢 Jenis : <b>'. $data->JenisKeg->jkeg_nama.'</b>' .chr(10);
+            $message .= '🟢 Total target : <b>'. $request->keg_total_target .' '.$data->keg_target_satuan.'</b>' .chr(10);
+            $message .= '🟢 Tanggal mulai : <b>'. Tanggal::HariPanjang($data->keg_start).'</b>' .chr(10);
+            $message .= '🟢 Tanggal selesai : <b>'. Tanggal::HariPanjang($data->keg_end).'</b>' .chr(10);
+            $message .= '🟢 Ada SPJ : <b>'. $kegspj.'</b>' .chr(10);
+            $message .= '🟢 Tanggal dibuat : <b>'. Tanggal::LengkapHariPanjang($data->created_at).'</b>' .chr(10);
+            $message .= '🟢 Operator : <b>'. Auth::user()->username.'</b>' .chr(10);
+            $message .= '-----------------------'.chr(10);
+            $message .= 'Target masing-masing kabkota' .chr(10);
+            $message .= '-----------------------'.chr(10);
             foreach ($request->keg_kabkota as $key => $v)
             {
                 if ($v > 0)
@@ -216,6 +267,9 @@ class KegiatanController extends Controller
                 //kirim notif
                 if ($target > 0)
                 {
+                    //buat pesan telegram per kabkota
+                    $message .= '🔸 ['.$key.'] '.$dataTarget->Unitkerja->unit_nama.': <b>'. $target.' '.$request->keg_satuan.'</b>' .chr(10);
+                    //batasannya
                     //jenisnotif kegiatan = 3
                     //cari dulu operator kabkotanya
                     $count_op = User::where([['kodeunit',$key],['level','>','1']])->count();
@@ -234,7 +288,6 @@ class KegiatanController extends Controller
                             $notif->notif_isi = $nofif_isi;
                             $notif->notif_jenis = '3';
                             $notif->save();
-
                             //testing notif ke email
                             if (env('APP_MAIL_MODE') == true)
                             {
@@ -270,7 +323,6 @@ class KegiatanController extends Controller
                         }
                     }
                 }
-
             }
             if ($request->keg_spj == 1)
             {
@@ -302,6 +354,16 @@ class KegiatanController extends Controller
                     $dataSpj->save();
                 }
             }
+            //kirim pesan ke channel notif
+            $message .= '-----------------------'.chr(10);
+            $message .= '🟢 Link : <a href="'.route('kegiatan.detil',$keg_id).'">Kegiatan Detil</a>' .chr(10);
+            $response = Telegram::sendMessage([
+                'chat_id' => $this->chan_notif_id,
+                'text' => $message,
+                'parse_mode'=> 'HTML'
+            ]);
+            //batasannya
+
             $pesan_error='Kegiatan ini sudah di simpan';
             $pesan_warna='success';
             if (env('APP_AKTIVITAS_MODE') == true)
@@ -315,6 +377,25 @@ class KegiatanController extends Controller
                 $data_log->log_pesan = 'berhasil menambah kegiatan ['.$keg_id.'] '. trim($request->keg_nama) .' dengan SM ['. $request->keg_unitkerja .'] '. $unit_nama;
                 $data_log->save();
                 //batas catat aktivitas tambah kegiatan
+                //kirim ke sistem channel
+                //kirim ke channel log
+                $message = '### KEGIATAN BARU  ###' .chr(10);
+                $message .= '-----------------------'.chr(10);
+                $message .= '🟢 Username : '.Auth::user()->username .chr(10);
+                $message .= '🟢 IP Address : '. Generate::GetIpAddress() .chr(10);
+                $message .= '🟢 Useragent : '. Generate::GetUserAgent() .chr(10);
+                $message .= '🟢 Pesan : berhasil menambah kegiatan ['.$keg_id.'] '. trim($request->keg_nama) .' dengan SM ['. $request->keg_unitkerja .'] '. $unit_nama .chr(10);
+                //$message .= '🟢 Link : <a href="https://sirinjani.bpsntb.id/kegiatan/detil/'.$keg_id.'">Kegiatan Detil</a>'. chr(10);
+                $message .= '🟢 Link : <a href="'.route('kegiatan.detil',$keg_id).'">Kegiatan Detil</a>' .chr(10);
+                $message .= '-----------------------'.chr(10);
+                //dd($message);
+                //kirim pesan ke channel log
+                $response = Telegram::sendMessage([
+                    'chat_id' => $this->chan_log_id,
+                    'text' => $message,
+                    'parse_mode'=> 'HTML'
+                ]);
+                //batasannya
             }
         }
         Session::flash('message', $pesan_error);
@@ -486,6 +567,22 @@ class KegiatanController extends Controller
                         $data_log->log_pesan = 'berhasil menghapus kegiatan ['.$request->keg_id.'] '. trim($nama) .' dengan SM ['. $unit_kode .'] '. $unit_nama;
                         $data_log->save();
                         //batas catat aktivitas hapus kegiatan
+                        //kirim ke sistem channel
+                        //kirim ke channel log
+                        $message = '### HAPUS KEGIATAN ###' .chr(10);
+                        $message .= '-----------------------'.chr(10);
+                        $message .= '🟢 Username : '.Auth::user()->username .chr(10);
+                        $message .= '🟢 IP Address : '. Generate::GetIpAddress() .chr(10);
+                        $message .= '🟢 Useragent : '. Generate::GetUserAgent() .chr(10);
+                        $message .= '🟢 Pesan : berhasil menghapus kegiatan ['.$request->keg_id.'] '. trim($nama) .' dengan SM ['. $unit_kode .'] '. $unit_nama .chr(10);
+                        $message .= '-----------------------'.chr(10);
+
+                        $response = Telegram::sendMessage([
+                            'chat_id' => $this->chan_log_id,
+                            'text' => $message,
+                            'parse_mode'=> 'HTML'
+                        ]);
+                        $messageId = $response->getMessageId();
                     }
                 }
                 else
@@ -735,6 +832,7 @@ class KegiatanController extends Controller
                     </div>
                     */
                     //$data_keg = Kegiatan::where('keg_id',$keg_id)->first();
+
                     $objEmail = new \stdClass();
                     $objEmail->keg_id = $data_keg->keg_id;
                     $objEmail->keg_nama = $data_keg->keg_nama;
@@ -756,7 +854,44 @@ class KegiatanController extends Controller
                 }
                 //batas testing
             }
-
+            //pengiriman ke channel notif
+            if ($data_keg->keg_spj == 1)
+            {
+                $kegspj = 'Ada';
+            }
+            else
+            {
+                $kegspj = 'Tidak ada';
+            }
+            $message = '<b>🎯🎯🎯 PENGIRIMAN 🎯🎯🎯</b>' .chr(10);
+            $message .= '-----------------------'.chr(10);
+            $message .= '🟢 ID : <b>#'.$data_keg->keg_id.'</b>'.chr(10);
+            $message .= '🟢 NAMA KEGIATAN : <b>'. $data_keg->keg_nama.'</b>' .chr(10);
+            $message .= '🟢 SM : <b>'. $data_keg->Unitkerja->unit_nama.'</b>' .chr(10);
+            $message .= '🟢 Jenis : <b>'. $data_keg->JenisKeg->jkeg_nama.'</b>' .chr(10);
+            $message .= '🟢 Tanggal mulai : <b>'. Tanggal::HariPanjang($data_keg->keg_start).'</b>' .chr(10);
+            $message .= '🟢 Tanggal selesai : <b>'. Tanggal::HariPanjang($data_keg->keg_end).'</b>' .chr(10);
+            $message .= '🟢 Ada SPJ : <b>'. $kegspj.'</b>' .chr(10);
+            $message .= '-----------------------'.chr(10);
+            $message .= '🔹 Target dikirim : <b>'. $request->keg_r_jumlah .' '.$data_keg->keg_target_satuan.'</b>' .chr(10);
+            $message .= '🔹 Tanggal pengiriman : <b>'. Tanggal::HariPanjang($request->keg_r_tgl).'</b>' .chr(10);
+            $message .= '🔹 Keterangan : <b>'. $request->keg_r_ket.'</b>' .chr(10);
+            $message .= '🔹 Kabkota : <b>'. $nama_kabkota.'</b>' .chr(10);
+            $message .= '-----------------------'.chr(10);
+            $message .= '<b>💡💡 Info Tambahan 💡💡</b>' .chr(10);
+            $message .= '-----------------------'.chr(10);
+            $message .= '📡 Target Kabkota : <b>'. $target_kabkota .' '.$data_keg->keg_target_satuan.'</b>' .chr(10);
+            $message .= '⌛️ Tanggal dibuat : <b>'. Tanggal::LengkapHariPanjang($waktu_simpan_penerimaan).'</b>' .chr(10);
+            $message .= '👤 Operator Pengirim : <b>'. Auth::user()->username.'</b>' .chr(10);
+            //kirim pesan ke channel notif
+            $message .= '-----------------------'.chr(10);
+            $message .= '🟢 Link : <a href="'.route('kegiatan.detil',$data_keg->keg_id).'">Kegiatan Detil</a>' .chr(10);
+            $response = Telegram::sendMessage([
+                'chat_id' => $this->chan_notif_id,
+                'text' => $message,
+                'parse_mode'=> 'HTML'
+            ]);
+            //batasannya
             if (env('APP_AKTIVITAS_MODE') == true)
             {
                 //catat pengiriman oleh operator kabkota
@@ -768,6 +903,24 @@ class KegiatanController extends Controller
                 $data_log->log_pesan = 'berhasil menambah pengiriman untuk kegiatan ['.$request->keg_id.'] '. trim($data_keg->keg_nama) .' tanggal '.Tanggal::HariPanjang($request->keg_r_tgl).' sebanyak '. $request->keg_r_jumlah .' '.$data_keg->keg_target_satuan;
                 $data_log->save();
                 //batas pengiriman oleh operator kabkota
+                //kirim ke sistem channel
+                //kirim ke channel log
+                $message = '### PENGIRIMAN  ###' .chr(10);
+                $message .= '-----------------------'.chr(10);
+                $message .= '🟢 Username : '.Auth::user()->username .chr(10);
+                $message .= '🟢 IP Address : '. Generate::GetIpAddress() .chr(10);
+                $message .= '🟢 Useragent : '. Generate::GetUserAgent() .chr(10);
+                $message .= '🟢 Pesan : berhasil menambah pengiriman untuk kegiatan ['.$request->keg_id.'] '. trim($data_keg->keg_nama) .' tanggal '.Tanggal::HariPanjang($request->keg_r_tgl).' sebanyak '. $request->keg_r_jumlah .' '.$data_keg->keg_target_satuan .chr(10);
+                $message .= '🟢 Link : <a href="'.route('kegiatan.detil',$request->keg_id).'">Kegiatan Detil</a>' .chr(10);
+                $message .= '-----------------------'.chr(10);
+                //dd($message);
+                //kirim pesan ke channel log
+                $response = Telegram::sendMessage([
+                    'chat_id' => $this->chan_log_id,
+                    'text' => $message,
+                    'parse_mode'=> 'HTML'
+                ]);
+                //batasannya
             }
             $pesan_error="Pengiriman oleh ". $data->Unitkerja->unit_nama.' sudah disimpan';
             $pesan_warna="success";
@@ -840,6 +993,24 @@ class KegiatanController extends Controller
                 $data_log->log_pesan = 'berhasil menghapus pengiriman untuk kegiatan ['.$data_keg->keg_id.'] '. trim($data_keg->keg_nama) .' tanggal '.$tgl.' sebanyak '. $keg_r_jumlah .' '.$data_keg->keg_target_satuan;
                 $data_log->save();
                 //batas hapus pengiriman
+                //kirim ke sistem channel
+                //kirim ke channel log
+                $message = '### HAPUS PENGIRIMAN  ###' .chr(10);
+                $message .= '-----------------------'.chr(10);
+                $message .= '🟢 Username : '.Auth::user()->username .chr(10);
+                $message .= '🟢 IP Address : '. Generate::GetIpAddress() .chr(10);
+                $message .= '🟢 Useragent : '. Generate::GetUserAgent() .chr(10);
+                $message .= '🟢 Pesan : berhasil menghapus pengiriman untuk kegiatan ['.$data_keg->keg_id.'] '. trim($data_keg->keg_nama) .' tanggal '.$tgl.' sebanyak '. $keg_r_jumlah .' '.$data_keg->keg_target_satuan .chr(10);
+                $message .= '🟢 Link : <a href="'.route('kegiatan.detil',$data_keg->keg_id).'">Kegiatan Detil</a>' .chr(10);
+                $message .= '-----------------------'.chr(10);
+                //dd($message);
+                //kirim pesan ke channel log
+                $response = Telegram::sendMessage([
+                    'chat_id' => $this->chan_log_id,
+                    'text' => $message,
+                    'parse_mode'=> 'HTML'
+                ]);
+                //batasannya
             }
         }
         return Response()->json($arr);
@@ -876,6 +1047,7 @@ class KegiatanController extends Controller
             $dataNilai->keg_t_diupdate_oleh = Auth::user()->username;
             $dataNilai->update();
             $target_kabkota = $dataNilai->keg_t_target;
+            $nama_kabkota = $dataNilai->Unitkerja->unit_nama;
             $data_keg = Kegiatan::where('keg_id',$request->keg_id)->first();
             $nofif_isi = '['.$request->keg_id.'] ada penerimaan oleh '.Auth::user()->username .' tanggal '.Tanggal::HariPanjang($request->keg_r_tgl).' sebanyak '. $request->keg_r_jumlah .' '.$data_keg->keg_target_satuan;
             $data_user = User::where([['kodeunit',$request->keg_r_unitkerja],['level','>','1']])->get();
@@ -930,6 +1102,43 @@ class KegiatanController extends Controller
                 }
                 //batas testing
             }
+            //telegram penerimaan
+            if ($data_keg->keg_spj == 1)
+            {
+                $kegspj = 'Ada';
+            }
+            else
+            {
+                $kegspj = 'Tidak ada';
+            }
+            $message = '<b>▶️▶️▶️ PENERIMAAN ◀️◀️◀️</b>' .chr(10);
+            $message .= '-----------------------'.chr(10);
+            $message .= '🟢 ID : <b>#'.$data_keg->keg_id.'</b>'.chr(10);
+            $message .= '🟢 NAMA KEGIATAN : <b>'. $data_keg->keg_nama.'</b>' .chr(10);
+            $message .= '🟢 SM : <b>'. $data_keg->Unitkerja->unit_nama.'</b>' .chr(10);
+            $message .= '🟢 Jenis : <b>'. $data_keg->JenisKeg->jkeg_nama.'</b>' .chr(10);
+            $message .= '🟢 Tanggal mulai : <b>'. Tanggal::HariPanjang($data_keg->keg_start).'</b>' .chr(10);
+            $message .= '🟢 Tanggal selesai : <b>'. Tanggal::HariPanjang($data_keg->keg_end).'</b>' .chr(10);
+            $message .= '🟢 Ada SPJ : <b>'. $kegspj.'</b>' .chr(10);
+            $message .= '-----------------------'.chr(10);
+            $message .= '🔴 Target diterima : <b>'. $request->keg_r_jumlah .' '.$data_keg->keg_target_satuan.'</b>' .chr(10);
+            $message .= '🔴 Tanggal penerimaan : <b>'. Tanggal::HariPanjang($request->keg_r_tgl).'</b>' .chr(10);
+            $message .= '🔴 Dari : <b>['.$request->keg_r_unitkerja.'] '. $nama_kabkota.'</b>' .chr(10);
+            $message .= '-----------------------'.chr(10);
+            $message .= '<b>💡💡 Info Tambahan 💡💡</b>' .chr(10);
+            $message .= '-----------------------'.chr(10);
+            $message .= '📡 Target Kabkota : <b>'. $target_kabkota .' '.$data_keg->keg_target_satuan.'</b>' .chr(10);
+            $message .= '⌛️ Tanggal dibuat : <b>'. Tanggal::LengkapHariPanjang($waktu_simpan_penerimaan).'</b>' .chr(10);
+            $message .= '👤 Operator penerima : <b>'. Auth::user()->username.'</b>' .chr(10);
+            //kirim pesan ke channel notif
+            $message .= '-----------------------'.chr(10);
+            $message .= '🟢 Link : <a href="'.route('kegiatan.detil',$data_keg->keg_id).'">Kegiatan Detil</a>' .chr(10);
+            $response = Telegram::sendMessage([
+                'chat_id' => $this->chan_notif_id,
+                'text' => $message,
+                'parse_mode'=> 'HTML'
+            ]);
+            //batasannya
             if (env('APP_AKTIVITAS_MODE') == true)
             {
                 //catat penerimaan oleh operator provinsi
@@ -941,6 +1150,24 @@ class KegiatanController extends Controller
                 $data_log->log_pesan = 'berhasil menambah penerimaan untuk kegiatan ['.$request->keg_id.'] '. trim($data_keg->keg_nama) .' tanggal '.Tanggal::HariPanjang($request->keg_r_tgl).' sebanyak '. $request->keg_r_jumlah .' '.$data_keg->keg_target_satuan;
                 $data_log->save();
                 //batas penerimaan oleh operator provinsi
+                //kirim ke sistem channel
+                //kirim ke channel log
+                $message = '### PENERIMAAN  ###' .chr(10);
+                $message .= '-----------------------'.chr(10);
+                $message .= '🟢 Username : '.Auth::user()->username .chr(10);
+                $message .= '🟢 IP Address : '. Generate::GetIpAddress() .chr(10);
+                $message .= '🟢 Useragent : '. Generate::GetUserAgent() .chr(10);
+                $message .= '🟢 Pesan : berhasil menambah penerimaan untuk kegiatan ['.$request->keg_id.'] '. trim($data_keg->keg_nama) .' tanggal '.Tanggal::HariPanjang($request->keg_r_tgl).' sebanyak '. $request->keg_r_jumlah .' '.$data_keg->keg_target_satuan .chr(10);
+                $message .= '🟢 Link : <a href="'.route('kegiatan.detil',$request->keg_id).'">Kegiatan Detil</a>' .chr(10);
+                $message .= '-----------------------'.chr(10);
+                //dd($message);
+                //kirim pesan ke channel log
+                $response = Telegram::sendMessage([
+                    'chat_id' => $this->chan_log_id,
+                    'text' => $message,
+                    'parse_mode'=> 'HTML'
+                ]);
+                //batasannya
             }
             $pesan_error="Konfirmasi penerimaan dari ". $data->Unitkerja->unit_nama.' sudah disimpan';
             $pesan_warna="success";
@@ -1002,6 +1229,24 @@ class KegiatanController extends Controller
                 $data_log->log_pesan = 'berhasil menghapus penerimaan untuk kegiatan ['.$keg_id.'] '. trim($data_keg->keg_nama) .' tanggal '.$tgl.' sebanyak '. $keg_r_jumlah .' '.$data_keg->keg_target_satuan;
                 $data_log->save();
                 //batas hapus penerimaan oleh operator provinsi
+                //kirim ke sistem channel
+                //kirim ke channel log
+                $message = '### HAPUS PENERIMAAN  ###' .chr(10);
+                $message .= '-----------------------'.chr(10);
+                $message .= '🟢 Username : '.Auth::user()->username .chr(10);
+                $message .= '🟢 IP Address : '. Generate::GetIpAddress() .chr(10);
+                $message .= '🟢 Useragent : '. Generate::GetUserAgent() .chr(10);
+                $message .= '🟢 Pesan : berhasil menghapus penerimaan untuk kegiatan ['.$keg_id.'] '. trim($data_keg->keg_nama) .' tanggal '.$tgl.' sebanyak '. $keg_r_jumlah .' '.$data_keg->keg_target_satuan .chr(10);
+                $message .= '🟢 Link : <a href="'.route('kegiatan.detil',$request->keg_id).'">Kegiatan Detil</a>' .chr(10);
+                $message .= '-----------------------'.chr(10);
+                //dd($message);
+                //kirim pesan ke channel log
+                $response = Telegram::sendMessage([
+                    'chat_id' => $this->chan_log_id,
+                    'text' => $message,
+                    'parse_mode'=> 'HTML'
+                ]);
+                //batasannya
             }
         }
         return Response()->json($arr);
