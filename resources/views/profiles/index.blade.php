@@ -81,18 +81,19 @@
                         <dt class="col-lg-2 col-md-2">Token Telegram</dt>
                         <dd class="col-lg-10 col-sm-10">
                             @if (Auth::user()->token_tg)
-                            {{Auth::user()->token_tg}}
+                                <input type="text" size="32" value="{{Auth::user()->token_tg}}" disabled="" id="tokentg">
+                                <button class="btn btn-xs btn-success" onclick="copyTeks()">copy</button>
                             @else
-                                Silakan generate token baru
+                                ---Silakan generate token baru---
                             @endif
                         </dd>
                     </dl>
 
                     <div class="row">
                         <div class="col-lg-8 m-t-30">
-                            <button class="btn btn-rounded btn-success" data-toggle="modal" data-target="#EditModal" data-id="{{Auth::user()->id}}" data-nama="{{Auth::user()->nama}}" data-email="{{Auth::user()->email}}"><i class="fas fa-pencil-alt" data-toggle="tooltip" title="Edit Data"></i> EDIT</button>
-                            <button class="btn btn-rounded btn-danger" data-toggle="modal" data-target="#GantiPasswordModal" data-id="{{Auth::user()->id}}" data-nama="{{Auth::user()->nama}}" data-email="{{Auth::user()->email}}"><i class="fas fa-key" data-toggle="tooltip" title="Ganti Password"></i> GANTI PASSWORD</button>
-                            <button class="btn btn-rounded btn-warning generatetoken" data-id="{{Auth::user()->id}}" data-nama="{{Auth::user()->nama}}"><i class="fas fa-key" data-toggle="tooltip" title="Generate Token Telegram Baru"></i> GENERATE TOKEN BARU</button>
+                            <button class="btn btn-rounded btn-sm btn-success" data-toggle="modal" data-target="#EditModal" data-id="{{Auth::user()->id}}" data-nama="{{Auth::user()->nama}}" data-email="{{Auth::user()->email}}"><i class="fas fa-pencil-alt" data-toggle="tooltip" title="Edit Data"></i> EDIT</button>
+                            <button class="btn btn-rounded btn-sm btn-danger" data-toggle="modal" data-target="#GantiPasswordModal" data-id="{{Auth::user()->id}}" data-nama="{{Auth::user()->nama}}" data-email="{{Auth::user()->email}}"><i class="fas fa-key" data-toggle="tooltip" title="Ganti Password"></i> GANTI PASSWORD</button>
+                            <button class="btn btn-rounded btn-sm btn-warning generatetoken" data-id="{{Auth::user()->id}}" data-nama="{{Auth::user()->nama}}"><i class="fas fa-key" data-toggle="tooltip" title="Generate Token Telegram Baru"></i> GENERATE TOKEN BARU</button>
                         </div>
                     </div>
             </div>

@@ -73,7 +73,7 @@ class MyProfileController extends Controller
         {
             $data=User::where('id','=',$request->id)->first();
             //generate token
-            $token = Str::random(60);
+            $token = Str::random(30);
             $data->token_tg = $token;
             $data->user_tg = NULL;
             $data->chatid_tg = NULL;
