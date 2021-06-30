@@ -81,7 +81,8 @@
                         <dt class="col-lg-2 col-md-2">Token Telegram</dt>
                         <dd class="col-lg-10 col-sm-10">
                             @if (Auth::user()->token_tg)
-                                <input type="text" size="32" value="{{Auth::user()->token_tg}}" disabled="" id="tokentg">
+                            {{Auth::user()->token_tg}}
+                                <input type="hidden" name="tokentg" value="{{Auth::user()->token_tg}}" id="tokentg">
                                 <button class="btn btn-xs btn-success" onclick="copyTeks()">copy</button>
                             @else
                                 ---Silakan generate token baru---
