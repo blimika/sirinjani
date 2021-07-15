@@ -245,25 +245,6 @@ class NotifikasiController extends Controller
     }
     public function DeadlineKegiatan()
     {
-        $message = '<b>📑📑📑 KEGIATAN MENDEKATI BATAS WAKTU 📑📑📑</b>' .chr(10);
-        $message .= '----------------------------------------------------------------------' .chr(10);
-        if (Generate::KegiatanDeadline())
-        {
-
-            foreach (Generate::KegiatanDeadline() as $item)
-            {
-                $message .= '🗂 <b>'. $item->keg_nama .'</b>'.chr(10);
-                $message .= '🗓 Tanggal : <i>'.Tanggal::Panjang($item->keg_end).'</i>'.chr(10);
-                $message .= '✉️ Pengiriman : '.number_format(($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100,2,",",".").'%' .chr(10);
-                $message .= '📨 Penerimaan : '.number_format(($item->RealisasiTerima->sum('keg_r_jumlah')/$item->keg_total_target)*100,2,",",".").'%' .chr(10);
-                $message .= '📎 Link : <a href="'.route('kegiatan.detil',$item->keg_id).'"> Kegiatan detil</a>' .chr(10);
-                $message .= '---------------------------------------------'.chr(10);
-            }
-        }
-        else
-        {
-            $message .= '<b>Belum ada kegiatan yang mendekati batas waktu</b>' .chr(10);
-        }
         LogPosisi::create([
             'user_tg' => $this->user_tg,
             'chatid_tg' => $this->chat_id,
@@ -272,20 +253,84 @@ class NotifikasiController extends Controller
             'update_id' => $this->update_id,
             'waktu_tg' => $this->waktu_kirim
         ]);
-
-        $reply_markup = Keyboard::make([
-            'keyboard' => $this->keyboard_menu,
-            'resize_keyboard' => true,
-            'one_time_keyboard' => true
-        ]);
-        $response = Telegram::sendMessage([
-            'chat_id' => $this->chat_id,
-            'text' => $message,
-            'parse_mode'=> 'HTML',
-            'disable_web_page_preview'=>true,
-            'reply_markup' => $reply_markup
-        ]);
-        $messageId = $response->getMessageId();
+        $cek_total = Kegiatan::whereBetween('keg_end',array(\Carbon\Carbon::now()->format('Y-m-d'), \Carbon\Carbon::now()->addWeek()->format('Y-m-d')))->orderBy('keg_end')->count();
+        if ($cek_total > 0)
+        {
+            $item_per_hal = 15;
+            $i=1;
+            if ($cek_total > $item_per_hal)
+            {
+                $hal = ceil($cek_total/$item_per_hal);
+                if ($hal > 5)
+                {
+                    $hal = 5;
+                }
+                for ($j = 1 ; $j <= $hal; $j++)
+                {
+                    //display per halaman
+                    $data = Kegiatan::whereBetween('keg_end',array(\Carbon\Carbon::now()->format('Y-m-d'), \Carbon\Carbon::now()->addWeek()->format('Y-m-d')))->orderBy('keg_end')->skip((($j-1)*$item_per_hal))->take($item_per_hal)->get();
+                    $message = '<b>📑📑📑 KEGIATAN MENDEKATI BATAS WAKTU 📑📑📑</b>' .chr(10);
+                    $message .= '----------------------------------------------------------------------' .chr(10);
+                    $message .= '💾 Halaman '.$j .chr(10);
+                    $message .= '----------------------------------------------------------------------' .chr(10);
+                    foreach ($data as $item)
+                    {
+                        $message .= '🗂 <b>'. $item->keg_nama .'</b>'.chr(10);
+                        $message .= '🗓 Tanggal : <i>'.Tanggal::Panjang($item->keg_end).'</i>'.chr(10);
+                        $message .= '✉️ Pengiriman : '.number_format(($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100,2,",",".").'%' .chr(10);
+                        $message .= '📨 Penerimaan : '.number_format(($item->RealisasiTerima->sum('keg_r_jumlah')/$item->keg_total_target)*100,2,",",".").'%' .chr(10);
+                        $message .= '📎 Link : <a href="'.route('kegiatan.detil',$item->keg_id).'"> Kegiatan detil</a>' .chr(10);
+                        $message .= '---------------------------------------------'.chr(10);
+                    }
+                    $reply_markup = Keyboard::make([
+                        'keyboard' => $this->keyboard_menu,
+                        'resize_keyboard' => true,
+                        'one_time_keyboard' => true
+                    ]);
+                    $response = Telegram::sendMessage([
+                        'chat_id' => $this->chat_id,
+                        'text' => $message,
+                        'parse_mode'=> 'HTML',
+                        'disable_web_page_preview'=>true,
+                        'reply_markup' => $reply_markup
+                    ]);
+                    $messageId = $response->getMessageId();
+                }
+            }
+            else
+            {
+                //kurang dari item_per_hal
+                $data = Kegiatan::whereBetween('keg_end',array(\Carbon\Carbon::now()->format('Y-m-d'), \Carbon\Carbon::now()->addWeek()->format('Y-m-d')))->orderBy('keg_end')->get();
+                $message = '<b>📑📑📑 KEGIATAN MENDEKATI BATAS WAKTU 📑📑📑</b>' .chr(10);
+                $message .= '----------------------------------------------------------------------' .chr(10);
+                foreach ($data as $item)
+                {
+                    $message .= '🗂 <b>'. $item->keg_nama .'</b>'.chr(10);
+                    $message .= '🗓 Tanggal : <i>'.Tanggal::Panjang($item->keg_end).'</i>'.chr(10);
+                    $message .= '✉️ Pengiriman : '.number_format(($item->RealisasiKirim->sum('keg_r_jumlah')/$item->keg_total_target)*100,2,",",".").'%' .chr(10);
+                    $message .= '📨 Penerimaan : '.number_format(($item->RealisasiTerima->sum('keg_r_jumlah')/$item->keg_total_target)*100,2,",",".").'%' .chr(10);
+                    $message .= '📎 Link : <a href="'.route('kegiatan.detil',$item->keg_id).'"> Kegiatan detil</a>' .chr(10);
+                    $message .= '---------------------------------------------'.chr(10);
+                }
+                $reply_markup = Keyboard::make([
+                    'keyboard' => $this->keyboard_menu,
+                    'resize_keyboard' => true,
+                    'one_time_keyboard' => true
+                ]);
+                $response = Telegram::sendMessage([
+                    'chat_id' => $this->chat_id,
+                    'text' => $message,
+                    'parse_mode'=> 'HTML',
+                    'disable_web_page_preview'=>true,
+                    'reply_markup' => $reply_markup
+                ]);
+                $messageId = $response->getMessageId();
+            }
+        }
+        else
+        {
+            $message .= '<b>Belum ada kegiatan yang mendekati batas waktu</b>' .chr(10);
+        }
     }
     public function InformasiBot()
     {
