@@ -97,8 +97,10 @@
                                             </div>
                                        </td>
                                        <td>{{$item->unit_nama}}</td>
-                                       <td>{{Tanggal::Panjang($item->keg_start)}}</td>
-                                       <td>{{Tanggal::Panjang($item->keg_end)}}</td>
+                                       <!----<td>{{Tanggal::Panjang($item->keg_start)}}</td>
+                                       <td>{{Tanggal::Panjang($item->keg_end)}}</td>--->
+                                       <td><span class="tgl_hide">{{\Carbon\Carbon::parse($item->keg_start)->format('Ymd')}}</span> {{Tanggal::Panjang($item->keg_start)}}</td>
+                                       <td><span class="tgl_hide">{{\Carbon\Carbon::parse($item->keg_end)->format('Ymd')}}</span> {{Tanggal::Panjang($item->keg_end)}}</td>
                                        <td>{{$item->keg_total_target}}</td>
                                        <td>{{$item->RealisasiTerima->sum('keg_r_jumlah')}}</td>
                                        <td>{{$item->keg_target_satuan}}</td>
@@ -131,6 +133,12 @@
 <link href="{{asset('assets/node_modules/sweetalert2/dist/sweetalert2.min.css')}}" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="{{asset('assets/node_modules/datatables.net-bs4/css/dataTables.bootstrap4.css')}}">
 <link rel="stylesheet" type="text/css" href="{{asset('assets/node_modules/datatables.net-bs4/css/responsive.dataTables.min.css')}}">
+<style>
+    .tgl_hide
+    {
+        display: none;
+    }
+</style>
 @endsection
 
 @section('js')
