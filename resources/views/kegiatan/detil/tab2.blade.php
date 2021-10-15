@@ -36,7 +36,7 @@
                                          <i class="fas fa-pencil-alt" data-toggle="tooltip" title="Edit konfirmasi pengiriman tanggal {{Tanggal::Pendek($r->keg_r_tgl)}}"></i>
                                      </button>
                                      <!--batas edit realisasi kirim-->
-                                     <!--hapus realiasi-->
+                                     <!--hapus realisasi-->
                                      <button class="btn btn-danger btn-xs hapuskirim" data-kegrid="{{$r->keg_r_id}}" data-nama="konfirmasi pengiriman oleh {{$item->Unitkerja->unit_nama}} tanggal {{Tanggal::Pendek($r->keg_r_tgl)}}">
                                          <i class="fas fa-trash" data-toggle="tooltip" title="Hapus konfirmasi pengiriman tanggal {{Tanggal::Pendek($r->keg_r_tgl)}}"></i>
                                      </button>
@@ -48,6 +48,11 @@
                                      | <span class="badge badge-pill badge-warning" data-toggle="tooltip" title="Keterangan konfirmasi pengiriman">{{$r->keg_r_ket}}</span>
                                      @if ($r->keg_r_link != null)
                                         | <a href="{{$r->keg_r_link}}" class="btn btn-xs btn-dark" target="_blank" data-toggle="tooltip" title="Url download pengiriman"><i class="fas fa-link"></i></a>
+                                     @endif
+                                     @if (Auth::user())
+                                        @if (Auth::user()->level > 4)
+                                     | <span class="badge badge-pill badge-dark" data-toggle="tooltip" title="Tanggal update pengiriman">{{Tanggal::LengkapPendek($r->updated_at)}}</span>
+                                        @endif
                                      @endif
                                 </div>
                             @endforeach
@@ -102,6 +107,11 @@
                                      <span class="badge badge-pill badge-info" data-toggle="tooltip" title="Tanggal konfirmasi penerimaan">{{Tanggal::Pendek($r->keg_r_tgl)}}</span>
                                      | <span class="badge badge-pill badge-success" data-toggle="tooltip" title="Jumlah diterima">{{$r->keg_r_jumlah}}</span>
                                      | <span class="badge badge-pill badge-warning" data-toggle="tooltip" title="Keterangan konfirmasi penerimaan">{{$r->keg_r_ket}}</span>
+                                     @if (Auth::user())
+                                        @if (Auth::user()->level > 4)
+                                     | <span class="badge badge-pill badge-dark" data-toggle="tooltip" title="Tanggal update penerimaan">{{Tanggal::LengkapPendek($r->updated_at)}}</span>
+                                        @endif
+                                     @endif
                                 </div>
                             @endforeach
                         @endif
