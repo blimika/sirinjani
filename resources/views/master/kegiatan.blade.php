@@ -6,13 +6,13 @@
 <!-- ============================================================== -->
 <div class="row page-titles">
     <div class="col-md-5 align-self-center">
-        <h4 class="text-themecolor">Peringkat Nilai Tahunan</h4>
+        <h4 class="text-themecolor">Master Kegiatan</h4>
     </div>
     <div class="col-md-7 align-self-center text-right">
         <div class="d-flex justify-content-end align-items-center">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="javascript:void(0)">Dashboard</a></li>
-                <li class="breadcrumb-item active">Peringkat Nilai Tahunan</li>
+                <li class="breadcrumb-item active">Master Kegiatan</li>
             </ol>
         </div>
     </div>
@@ -31,24 +31,19 @@
 <!-- Start Page Content -->
 <!-- ============================================================== -->
 <div class="row">
-    <div class="col-12">
+    <div class="col-lg-12">
         <div class="card">
             <div class="card-body">
-                <div class="row">
-                    <div class="col-lg-12 col-sm-12 col-xs-12">
-                        <div class="row">
-                            <div class="col-md-9">
-                        <form class="form-horizontal">
+                <form id="form_generate" name="form_generate" class="form-horizontal">
                               <div class="form-group row">
-                                <label for="unit" class="col-sm-2 control-label">Peringkat berdasarkan </label>
-                                <div class="col-md-5">
-                                    <select name="unit" id="unit" class="form-control">
-                                    <option value="0">BPS Provinsi NTB</option>
-                                    @foreach ($dataUnitkerja as $d)
-                                    <option value="{{$d->unit_kode}}" @if (request('unit')==$d->unit_kode or $unit==$d->unit_kode)
-                                        selected
-                                       @endif>{{$d->unit_nama}}</option>
-                                    @endforeach
+                                <label for="unit" class="col-sm-2 control-label">Generate Nilai </label>
+                                <div class="col-md-2">
+                                    <select name="bulan" id="bulan" class="form-control">
+                                     @for ($i = 1; $i <= 12; $i++)
+                                         <option value="{{$i}}" @if (request('bulan')==$i or $bulan==$i)
+                                             selected
+                                         @endif>{{$dataBulanPanjang[$i]}}</option>
+                                     @endfor
                                     </select>
                                 </div>
                                 <div class="col-md-2">
@@ -62,48 +57,55 @@
                                 </div>
 
                                 <div class="col-md-2">
-                                    <button type="submit" class="btn btn-success">Filter</button>
+                                    <button type="submit" class="btn btn-success" id="generate" name="generate">Generate</button>
                                 </div>
                               </div>
-                        </form>
-                            </div>
-                            </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-6 col-sm-12 col-xs-12">
-                        <div class="table-responsive">
-                            <table id="nilai" class="table table-bordered table-hover table-striped" cellspacing="0" width="100%">
-                                <thead>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12 col-sm-12 col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <h4 class="card-title text-center">Nilai Kabkota</h4>
+                
+                    <table class="table table-bordered table-hover table-striped" cellspacing="0" width="100%">
+                        <thead>
+                        <tr>
+                            <th rowspan="2" class="text-center">Nama Kabkota</th>
+                            <th colspan="12" class="text-center">Tahun {{$tahun}} </th>
+                        </tr>
+                        <tr>
+                            @for ($i = 1; $i <= 12; $i++)
+                               <td>{{$dataBulan[$i]}}</td>
+                            @endfor
+                        </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($dataKabkota as $item)
                                 <tr>
-                                    <th>No</th>
-                                    <th>Nama Kabupaten/Kota</th>
-                                    <th>Jumlah Kegiatan</th>
-                                    <th>Jumlah Target</th>
-                                    <th>Poin</th>
+                                    <td>{{$item->unit_nama}}</td>
+                                    @for ($i = 1; $i <= 12; $i++)
+                                        <td>
+                                            @if ((int) Generate::ListNilaiTotal($item->unit_kode,$i,$tahun)['nilai_total'] == 0)
+                                                -
+                                            @else
+                                                @if (date('Y')==$tahun && $i > date('m'))
+                                                -
+                                                @else
+                                                {{Generate::ListNilaiTotal($item->unit_kode,$i,$tahun)['nilai_total']}}
+                                                @endif
+                                            @endif
+                                        </td>
+                                    @endfor
                                 </tr>
-                                </thead>
-                                <tbody>
-                                @foreach ($dataPeringkat as $item)
-                                    <tr>
-                                        <td>{{$loop->iteration}}</td>
-                                        <td>{{$item->unit_nama}}</td>
-                                        <td>{{$item->keg_jml}}</td>
-                                        <td>{{$item->keg_jml_target}}</td>
-                                        <td>{{number_format($item->point_total,2,".",",")}}</td>
-                                    </tr>
-                                @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 col-sm-12 col-xs-12">
-                        <h4 class="card-title">Grafik Nilai</h4>
-                        <div id="nilai_tahunan"></div>
-                        @if ($tahun == date('Y'))
-                        <div class="text-danger"><i>*) Keadaan sampai bulan berjalan tahun {{$tahun}}</i></div>
-                        @endif
-                    </div>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -162,5 +164,5 @@
     <script src="{{asset('dist/grafik/export-data.js')}}"></script>
     <script src="{{asset('dist/grafik/series-label.js')}}"></script>
     <script src="{{asset('dist/grafik/accessibility.js')}}"></script>
-    @include('peringkat.GrafikTahunan')
+    @include('master.js')
 @endsection

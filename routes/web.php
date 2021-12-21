@@ -62,6 +62,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/peringkat/rincian', 'PeringkatController@rincian')->name('peringkat.rincian');
     Route::get('/peringkat/export/{unitkerja}/{bulan}/{tahun}', 'PeringkatController@ExportExcel')->name('peringkat.export');
     Route::get('/peringkat/ckp', 'PeringkatController@Ckp')->name('peringkat.ckp');
+    Route::get('/peringkat/rekapnilai', 'PeringkatController@RekapNilaiBulanan')->name('peringkat.rekapnilai');
     Route::get('/ckp/export/{tahun}', 'PeringkatController@ExportCkpExcel')->name('ckp.export');
     Route::get('/laporan/bulanan', 'LaporanController@bulanan')->name('laporan.bulanan');
     Route::get('/laporan/bulanan/export/{unitkerja}/{bulan}/{tahun}', 'LaporanController@bulananExport')->name('bulanan.export');
@@ -99,5 +100,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/bot/telegram/getme', 'NotifikasiController@GetMeBot')->name('bot.getme');
     //aktivitas
     Route::get('/aktivitas/list', 'LogAktivitasController@ListLog')->name('aktivitas.list');
+    //point
+    Route::get('/poin/list', 'KegiatanController@ListPoin')->name('poin.list');
+    //master kegiatan
+    Route::get('/master/kegiatan', 'KegiatanController@MasterKegiatan')->name('master.kegiatan');
 });
 Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout')->name('logout');

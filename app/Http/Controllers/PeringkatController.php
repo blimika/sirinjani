@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use App\User;
 use Carbon\Carbon;
 use Session;
+use App\Kegiatan;
 
 class PeringkatController extends Controller
 {
@@ -42,6 +43,7 @@ class PeringkatController extends Controller
             }
         }
         $dataUnit = UnitKerja::where([['unit_jenis','=','1'],['unit_eselon','=','3']])->get();
+       /*
         $data = DB::table('m_keg')
                 ->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
                 ->leftJoin(DB::raw("(select unit_kode as unit_kode_prov, unit_nama as unit_nama_prov, unit_parent as unit_parent_prov from t_unitkerja where unit_jenis='1') as unit_prov"),'m_keg.keg_unitkerja','=','unit_prov.unit_kode_prov')
@@ -55,6 +57,24 @@ class PeringkatController extends Controller
 				->select(DB::raw("m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_jumlah, sum(m_keg_target.keg_t_point) as point_total, avg(m_keg_target.keg_t_point) as point_rata, count(*) as keg_jml"))
 				->groupBy('m_keg_target.keg_t_unitkerja')
 				->orderBy('point_rata','desc')
+                ->orderBy('keg_jml_target','desc')
+                ->orderBy('keg_jml','desc')
+                ->orderBy('m_keg_target.keg_t_unitkerja','asc')
+                ->get();
+                */
+            $data = DB::table('m_keg')
+                ->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
+                ->leftJoin(DB::raw("(select unit_kode as unit_kode_prov, unit_nama as unit_nama_prov, unit_parent as unit_parent_prov from t_unitkerja where unit_jenis='1') as unit_prov"),'m_keg.keg_unitkerja','=','unit_prov.unit_kode_prov')
+                ->leftJoin('t_unitkerja','m_keg_target.keg_t_unitkerja','=','t_unitkerja.unit_kode')
+                ->when(request('unit'),function ($query){
+                    return $query->where('unit_prov.unit_parent_prov','=',request('unit'));
+                })
+                ->whereMonth('m_keg.keg_end','<=',$bulan_filter)
+				->whereYear('m_keg.keg_end','=',$tahun_filter)
+				->where('m_keg_target.keg_t_target','>','0')
+				->select(DB::raw("m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_volume, sum(m_keg_target.keg_t_point) as point_jumlah, avg(m_keg_target.keg_t_point) as point_keg, avg(m_keg_target.spj_t_point) as point_spj, avg(m_keg_target.keg_t_point_total) as point_total, count(*) as keg_jml"))
+				->groupBy('m_keg_target.keg_t_unitkerja')
+				->orderBy('point_total','desc')
                 ->orderBy('keg_jml_target','desc')
                 ->orderBy('keg_jml','desc')
                 ->orderBy('m_keg_target.keg_t_unitkerja','asc')
@@ -96,6 +116,7 @@ class PeringkatController extends Controller
         {
             $tahun_filter = request('tahun');
         }
+        /*
         $data = DB::table('m_keg')
                 ->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
                 ->leftJoin(DB::raw("(select unit_kode as unit_kode_prov, unit_nama as unit_nama_prov, unit_parent as unit_parent_prov from t_unitkerja where unit_jenis='1') as unit_prov"),'m_keg.keg_unitkerja','=','unit_prov.unit_kode_prov')
@@ -109,6 +130,24 @@ class PeringkatController extends Controller
 				->select(DB::raw("month(m_keg.keg_end) as bulan, year(m_keg.keg_end) as tahun,m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_jumlah, sum(m_keg_target.keg_t_point) as point_total, avg(m_keg_target.keg_t_point) as point_rata, count(*) as keg_jml"))
 				->groupBy('m_keg_target.keg_t_unitkerja')
 				->orderBy('point_rata','desc')
+                ->orderBy('keg_jml_target','desc')
+                ->orderBy('keg_jml','desc')
+                ->orderBy('m_keg_target.keg_t_unitkerja','asc')
+                ->get();
+        */
+        $data = DB::table('m_keg')
+                ->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
+                ->leftJoin(DB::raw("(select unit_kode as unit_kode_prov, unit_nama as unit_nama_prov, unit_parent as unit_parent_prov from t_unitkerja where unit_jenis='1') as unit_prov"),'m_keg.keg_unitkerja','=','unit_prov.unit_kode_prov')
+                ->leftJoin('t_unitkerja','m_keg_target.keg_t_unitkerja','=','t_unitkerja.unit_kode')
+                ->when(request('unit'),function ($query){
+                    return $query->where('unit_prov.unit_parent_prov','=',request('unit'));
+                })
+                ->whereMonth('m_keg.keg_end','=',$bulan_filter)
+				->whereYear('m_keg.keg_end','=',$tahun_filter)
+				->where('m_keg_target.keg_t_target','>','0')
+				->select(DB::raw("month(m_keg.keg_end) as bulan, year(m_keg.keg_end) as tahun,m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_volume, sum(m_keg_target.keg_t_point) as point_jumlah, avg(m_keg_target.keg_t_point) as point_keg, avg(m_keg_target.spj_t_point) as point_spj, avg(m_keg_target.keg_t_point_total) as point_total, count(*) as keg_jml"))
+				->groupBy('m_keg_target.keg_t_unitkerja')
+				->orderBy('point_total','desc')
                 ->orderBy('keg_jml_target','desc')
                 ->orderBy('keg_jml','desc')
                 ->orderBy('m_keg_target.keg_t_unitkerja','asc')
@@ -166,7 +205,7 @@ class PeringkatController extends Controller
         $data_tahun = DB::table('m_keg')
         ->selectRaw('year(keg_end) as tahun')
         ->groupBy('tahun')
-        ->whereYear('keg_end','<=',NOW())
+        //->whereYear('keg_end','<=',NOW())
         ->orderBy('tahun','asc')
          ->get();
         if (request('bulan')<=0)
@@ -299,5 +338,43 @@ class PeringkatController extends Controller
         $namafile = $fileName . date('Y-m-d_H-i-s') . '.xlsx';
         //dd($anggaran_array);
         return Excel::download(new FormatViewExim($rincian_array), $namafile);
+    }
+    public function RekapNilaiBulanan()
+    {
+        if (Auth::user()->level == 3 or Auth::user()->level > 4)
+        {
+            $data_bulan = array(
+                1=>'Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'
+            );
+            $Kabkota = UnitKerja::where([['unit_jenis','=','2'],['unit_eselon','=','3']])->get();
+            $data_tahun = DB::table('m_keg')
+            ->selectRaw('year(keg_end) as tahun')
+            ->groupBy('tahun')
+            ->whereYear('keg_end','<=',NOW())
+            ->orderBy('tahun','asc')
+              ->get();
+            if (request('tahun')<=0)
+            {
+            $tahun_filter=date('Y');
+            }
+            else
+            {
+            $tahun_filter = request('tahun');
+            }
+            if (request('bulan')<=0)
+            {
+                $bulan_filter=date('m');
+            }
+            else
+            {
+                $bulan_filter = request('bulan');
+            }
+            $dataUnit = UnitKerja::where([['unit_jenis','=','1'],['unit_eselon','=','3']])->get();
+            return view('peringkat.rekapnilai',['dataUnitkerja'=>$dataUnit,'dataKabkota'=>$Kabkota,'dataTahun'=>$data_tahun,'tahun'=>$tahun_filter,'unit'=>request('unit'),'dataBulan'=>$data_bulan]);
+        }
+        else
+        {
+            return view('error.aksesditolak');
+        }
     }
 }

@@ -159,14 +159,17 @@ class LoginController extends Controller
         $user->lastip = $this->getUserIpAddr();
         $user->save();
 
+        if (env('APP_AKTIVITAS_MODE') == true)
+        {
         //save tabel aktivitas
-        $data = new LogAktivitas();
-        $data->log_username = $request->username;
-        $data->log_ip = Generate::GetIpAddress();
-        $data->log_jenis = 1;
-        $data->log_useragent = Generate::GetUserAgent();
-        $data->log_pesan = 'berhasil masuk ke sistem';
-        $data->save();
+            $data = new LogAktivitas();
+            $data->log_username = $request->username;
+            $data->log_ip = Generate::GetIpAddress();
+            $data->log_jenis = 1;
+            $data->log_useragent = Generate::GetUserAgent();
+            $data->log_pesan = 'berhasil masuk ke sistem';
+            $data->save();
+        }
         //kirim ke channel log
         $message = '### LOGIN  ###' .chr(10);
         $message .= '-----------------------'.chr(10);
@@ -176,23 +179,28 @@ class LoginController extends Controller
         $message .= '🟢 Pesan : Berhasil masuk ke Sistem SiRinjani'.chr(10);
         $message .= '-----------------------'.chr(10);
 
-        $response = Telegram::sendMessage([
-            'chat_id' => $this->chan_log_id,
-            'text' => $message,
-            'parse_mode'=> 'HTML'
-        ]);
-        $messageId = $response->getMessageId();
+        if (env('APP_TELEGRAM_MODE') == true)
+        {
+            $response = Telegram::sendMessage([
+                'chat_id' => $this->chan_log_id,
+                'text' => $message,
+                'parse_mode'=> 'HTML'
+            ]);
+            $messageId = $response->getMessageId();
+        }
     }
     public function logout(Request $request)
     {
-        $data = new LogAktivitas();
-        $data->log_username = Auth::user()->username;
-        $data->log_ip = Generate::GetIpAddress();
-        $data->log_jenis = 2;
-        $data->log_useragent = Generate::GetUserAgent();
-        $data->log_pesan = 'berhasil logout dari sistem';
-        $data->save();
-
+        if (env('APP_AKTIVITAS_MODE') == true)
+        {
+            $data = new LogAktivitas();
+            $data->log_username = Auth::user()->username;
+            $data->log_ip = Generate::GetIpAddress();
+            $data->log_jenis = 2;
+            $data->log_useragent = Generate::GetUserAgent();
+            $data->log_pesan = 'berhasil logout dari sistem';
+            $data->save();
+        }
         //kirim ke channel log
         $message = '### LOGOUT  ###' .chr(10);
         $message .= '-----------------------'.chr(10);
@@ -202,13 +210,15 @@ class LoginController extends Controller
         $message .= '🟢 Pesan : Berhasil logout dari Sistem SiRinjani'.chr(10);
         $message .= '-----------------------'.chr(10);
 
-        $response = Telegram::sendMessage([
-            'chat_id' => $this->chan_log_id,
-            'text' => $message,
-            'parse_mode'=> 'HTML'
-        ]);
-        $messageId = $response->getMessageId();
-
+        if (env('APP_TELEGRAM_MODE') == true)
+        {
+            $response = Telegram::sendMessage([
+                'chat_id' => $this->chan_log_id,
+                'text' => $message,
+                'parse_mode'=> 'HTML'
+            ]);
+            $messageId = $response->getMessageId();
+        }
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

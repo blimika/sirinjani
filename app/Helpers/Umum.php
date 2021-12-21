@@ -674,6 +674,7 @@ Class Generate {
 		/*
 		select keg_t_unitkerja, count(*) as keg_jml, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_jumlah, sum(m_keg_target.keg_t_point) as point_total, avg(m_keg_target.keg_t_point) as point_rata from m_keg_target,m_keg where m_keg.keg_id=m_keg_target.keg_id and month(m_keg.keg_end)='5' and year(m_keg.keg_end)='2020' and m_keg_target.keg_t_target>0 group by keg_t_unitkerja order by point_rata desc, point_total desc
 		*/
+		/*
 		$data = \DB::table('m_keg')
 				->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
 				->leftJoin('t_unitkerja','m_keg_target.keg_t_unitkerja','=','t_unitkerja.unit_kode')
@@ -686,6 +687,21 @@ Class Generate {
                 ->orderBy('keg_jml','desc')
                 ->orderBy('m_keg_target.keg_t_unitkerja','asc')
 				->get();
+		*/
+		$data = \DB::table('m_keg')
+                ->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
+                ->leftJoin(\DB::raw("(select unit_kode as unit_kode_prov, unit_nama as unit_nama_prov, unit_parent as unit_parent_prov from t_unitkerja where unit_jenis='1') as unit_prov"),'m_keg.keg_unitkerja','=','unit_prov.unit_kode_prov')
+                ->leftJoin('t_unitkerja','m_keg_target.keg_t_unitkerja','=','t_unitkerja.unit_kode')
+                ->whereMonth('m_keg.keg_end','=',$bulan)
+				->whereYear('m_keg.keg_end','=',$tahun)
+				->where('m_keg_target.keg_t_target','>','0')
+				->select(\DB::raw("month(m_keg.keg_end) as bulan, year(m_keg.keg_end) as tahun,m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_volume, sum(m_keg_target.keg_t_point) as point_jumlah, avg(m_keg_target.keg_t_point) as point_keg, avg(m_keg_target.spj_t_point) as point_spj, avg(m_keg_target.keg_t_point_total) as point_total, count(*) as keg_jml"))
+				->groupBy('m_keg_target.keg_t_unitkerja')
+				->orderBy('point_total','desc')
+                ->orderBy('keg_jml_target','desc')
+                ->orderBy('keg_jml','desc')
+                ->orderBy('m_keg_target.keg_t_unitkerja','asc')
+                ->get();
 		//return $data; number_format($k->point_rata,4,".",",");
 		//dd($data);
 		foreach ($data as $item) {
@@ -694,9 +710,12 @@ Class Generate {
 			$keg_jml[]=$item->keg_jml;
 			$keg_jml_target[]=$item->keg_jml_target;
 			$point_waktu[]=$item->point_waktu;
+			$point_volume[]=$item->point_volume;
 			$point_jumlah[]=$item->point_jumlah;
+			$point_keg[]=$item->point_keg;
+			$point_spj[]=$item->point_spj;
 			$point_total[]=$item->point_total;
-			$point_rata[]=number_format($item->point_rata,2,".",",");
+			$point_rata[]=number_format($item->point_total,2,".",",");
 		}
 		$arr = array(
 			'unit_nama'=>$unit_nama,
@@ -704,7 +723,10 @@ Class Generate {
 			'keg_jml'=>$keg_jml,
 			'keg_jml_target'=>$keg_jml_target,
 			'point_waktu'=>$point_waktu,
+			'point_volume'=>$point_volume,
 			'point_jumlah'=>$point_jumlah,
+			'point_keg'=>$point_keg,
+			'point_spj'=>$point_spj,
 			'point_total'=>$point_total,
 			'point_rata'=>$point_rata
 		);
@@ -724,6 +746,7 @@ Class Generate {
 		{
 			$bulan_filter = 12;
 		}
+		/*
 		$data = \DB::table('m_keg')
 				->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
 				->leftJoin('t_unitkerja','m_keg_target.keg_t_unitkerja','=','t_unitkerja.unit_kode')
@@ -737,6 +760,21 @@ Class Generate {
                 ->orderBy('keg_jml','desc')
                 ->orderBy('m_keg_target.keg_t_unitkerja','desc')
 				->get();
+		*/
+		$data = \DB::table('m_keg')
+				->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
+				->leftJoin(\DB::raw("(select unit_kode as unit_kode_prov, unit_nama as unit_nama_prov, unit_parent as unit_parent_prov from t_unitkerja where unit_jenis='1') as unit_prov"),'m_keg.keg_unitkerja','=','unit_prov.unit_kode_prov')
+				->leftJoin('t_unitkerja','m_keg_target.keg_t_unitkerja','=','t_unitkerja.unit_kode')
+				->whereMonth('m_keg.keg_end','<=',$bulan_filter)
+				->whereYear('m_keg.keg_end','=',$tahun)
+				->where('m_keg_target.keg_t_target','>','0')
+				->select(\DB::raw("m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_volume, sum(m_keg_target.keg_t_point) as point_jumlah, avg(m_keg_target.keg_t_point) as point_keg, avg(m_keg_target.spj_t_point) as point_spj, avg(m_keg_target.keg_t_point_total) as point_total, count(*) as keg_jml"))
+				->groupBy('m_keg_target.keg_t_unitkerja')
+				->orderBy('point_total','desc')
+				->orderBy('keg_jml_target','desc')
+				->orderBy('keg_jml','desc')
+				->orderBy('m_keg_target.keg_t_unitkerja','asc')
+				->get();
 		//return $data; number_format($k->point_rata,4,".",",");
 		//dd($data);
 		foreach ($data as $item) {
@@ -745,9 +783,12 @@ Class Generate {
 			$keg_jml[]=$item->keg_jml;
 			$keg_jml_target[]=$item->keg_jml_target;
 			$point_waktu[]=$item->point_waktu;
+			$point_volume[]=$item->point_volume;
 			$point_jumlah[]=$item->point_jumlah;
+			$point_keg[]=$item->point_keg;
+			$point_spj[]=$item->point_spj;
 			$point_total[]=$item->point_total;
-			$point_rata[]=number_format($item->point_rata,2,".",",");
+			$point_rata[]=number_format($item->point_total,2,".",",");
 		}
 		$arr = array(
 			'unit_nama'=>$unit_nama,
@@ -755,7 +796,10 @@ Class Generate {
 			'keg_jml'=>$keg_jml,
 			'keg_jml_target'=>$keg_jml_target,
 			'point_waktu'=>$point_waktu,
+			'point_volume'=>$point_volume,
 			'point_jumlah'=>$point_jumlah,
+			'point_keg'=>$point_keg,
+			'point_spj'=>$point_spj,
 			'point_total'=>$point_total,
 			'point_rata'=>$point_rata
 		);
@@ -781,6 +825,7 @@ Class Generate {
 		foreach ($data_unit as $item)
 		{
 			$unit_nama[$item->unit_kode]= $item->unit_nama;
+			/*
 			$data = \DB::table('m_keg')
 				->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
 				->whereYear('m_keg.keg_end','=',$tahun)
@@ -790,9 +835,19 @@ Class Generate {
 				->groupBy(['bulan'],['tahun'],['keg_t_unitkerja'])
 				->orderBy('bulan','asc')
 				->get();
+			*/
+			$data = \DB::table('m_keg')
+				->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
+				->whereYear('m_keg.keg_end','=',$tahun)
+				->where('keg_t_unitkerja','=',$item->unit_kode)
+				->where('m_keg_target.keg_t_target','>','0')
+				->select(\DB::raw("month(m_keg.keg_end) as bulan, year(m_keg.keg_end) as tahun, keg_t_unitkerja, count(*) as keg_jml, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_volume, sum(m_keg_target.keg_t_point) as point_jumlah, avg(m_keg_target.keg_t_point) as point_keg, avg(m_keg_target.spj_t_point) as point_spj, avg(m_keg_target.keg_t_point_total) as point_total"))
+				->groupBy(['bulan'],['tahun'],['keg_t_unitkerja'])
+				->orderBy('bulan','asc')
+				->get();
 			foreach ($data as $row)
 			{
-				$point_rata[$item->unit_kode][] = number_format($row->point_rata,2,".",",");
+				$point_rata[$item->unit_kode][] = number_format($row->point_total,2,".",",");
 				$point_total[$item->unit_kode][] = $row->point_total;
 			}
 		}
@@ -915,6 +970,55 @@ Class Generate {
 		);
         return $arr;
     }
+	public static function ListNilaiTotal($kabkota,$bulan,$tahun)
+	{
+		$data = \DB::table('m_keg')
+                ->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
+                ->leftJoin(\DB::raw("(select unit_kode as unit_kode_prov, unit_nama as unit_nama_prov, unit_parent as unit_parent_prov from t_unitkerja where unit_jenis='1') as unit_prov"),'m_keg.keg_unitkerja','=','unit_prov.unit_kode_prov')
+                ->leftJoin('t_unitkerja','m_keg_target.keg_t_unitkerja','=','t_unitkerja.unit_kode')
+				->where('m_keg_target.keg_t_unitkerja',$kabkota)
+                ->whereMonth('m_keg.keg_end','=',(int)$bulan)
+				->whereYear('m_keg.keg_end','=',$tahun)
+				->where('m_keg_target.keg_t_target','>','0')
+				->select(\DB::raw("month(m_keg.keg_end) as bulan, year(m_keg.keg_end) as tahun,m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_keg_jumlah, sum(m_keg_target.keg_t_point) as point_keg_total, avg(m_keg_target.keg_t_point) as point_keg, avg(m_keg_target.spj_t_point) as point_spj, avg(m_keg_target.keg_t_point_total) as point_total, count(*) as keg_jml"))
+				->groupBy('m_keg_target.keg_t_unitkerja')
+				->orderBy('point_total','desc')
+                ->first();
+		//dd($data);
+        if ($data->point_total)
+        {
+            $nilai_total = number_format($data->point_total,2,".",",");
+        }
+        else
+        {
+            $nilai_total = 0;
+        }
+		if ($data->point_keg)
+        {
+            $nilai_keg = number_format($data->point_keg,2,".",",");
+        }
+        else
+        {
+            $nilai_keg = 0;
+        }
+		if ($data->point_spj)
+        {
+            $nilai_spj = number_format($data->point_spj,2,".",",");
+        }
+        else
+        {
+            $nilai_spj = 0;
+        }
+		$nilai_total = number_format($nilai_total,2,",",".");
+		$nilai_keg = number_format($nilai_keg,2,",",".");
+		$nilai_spj = number_format($nilai_spj,2,",",".");
+        $arr = array(
+			'nilai_keg'=>$nilai_keg,
+			'nilai_spj'=>$nilai_spj,
+			'nilai_total'=>$nilai_total,
+		);
+        return $arr;
+	}
     public static function NotifikasiBelumRead($username)
 	{
 		$data_count = \App\Notifikasi::where([['notif_untuk',$username],['notif_flag','0']])->count();

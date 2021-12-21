@@ -357,11 +357,14 @@ class KegiatanController extends Controller
             //kirim pesan ke channel notif
             $message .= '-----------------------'.chr(10);
             $message .= '🟢 Link : <a href="'.route('kegiatan.detil',$keg_id).'">Kegiatan Detil</a>' .chr(10);
-            $response = Telegram::sendMessage([
-                'chat_id' => $this->chan_notif_id,
-                'text' => $message,
-                'parse_mode'=> 'HTML'
-            ]);
+            if (env('APP_TELEGRAM_MODE') == true)
+            {
+                $response = Telegram::sendMessage([
+                    'chat_id' => $this->chan_notif_id,
+                    'text' => $message,
+                    'parse_mode'=> 'HTML'
+                ]);
+            }
             //batasannya
 
             $pesan_error='Kegiatan ini sudah di simpan';
@@ -390,11 +393,14 @@ class KegiatanController extends Controller
                 $message .= '-----------------------'.chr(10);
                 //dd($message);
                 //kirim pesan ke channel log
-                $response = Telegram::sendMessage([
-                    'chat_id' => $this->chan_log_id,
-                    'text' => $message,
-                    'parse_mode'=> 'HTML'
-                ]);
+                if (env('APP_TELEGRAM_MODE') == true)
+                {
+                    $response = Telegram::sendMessage([
+                        'chat_id' => $this->chan_log_id,
+                        'text' => $message,
+                        'parse_mode'=> 'HTML'
+                    ]);
+                }
                 //batasannya
             }
         }
@@ -576,13 +582,15 @@ class KegiatanController extends Controller
                         $message .= '🟢 Useragent : '. Generate::GetUserAgent() .chr(10);
                         $message .= '🟢 Pesan : berhasil menghapus kegiatan ['.$request->keg_id.'] '. trim($nama) .' dengan SM ['. $unit_kode .'] '. $unit_nama .chr(10);
                         $message .= '-----------------------'.chr(10);
-
-                        $response = Telegram::sendMessage([
-                            'chat_id' => $this->chan_log_id,
-                            'text' => $message,
-                            'parse_mode'=> 'HTML'
-                        ]);
-                        $messageId = $response->getMessageId();
+                        if (env('APP_TELEGRAM_MODE') == true)
+                        {
+                            $response = Telegram::sendMessage([
+                                'chat_id' => $this->chan_log_id,
+                                'text' => $message,
+                                'parse_mode'=> 'HTML'
+                            ]);
+                            $messageId = $response->getMessageId();
+                        }
                     }
                 }
                 else
@@ -886,11 +894,14 @@ class KegiatanController extends Controller
             //kirim pesan ke channel notif
             $message .= '-----------------------'.chr(10);
             $message .= '🟢 Link : <a href="'.route('kegiatan.detil',$data_keg->keg_id).'">Kegiatan Detil</a>' .chr(10);
-            $response = Telegram::sendMessage([
-                'chat_id' => $this->chan_notif_id,
-                'text' => $message,
-                'parse_mode'=> 'HTML'
-            ]);
+            if (env('APP_TELEGRAM_MODE') == true)
+            {
+                $response = Telegram::sendMessage([
+                    'chat_id' => $this->chan_notif_id,
+                    'text' => $message,
+                    'parse_mode'=> 'HTML'
+                ]);
+            }
             //batasannya
             if (env('APP_AKTIVITAS_MODE') == true)
             {
@@ -915,12 +926,15 @@ class KegiatanController extends Controller
                 $message .= '-----------------------'.chr(10);
                 //dd($message);
                 //kirim pesan ke channel log
-                $response = Telegram::sendMessage([
-                    'chat_id' => $this->chan_log_id,
-                    'text' => $message,
-                    'parse_mode'=> 'HTML'
-                ]);
-                //batasannya
+                if (env('APP_TELEGRAM_MODE') == true)
+                {
+                    $response = Telegram::sendMessage([
+                        'chat_id' => $this->chan_log_id,
+                        'text' => $message,
+                        'parse_mode'=> 'HTML'
+                    ]);
+                    //batasannya
+                }
             }
             $pesan_error="Pengiriman oleh ". $data->Unitkerja->unit_nama.' sudah disimpan';
             $pesan_warna="success";
@@ -1005,12 +1019,15 @@ class KegiatanController extends Controller
                 $message .= '-----------------------'.chr(10);
                 //dd($message);
                 //kirim pesan ke channel log
-                $response = Telegram::sendMessage([
-                    'chat_id' => $this->chan_log_id,
-                    'text' => $message,
-                    'parse_mode'=> 'HTML'
-                ]);
-                //batasannya
+                if (env('APP_TELEGRAM_MODE') == true)
+                {
+                    $response = Telegram::sendMessage([
+                        'chat_id' => $this->chan_log_id,
+                        'text' => $message,
+                        'parse_mode'=> 'HTML'
+                    ]);
+                    //batasannya
+                }
             }
         }
         return Response()->json($arr);
@@ -1024,6 +1041,7 @@ class KegiatanController extends Controller
             //kegiatan ini ada
             //buat realisasi
             //dan nilai di tabel keg_target
+            //$data_keg = Kegiatan::where('keg_id',$request->keg_id)->first();
             $data = new KegRealisasi();
             $data->keg_id = $request->keg_id;
             $data->keg_r_unitkerja = $request->keg_r_unitkerja;
@@ -1044,6 +1062,18 @@ class KegiatanController extends Controller
             $dataNilai->keg_t_point_waktu = $nilai['nilai_waktu'];
             $dataNilai->keg_t_point_jumlah = $nilai['nilai_volume'];
             $dataNilai->keg_t_point = $nilai['nilai_total'];
+            if ($dataNilai->MasterKegiatan->keg_spj == '1')
+            {
+                //ada SPJ
+                //nilai total = (nilai keg + nilai spj)/2
+                $nilai_spj = $dataNilai->spj_t_point;
+                $dataNilai->keg_t_point_total = ($nilai['nilai_total'] + $nilai_spj)/2;
+            }
+            else 
+            {
+                //nilai total = nilai kegiatan
+                $dataNilai->keg_t_point_total = $nilai['nilai_total'];
+            }
             $dataNilai->keg_t_diupdate_oleh = Auth::user()->username;
             $dataNilai->update();
             $target_kabkota = $dataNilai->keg_t_target;
@@ -1133,12 +1163,15 @@ class KegiatanController extends Controller
             //kirim pesan ke channel notif
             $message .= '-----------------------'.chr(10);
             $message .= '🟢 Link : <a href="'.route('kegiatan.detil',$data_keg->keg_id).'">Kegiatan Detil</a>' .chr(10);
-            $response = Telegram::sendMessage([
-                'chat_id' => $this->chan_notif_id,
-                'text' => $message,
-                'parse_mode'=> 'HTML'
-            ]);
-            //batasannya
+            if (env('APP_TELEGRAM_MODE') == true)
+            {
+                $response = Telegram::sendMessage([
+                    'chat_id' => $this->chan_notif_id,
+                    'text' => $message,
+                    'parse_mode'=> 'HTML'
+                ]);
+                //batasannya
+            }
             if (env('APP_AKTIVITAS_MODE') == true)
             {
                 //catat penerimaan oleh operator provinsi
@@ -1162,12 +1195,15 @@ class KegiatanController extends Controller
                 $message .= '-----------------------'.chr(10);
                 //dd($message);
                 //kirim pesan ke channel log
-                $response = Telegram::sendMessage([
-                    'chat_id' => $this->chan_log_id,
-                    'text' => $message,
-                    'parse_mode'=> 'HTML'
-                ]);
-                //batasannya
+                if (env('APP_TELEGRAM_MODE') == true)
+                {
+                    $response = Telegram::sendMessage([
+                        'chat_id' => $this->chan_log_id,
+                        'text' => $message,
+                        'parse_mode'=> 'HTML'
+                    ]);
+                    //batasannya
+                }
             }
             $pesan_error="Konfirmasi penerimaan dari ". $data->Unitkerja->unit_nama.' sudah disimpan';
             $pesan_warna="success";
@@ -1241,12 +1277,15 @@ class KegiatanController extends Controller
                 $message .= '-----------------------'.chr(10);
                 //dd($message);
                 //kirim pesan ke channel log
-                $response = Telegram::sendMessage([
-                    'chat_id' => $this->chan_log_id,
-                    'text' => $message,
-                    'parse_mode'=> 'HTML'
-                ]);
-                //batasannya
+                if (env('APP_TELEGRAM_MODE') == true)
+                {
+                    $response = Telegram::sendMessage([
+                        'chat_id' => $this->chan_log_id,
+                        'text' => $message,
+                        'parse_mode'=> 'HTML'
+                    ]);
+                    //batasannya
+                }
             }
         }
         return Response()->json($arr);
@@ -1274,6 +1313,18 @@ class KegiatanController extends Controller
             $dataNilai->keg_t_point_waktu = $nilai['nilai_waktu'];
             $dataNilai->keg_t_point_jumlah = $nilai['nilai_volume'];
             $dataNilai->keg_t_point = $nilai['nilai_total'];
+            if ($dataNilai->MasterKegiatan->keg_spj == '1')
+            {
+                //ada SPJ
+                //nilai total = (nilai keg + nilai spj)/2
+                $nilai_spj = $dataNilai->spj_t_point;
+                $dataNilai->keg_t_point_total = ($nilai['nilai_total'] + $nilai_spj)/2;
+            }
+            else 
+            {
+                //nilai total = nilai kegiatan
+                $dataNilai->keg_t_point_total = $nilai['nilai_total'];
+            }
             $dataNilai->keg_t_diupdate_oleh = Auth::user()->username;
             $dataNilai->update();
             $pesan_error="Konfirmasi penerimaan dari ". $data->Unitkerja->unit_nama.' sudah diupdate';
@@ -1313,5 +1364,170 @@ class KegiatanController extends Controller
         Session::flash('message', $pesan_error);
         Session::flash('message_type', $pesan_warna);
         return redirect()->route('kegiatan.detil',$request->keg_id);
+    }
+    public function ListPoin()
+    {
+        if (Auth::user()->level > 5)
+        {
+            $data_bulan = array(
+                1=>'Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'
+            );
+            $Kabkota = UnitKerja::where([['unit_jenis','=','2'],['unit_eselon','=','3']])->get();
+            $data_tahun = DB::table('m_keg')
+            ->selectRaw('year(keg_end) as tahun')
+            ->groupBy('tahun')
+            ->whereYear('keg_end','<=',NOW())
+            ->orderBy('tahun','asc')
+              ->get();
+            if (request('tahun')<=0)
+            {
+            $tahun_filter=date('Y');
+            }
+            else
+            {
+            $tahun_filter = request('tahun');
+            }
+            if (request('bulan')<=0)
+            {
+                $bulan_filter=date('m');
+            }
+            else
+            {
+                $bulan_filter = request('bulan');
+            }
+            return view('poin.list',['dataKabkota'=>$Kabkota,'dataTahun'=>$data_tahun,'tahun'=>$tahun_filter,'unit'=>request('unit'),'dataBulan'=>$data_bulan]);
+        }
+        else
+        {
+            return view('error.aksesditolak');
+        }
+    }
+    public function MasterKegiatan()
+    {
+        if (Auth::user()->level > 5)
+        {
+            $time_start = microtime(true); 
+            $data_bulan = array(
+                1=>'Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'
+            );
+            $data_bulan_panjang = array(
+                1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'
+            );
+            $Kabkota = UnitKerja::where([['unit_jenis','=','2'],['unit_eselon','=','3']])->get();
+            $data_tahun = DB::table('m_keg')
+            ->selectRaw('year(keg_end) as tahun')
+            ->groupBy('tahun')
+            //->whereYear('keg_end','<=',NOW())
+            ->orderBy('tahun','asc')
+              ->get();
+            if (request('tahun')<=0)
+            {
+            $tahun_filter=date('Y');
+            }
+            else
+            {
+            $tahun_filter = request('tahun');
+            }
+            if (request('bulan')<=0)
+            {
+                $bulan_filter=date('m');
+                $awal = 0;
+            }
+            else
+            {
+                $awal = 1;
+                $bulan_filter = request('bulan');
+            }
+            if ($awal > 0)
+            {
+            //ambil semua kegiatan berdasarkan tahun
+            //generate nilai berdasarkan kabkotanya
+            $datakeg = Kegiatan::whereMonth('keg_end','=',$bulan_filter)->whereYear('keg_end','=',$tahun_filter)->get();
+            //dd($datakeg);
+            foreach ($datakeg as $item)
+            {
+                //jika ada kegiatan spj eksekusi dulu baru kegiatannya
+                //dd($item);
+                //dd($item->Target->where('keg_t_target','>','0'));
+                if ($item->keg_spj == 1)
+                {
+                    //ada spj
+                    //eksekusi spj dulu
+                    //$Kabkota = UnitKerja::where([['unit_jenis','=','2'],['unit_eselon','=','3']])->get();
+                    foreach ($item->Target->where('keg_t_target','>','0') as $unitkerja)
+                    {
+                        //$nilai = '';
+                        $nilai = Generate::NilaiSpjRealisasi($item->keg_id,$unitkerja->keg_t_unitkerja);
+                        //update nilai KegTarget
+                        $dataNilaiSpj = SpjTarget::where([
+                            ['keg_id',$item->keg_id],
+                            ['spj_t_unitkerja',$unitkerja->keg_t_unitkerja],
+                        ])->first();
+                        $dataNilaiSpj->spj_t_point_waktu = $nilai['nilai_waktu'];
+                        $dataNilaiSpj->spj_t_point_jumlah = $nilai['nilai_volume'];
+                        $dataNilaiSpj->spj_t_point = $nilai['nilai_total'];
+                        $dataNilaiSpj->update();
+                        //nilai spj ini diupdate sama dgn di keg_t_target
+                        $dataNilaiKegSpj = KegTarget::where([
+                            ['keg_id',$item->keg_id],
+                            ['keg_t_unitkerja',$unitkerja->keg_t_unitkerja],
+                        ])->first();
+                        $dataNilaiKegSpj->spj_t_point_waktu = $nilai['nilai_waktu'];
+                        $dataNilaiKegSpj->spj_t_point_jumlah = $nilai['nilai_volume'];
+                        $dataNilaiKegSpj->spj_t_point = $nilai['nilai_total'];
+                        $dataNilaiKegSpj->keg_t_point_total = ($nilai['nilai_total'] + $dataNilaiKegSpj->keg_t_point)/2;
+                        $dataNilaiKegSpj->update();
+
+                        //update nilai kegiatan
+                        //$nilai = '';
+                        $nilai_keg = Generate::NilaiKegRealiasi($item->keg_id,$unitkerja->keg_t_unitkerja);
+                        //update nilai KegTarget
+                        $dataNilaiKeg = KegTarget::where([
+                            ['keg_id',$item->keg_id],
+                            ['keg_t_unitkerja',$unitkerja->keg_t_unitkerja],
+                        ])->first();
+                        $dataNilaiKeg->keg_t_point_waktu = $nilai_keg['nilai_waktu'];
+                        $dataNilaiKeg->keg_t_point_jumlah = $nilai_keg['nilai_volume'];
+                        $dataNilaiKeg->keg_t_point = $nilai_keg['nilai_total'];
+                        $dataNilaiKeg->keg_t_point_total = $nilai_keg['nilai_total'];
+                        $dataNilaiKeg->keg_t_point_total = ($nilai_keg['nilai_total'] + $dataNilai->spj_t_point)/2;
+                        $dataNilaiKeg->update();
+                    }
+                    
+                }
+                else 
+                {
+                    //kegiatan tanpa ada pengiriman spj
+                    //$Kabkota = UnitKerja::where([['unit_jenis','=','2'],['unit_eselon','=','3']])->get();
+                    foreach ($item->Target->where('keg_t_target','>','0') as $unitkerja)
+                    {
+                        //$nilai = '';
+                        $nilai = Generate::NilaiKegRealiasi($item->keg_id,$unitkerja->keg_t_unitkerja);
+                        //update nilai KegTarget
+                        $dataNilai = KegTarget::where([
+                            ['keg_id',$item->keg_id],
+                            ['keg_t_unitkerja',$unitkerja->keg_t_unitkerja],
+                        ])->first();
+                        $dataNilai->keg_t_point_waktu = $nilai['nilai_waktu'];
+                        $dataNilai->keg_t_point_jumlah = $nilai['nilai_volume'];
+                        $dataNilai->keg_t_point = $nilai['nilai_total'];
+                        $dataNilai->keg_t_point_total = $nilai['nilai_total'];
+                        $dataNilai->update();
+                    }
+                }
+            }
+            $time_end = microtime(true);
+            $execution_time = ($time_end - $time_start);
+                $pesan_error="Data sudah diproses dalam ". (int) $execution_time ." detik";
+                $pesan_warna="success";
+                Session::flash('message', $pesan_error);
+                Session::flash('message_type', $pesan_warna);
+            }
+            return view('master.kegiatan',['dataKabkota'=>$Kabkota,'dataTahun'=>$data_tahun,'tahun'=>$tahun_filter,'unit'=>request('unit'),'dataBulan'=>$data_bulan,'bulan'=>$bulan_filter,'dataBulanPanjang'=>$data_bulan_panjang]);
+        }
+        else
+        {
+            return view('error.aksesditolak');
+        }
     }
 }

@@ -115,7 +115,7 @@
                                 <td>{{$item->unit_nama}}</td>
                                 <td>{{$item->keg_jml}}</td>
                                 <td>{{$item->keg_jml_target}}</td>
-                                <td>{{number_format($item->point_rata,2,".",",")}}</td>
+                                <td>{{number_format($item->point_total,2,".",",")}}</td>
                             </tr>
                         @endforeach
                         </tbody>

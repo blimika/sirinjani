@@ -6,13 +6,13 @@
 <!-- ============================================================== -->
 <div class="row page-titles">
     <div class="col-md-5 align-self-center">
-        <h4 class="text-themecolor">Peringkat Nilai Tahunan</h4>
+        <h4 class="text-themecolor">Rekap Nilai Bulanan</h4>
     </div>
     <div class="col-md-7 align-self-center text-right">
         <div class="d-flex justify-content-end align-items-center">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="javascript:void(0)">Dashboard</a></li>
-                <li class="breadcrumb-item active">Peringkat Nilai Tahunan</li>
+                <li class="breadcrumb-item active">Rekap Nilai Bulanan</li>
             </ol>
         </div>
     </div>
@@ -31,17 +31,13 @@
 <!-- Start Page Content -->
 <!-- ============================================================== -->
 <div class="row">
-    <div class="col-12">
+    <div class="col-lg-12">
         <div class="card">
             <div class="card-body">
-                <div class="row">
-                    <div class="col-lg-12 col-sm-12 col-xs-12">
-                        <div class="row">
-                            <div class="col-md-9">
-                        <form class="form-horizontal">
+                <form class="form-horizontal">
                               <div class="form-group row">
-                                <label for="unit" class="col-sm-2 control-label">Peringkat berdasarkan </label>
-                                <div class="col-md-5">
+                                <label for="unit" class="col-sm-2 control-label">Rekap nilai berdasarkan</label>
+                                <div class="col-md-4">
                                     <select name="unit" id="unit" class="form-control">
                                     <option value="0">BPS Provinsi NTB</option>
                                     @foreach ($dataUnitkerja as $d)
@@ -65,46 +61,17 @@
                                     <button type="submit" class="btn btn-success">Filter</button>
                                 </div>
                               </div>
-                        </form>
-                            </div>
-                            </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-6 col-sm-12 col-xs-12">
-                        <div class="table-responsive">
-                            <table id="nilai" class="table table-bordered table-hover table-striped" cellspacing="0" width="100%">
-                                <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Nama Kabupaten/Kota</th>
-                                    <th>Jumlah Kegiatan</th>
-                                    <th>Jumlah Target</th>
-                                    <th>Poin</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                @foreach ($dataPeringkat as $item)
-                                    <tr>
-                                        <td>{{$loop->iteration}}</td>
-                                        <td>{{$item->unit_nama}}</td>
-                                        <td>{{$item->keg_jml}}</td>
-                                        <td>{{$item->keg_jml_target}}</td>
-                                        <td>{{number_format($item->point_total,2,".",",")}}</td>
-                                    </tr>
-                                @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 col-sm-12 col-xs-12">
-                        <h4 class="card-title">Grafik Nilai</h4>
-                        <div id="nilai_tahunan"></div>
-                        @if ($tahun == date('Y'))
-                        <div class="text-danger"><i>*) Keadaan sampai bulan berjalan tahun {{$tahun}}</i></div>
-                        @endif
-                    </div>
-                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12 col-sm-12 col-xs-12">
+        <div class="card">
+            <div class="card-body">
+
             </div>
         </div>
     </div>
@@ -162,5 +129,5 @@
     <script src="{{asset('dist/grafik/export-data.js')}}"></script>
     <script src="{{asset('dist/grafik/series-label.js')}}"></script>
     <script src="{{asset('dist/grafik/accessibility.js')}}"></script>
-    @include('peringkat.GrafikTahunan')
+
 @endsection

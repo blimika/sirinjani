@@ -40,7 +40,7 @@ class LaporanController extends Controller
         $data_tahun = DB::table('m_keg')
         ->selectRaw('year(keg_end) as tahun')
         ->groupBy('tahun')
-        ->whereYear('keg_end','<=',NOW())
+        //->whereYear('keg_end','<=',NOW())
         ->orderBy('tahun','asc')
           ->get();
         if (request('bulan')<=0)
@@ -140,7 +140,7 @@ class LaporanController extends Controller
         $data_tahun = DB::table('m_keg')
         ->selectRaw('year(keg_end) as tahun')
         ->groupBy('tahun')
-        ->whereYear('keg_end','<=',NOW())
+        //->whereYear('keg_end','<=',NOW())
         ->orderBy('tahun','asc')
           ->get();
         if (request('tahun')<=0)

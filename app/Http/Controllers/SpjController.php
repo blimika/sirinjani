@@ -194,7 +194,17 @@ class SpjController extends Controller
             $dataNilai->spj_t_point = $nilai['nilai_total'];
             $dataNilai->spj_t_diupdate_oleh = Auth::user()->username;
             $dataNilai->update();
-
+            //nilai spj ini diupdate sama dgn di keg_t_target
+            $dataNilaiKegSpj = KegTarget::where([
+				['keg_id',$request->keg_id],
+				['keg_t_unitkerja',$request->spj_r_unitkerja],
+            ])->first();
+            $dataNilaiKegSpj->spj_t_point_waktu = $nilai['nilai_waktu'];
+            $dataNilaiKegSpj->spj_t_point_jumlah = $nilai['nilai_volume'];
+            $dataNilaiKegSpj->spj_t_point = $nilai['nilai_total'];
+            $dataNilaiKegSpj->keg_t_point_total = ($nilai['nilai_total'] + $dataNilaiKegSpj->keg_t_point)/2;
+            $dataNilaiKegSpj->update();
+            //batasnya update
             $pesan_error="Konfirmasi Penerimaan SPJ dari ". $data->Unitkerja->unit_nama.' sudah disimpan';
             $pesan_warna="success";
         }
@@ -233,7 +243,17 @@ class SpjController extends Controller
              $dataNilai->spj_t_point = $nilai['nilai_total'];
              $dataNilai->spj_t_diupdate_oleh = Auth::user()->username;
              $dataNilai->update();
- 
+             //nilai spj ini diupdate sama dgn di keg_t_target
+                $dataNilaiKegSpj = KegTarget::where([
+                    ['keg_id',$data->keg_id],
+                    ['keg_t_unitkerja',$data->spj_r_unitkerja],
+                ])->first();
+                $dataNilaiKegSpj->spj_t_point_waktu = $nilai['nilai_waktu'];
+                $dataNilaiKegSpj->spj_t_point_jumlah = $nilai['nilai_volume'];
+                $dataNilaiKegSpj->spj_t_point = $nilai['nilai_total'];
+                $dataNilaiKegSpj->keg_t_point_total = ($nilai['nilai_total'] + $dataNilaiKegSpj->keg_t_point)/2;
+                $dataNilaiKegSpj->update();
+            //batasnya update
              $pesan_error="Penerimaan SPJ dari ". $data->Unitkerja->unit_nama.' sudah diupdate';
              $pesan_warna="success";
          }
@@ -274,6 +294,17 @@ class SpjController extends Controller
              $dataNilai->spj_t_point = $nilai['nilai_total'];
              $dataNilai->spj_t_diupdate_oleh = Auth::user()->username;
              $dataNilai->update();
+             //nilai spj ini diupdate sama dgn di keg_t_target
+             $dataNilaiKegSpj = KegTarget::where([
+                ['keg_id',$keg_id],
+                ['keg_t_unitkerja',$unitkerja],
+            ])->first();
+            $dataNilaiKegSpj->spj_t_point_waktu = $nilai['nilai_waktu'];
+            $dataNilaiKegSpj->spj_t_point_jumlah = $nilai['nilai_volume'];
+            $dataNilaiKegSpj->spj_t_point = $nilai['nilai_total'];
+            $dataNilaiKegSpj->keg_t_point_total = ($nilai['nilai_total'] + $dataNilaiKegSpj->keg_t_point)/2;
+            $dataNilaiKegSpj->update();
+            //batasnya update
              $arr = array(
                     'status'=>true,
                     'hasil'=>'Data penerimaan spj dari '.$nama.' tanggal '.$tgl.' berhasil dihapus'

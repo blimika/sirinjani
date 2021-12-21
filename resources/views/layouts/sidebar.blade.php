@@ -44,7 +44,12 @@
                     @if (Auth::user()->flag_liatckp == 1 or Auth::user()->level > 5)
                         <li><a href="{{route('peringkat.ckp')}}">Rekap Nilai CKP</a></li>
                     @endif
+                    
+                    @if (Auth::user()->level == 3 or Auth::user()->level > 4)
+                        <li><a href="{{route('peringkat.rekapnilai')}}">Rekap Nilai Bulanan</a></li>
+                    @endif
                 @endif
+                
             </ul>
         </li>
         <li class="nav-small-cap">--- LAPORAN</li>
@@ -60,6 +65,8 @@
                 @if (Auth::user()->level == 9)
                     <li><a href="{{route('bot.telegram')}}">Bot Telegram</a></li>
                     <li><a href="{{route('aktivitas.list')}}">Log Aktivitas</a></li>
+                    <li><a href="{{route('poin.list')}}">Rekap Poin</a></li>
+                    <li><a href="{{route('master.kegiatan')}}">Kegiatan</a></li>
                     <!--<li><a href="{{route('db.index')}}">Database</a></li>-->
                 @endif
             </ul>
