@@ -71,7 +71,57 @@
     <div class="col-lg-12 col-sm-12 col-xs-12">
         <div class="card">
             <div class="card-body">
-
+                <div class="table-responsive">
+                    <h4 class="card-title text-center">Nilai Poin Kabupaten/Kota @if (request('unit')) Menurut {{$unit_nama}} @endif </h4>
+                    <a href="{{route("rekapnilai.export",[$unit,$tahun])}}" class="btn btn-success m-t-10 m-b-20"><i class="fas fa-file-excel"></i> Export ke Excel</a>
+                    <table class="table table-bordered table-hover table-striped" cellspacing="0" width="100%">
+                        <thead>
+                        <tr>
+                            <th rowspan="2" class="text-center">Nama Kabkota</th>
+                            <th colspan="12" class="text-center">Tahun {{$tahun}} </th>
+                        </tr>
+                        <tr>
+                            @for ($i = 1; $i <= 12; $i++)
+                               <td>{{$dataBulan[$i]}}</td>
+                            @endfor
+                        </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($dataKabkota as $item)
+                                <tr>
+                                    <td>{{$item->unit_nama}}</td>
+                                    @for ($i = 1; $i <= 12; $i++)
+                                        <td>
+                                            @if (request('unit') == 0)
+                                                @if ((int) Generate::ListNilaiTotal($item->unit_kode,$i,$tahun)['nilai_total'] == 0)
+                                                -
+                                                @else
+                                                    @if (date('Y')==$tahun && $i > date('m'))
+                                                    -
+                                                    @else
+                                                        {{Generate::ListNilaiTotal($item->unit_kode,$i,$tahun)['nilai_total']}}
+                                                    @endif
+                                                @endif
+                                               
+                                            @else
+                                                @if ((int) Generate::ListNilaiMenurutFungsi(request('unit'),$item->unit_kode,$i,$tahun)['nilai_total'] == 0)
+                                                -
+                                                @else
+                                                    @if (date('Y')==$tahun && $i > date('m'))
+                                                    -
+                                                    @else
+                                                        {{Generate::ListNilaiMenurutFungsi(request('unit'),$item->unit_kode,$i,$tahun)['nilai_total']}}
+                                                    @endif
+                                                @endif
+                                            @endif
+                                            
+                                        </td>
+                                    @endfor
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

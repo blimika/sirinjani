@@ -167,7 +167,7 @@ class PeringkatController extends Controller
             $data_tahun = DB::table('m_keg')
             ->selectRaw('year(keg_end) as tahun')
             ->groupBy('tahun')
-            ->whereYear('keg_end','<=',NOW())
+            //->whereYear('keg_end','<=',NOW())
             ->orderBy('tahun','asc')
               ->get();
             if (request('tahun')<=0)
@@ -350,7 +350,7 @@ class PeringkatController extends Controller
             $data_tahun = DB::table('m_keg')
             ->selectRaw('year(keg_end) as tahun')
             ->groupBy('tahun')
-            ->whereYear('keg_end','<=',NOW())
+            //->whereYear('keg_end','<=',NOW())
             ->orderBy('tahun','asc')
               ->get();
             if (request('tahun')<=0)
@@ -370,11 +370,79 @@ class PeringkatController extends Controller
                 $bulan_filter = request('bulan');
             }
             $dataUnit = UnitKerja::where([['unit_jenis','=','1'],['unit_eselon','=','3']])->get();
-            return view('peringkat.rekapnilai',['dataUnitkerja'=>$dataUnit,'dataKabkota'=>$Kabkota,'dataTahun'=>$data_tahun,'tahun'=>$tahun_filter,'unit'=>request('unit'),'dataBulan'=>$data_bulan]);
+            if (request('unit')<=0)
+            {
+                $unit_terpilih = 'BPS Provinsi Nusa Tenggara Barat';
+                $unit = 0;
+            }
+            else
+            {
+                $unit_kepilih = UnitKerja::where('unit_kode',request('unit'))->first();
+                $unit_terpilih = $unit_kepilih->unit_nama;
+                $unit = request('unit');
+            }
+            return view('peringkat.rekapnilai',['dataUnitkerja'=>$dataUnit,'unit_nama'=>$unit_terpilih,'dataKabkota'=>$Kabkota,'dataTahun'=>$data_tahun,'tahun'=>$tahun_filter,'unit'=>$unit,'dataBulan'=>$data_bulan]);
         }
         else
         {
             return view('error.aksesditolak');
         }
+    }
+    public function RekapNilaiBulananExport($unitkode,$tahun)
+    {
+        $data_bulan = array(
+            1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'
+        );
+        $Kabkota = UnitKerja::where([['unit_jenis','=','2'],['unit_eselon','=','3']])->get();
+        //dd($Kabkota);
+        //ListNilaiMenurutFungsi($unitkode,$kabkota,$bulan,$tahun)
+        //ListNilaiTotal($kabkota,$bulan,$tahun)
+        foreach ($Kabkota as $item) {
+            if ($unitkode == 0)
+            {                
+                //total menurut provinsi
+                $fileName = 'rekapnilai-kabkota-menurut-provinsi-';
+                $rincian_array[] = array(
+                    'BPS KABKOTA' => $item->unit_nama,
+                    'TAHUN' => $tahun,
+                    'JANUARI' => Generate::ListNilaiTotal($item->unit_kode,1,$tahun)['nilai_total'],
+                    'FEBRUARI' => Generate::ListNilaiTotal($item->unit_kode,2,$tahun)['nilai_total'],
+                    'MARET' => Generate::ListNilaiTotal($item->unit_kode,3,$tahun)['nilai_total'],
+                    'APRIL' => Generate::ListNilaiTotal($item->unit_kode,4,$tahun)['nilai_total'],
+                    'MEI' => Generate::ListNilaiTotal($item->unit_kode,5,$tahun)['nilai_total'],
+                    'JUNI' => Generate::ListNilaiTotal($item->unit_kode,6,$tahun)['nilai_total'],
+                    'JULI' => Generate::ListNilaiTotal($item->unit_kode,7,$tahun)['nilai_total'],
+                    'AGUSTUS' => Generate::ListNilaiTotal($item->unit_kode,8,$tahun)['nilai_total'],
+                    'SEPTEMBER' => Generate::ListNilaiTotal($item->unit_kode,9,$tahun)['nilai_total'],
+                    'OKTOBER' => Generate::ListNilaiTotal($item->unit_kode,10,$tahun)['nilai_total'],
+                    'NOVEMBER' => Generate::ListNilaiTotal($item->unit_kode,11,$tahun)['nilai_total'],
+                    'DESEMBER' => Generate::ListNilaiTotal($item->unit_kode,12,$tahun)['nilai_total'],
+                );
+            }
+            else 
+            {
+                //bila kode fungsi ada nilainya
+                $fileName = 'rekapnilai-kabkota-menurut-'.$unitkode.'-';
+                $rincian_array[] = array(
+                    'BPS KABKOTA' => $item->unit_nama,
+                    'TAHUN' => $tahun,
+                    'JANUARI' => Generate::ListNilaiMenurutFungsi($unitkode,$item->unit_kode,1,$tahun)['nilai_total'],
+                    'FEBRUARI' => Generate::ListNilaiMenurutFungsi($unitkode,$item->unit_kode,2,$tahun)['nilai_total'],
+                    'MARET' => Generate::ListNilaiMenurutFungsi($unitkode,$item->unit_kode,3,$tahun)['nilai_total'],
+                    'APRIL' => Generate::ListNilaiMenurutFungsi($unitkode,$item->unit_kode,4,$tahun)['nilai_total'],
+                    'MEI' => Generate::ListNilaiMenurutFungsi($unitkode,$item->unit_kode,5,$tahun)['nilai_total'],
+                    'JUNI' => Generate::ListNilaiMenurutFungsi($unitkode,$item->unit_kode,6,$tahun)['nilai_total'],
+                    'JULI' => Generate::ListNilaiMenurutFungsi($unitkode,$item->unit_kode,7,$tahun)['nilai_total'],
+                    'AGUSTUS' => Generate::ListNilaiMenurutFungsi($unitkode,$item->unit_kode,8,$tahun)['nilai_total'],
+                    'SEPTEMBER' => Generate::ListNilaiMenurutFungsi($unitkode,$item->unit_kode,9,$tahun)['nilai_total'],
+                    'OKTOBER' => Generate::ListNilaiMenurutFungsi($unitkode,$item->unit_kode,10,$tahun)['nilai_total'],
+                    'NOVEMBER' => Generate::ListNilaiMenurutFungsi($unitkode,$item->unit_kode,11,$tahun)['nilai_total'],
+                    'DESEMBER' => Generate::ListNilaiMenurutFungsi($unitkode,$item->unit_kode,12,$tahun)['nilai_total'],
+                );
+            }
+        }
+        $namafile = $fileName . date('Y-m-d_H-i-s') . '.xlsx';
+        //dd($anggaran_array);
+        return Excel::download(new FormatViewExim($rincian_array), $namafile);
     }
 }

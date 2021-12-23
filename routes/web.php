@@ -63,6 +63,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/peringkat/export/{unitkerja}/{bulan}/{tahun}', 'PeringkatController@ExportExcel')->name('peringkat.export');
     Route::get('/peringkat/ckp', 'PeringkatController@Ckp')->name('peringkat.ckp');
     Route::get('/peringkat/rekapnilai', 'PeringkatController@RekapNilaiBulanan')->name('peringkat.rekapnilai');
+    Route::get('/rekapnilai/export/{unitkode}/{tahun}', 'PeringkatController@RekapNilaiBulananExport')->name('rekapnilai.export');
     Route::get('/ckp/export/{tahun}', 'PeringkatController@ExportCkpExcel')->name('ckp.export');
     Route::get('/laporan/bulanan', 'LaporanController@bulanan')->name('laporan.bulanan');
     Route::get('/laporan/bulanan/export/{unitkerja}/{bulan}/{tahun}', 'LaporanController@bulananExport')->name('bulanan.export');

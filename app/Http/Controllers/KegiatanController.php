@@ -1376,7 +1376,7 @@ class KegiatanController extends Controller
             $data_tahun = DB::table('m_keg')
             ->selectRaw('year(keg_end) as tahun')
             ->groupBy('tahun')
-            ->whereYear('keg_end','<=',NOW())
+            //->whereYear('keg_end','<=',NOW())
             ->orderBy('tahun','asc')
               ->get();
             if (request('tahun')<=0)
@@ -1395,6 +1395,7 @@ class KegiatanController extends Controller
             {
                 $bulan_filter = request('bulan');
             }
+            
             return view('poin.list',['dataKabkota'=>$Kabkota,'dataTahun'=>$data_tahun,'tahun'=>$tahun_filter,'unit'=>request('unit'),'dataBulan'=>$data_bulan]);
         }
         else

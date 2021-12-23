@@ -867,101 +867,111 @@ Class Generate {
 				->groupBy('m_keg_target.keg_t_unitkerja')
 				->orderBy('point_rata','desc')
                 ->first();
-        if ($data->point_rata)
-        {
-            $nilai_point = number_format($data->point_rata,2,".",",");
-        }
-        else
-        {
-            $nilai_point = 0;
-        }
+		
+		if ($data)
+		{
+			if ($data->point_rata)
+			{
+				$nilai_point = number_format($data->point_rata,2,".",",");
+			}
+			else
+			{
+				$nilai_point = 0;
+			}
 
-        /*
-        1	5.00-4.50	99-97
-        2	4.49-4.00	96-94
-        3	3.99-3.50	93-91
-        4	3.49-3.00	90-88
-        5	2.99-2.50	87-85
-        6	< 2.50	    84-80
-        */
-        if ($nilai_point == 5)
-            {
-                $nilai_ckp = 99;
-            }
-        elseif ($nilai_point < 5 and $nilai_point >= 4.5)
-            {
-                $nilai_rill = $nilai_point - 4.5;
-                $nilai_rill = $nilai_rill/0.5;
-                $nilai_rill = $nilai_rill*2;
-                $nilai_ckp = 97 + $nilai_rill;
-            }
-        elseif ($nilai_point == 4.49)
-        {
-            $nilai_ckp = 96;
-        }
-        elseif ($nilai_point < 4.49  and $nilai_point >= 4)
-        {
-            $nilai_rill = $nilai_point - 4;
-            $nilai_rill = $nilai_rill/0.4;
-            $nilai_rill = $nilai_rill*2;
-            $nilai_ckp = 94 + $nilai_rill;
-        }
-        elseif ($nilai_point == 3.99)
-        {
-            $nilai_ckp = 93;
-        }
-        elseif ($nilai_point < 3.99  and $nilai_point >= 3.50)
-        {
-            $nilai_rill = $nilai_point - 3.5;
-            $nilai_rill = $nilai_rill/0.4;
-            $nilai_rill = $nilai_rill*2;
-            $nilai_ckp = 91 + $nilai_rill;
-        }
-        elseif ($nilai_point == 3.49)
-        {
-            $nilai_ckp = 90;
-        }
-        elseif ($nilai_point < 3.49  and $nilai_point >= 3)
-        {
-            $nilai_rill = $nilai_point - 3;
-            $nilai_rill = $nilai_rill/0.4;
-            $nilai_rill = $nilai_rill*2;
-            $nilai_ckp = 88 + $nilai_rill;
-        }
-        elseif ($nilai_point == 2.99)
-        {
-            $nilai_ckp = 87;
-        }
-        elseif ($nilai_point < 2.99  and $nilai_point >= 2.5)
-        {
-            $nilai_rill = $nilai_point - 2.5;
-            $nilai_rill = $nilai_rill/0.4;
-            $nilai_rill = $nilai_rill*2;
-            $nilai_ckp = 85 + $nilai_rill;
-        }
-        elseif ($nilai_point == 2.49)
-        {
-            $nilai_ckp = 84;
-        }
-        elseif ($nilai_point < 2.49 and $nilai_point > 0)
-        {
-            /*
-            5.0-4.5=0.5  (R1-R2=R) 2,49 – 2  = 0,49
-            99-97=2   (C1-C2=C)  84 – 80 = 4
-            4.7-4.5=0.2  (NS-R2 = A) 2 – 0 = 2
-            0.2/0.5=0.4   (A/R = B) 2 / 0,49
-            0.4/2=0.8  (B/C = D)
-            97+0.8=97.8  (C2+D = CKP)
-            */
-            $nilai_rill = $nilai_point;
-            $nilai_rill = $nilai_rill/2.49;
-            $nilai_rill = $nilai_rill*4;
-            $nilai_ckp = 80 + $nilai_rill;
-        }
-        else
-        {
-            $nilai_ckp = $nilai_point;
-        }
+			/*
+			1	5.00-4.50	99-97
+			2	4.49-4.00	96-94
+			3	3.99-3.50	93-91
+			4	3.49-3.00	90-88
+			5	2.99-2.50	87-85
+			6	< 2.50	    84-80
+			*/
+			if ($nilai_point == 5)
+				{
+					$nilai_ckp = 99;
+				}
+			elseif ($nilai_point < 5 and $nilai_point >= 4.5)
+				{
+					$nilai_rill = $nilai_point - 4.5;
+					$nilai_rill = $nilai_rill/0.5;
+					$nilai_rill = $nilai_rill*2;
+					$nilai_ckp = 97 + $nilai_rill;
+				}
+			elseif ($nilai_point == 4.49)
+			{
+				$nilai_ckp = 96;
+			}
+			elseif ($nilai_point < 4.49  and $nilai_point >= 4)
+			{
+				$nilai_rill = $nilai_point - 4;
+				$nilai_rill = $nilai_rill/0.4;
+				$nilai_rill = $nilai_rill*2;
+				$nilai_ckp = 94 + $nilai_rill;
+			}
+			elseif ($nilai_point == 3.99)
+			{
+				$nilai_ckp = 93;
+			}
+			elseif ($nilai_point < 3.99  and $nilai_point >= 3.50)
+			{
+				$nilai_rill = $nilai_point - 3.5;
+				$nilai_rill = $nilai_rill/0.4;
+				$nilai_rill = $nilai_rill*2;
+				$nilai_ckp = 91 + $nilai_rill;
+			}
+			elseif ($nilai_point == 3.49)
+			{
+				$nilai_ckp = 90;
+			}
+			elseif ($nilai_point < 3.49  and $nilai_point >= 3)
+			{
+				$nilai_rill = $nilai_point - 3;
+				$nilai_rill = $nilai_rill/0.4;
+				$nilai_rill = $nilai_rill*2;
+				$nilai_ckp = 88 + $nilai_rill;
+			}
+			elseif ($nilai_point == 2.99)
+			{
+				$nilai_ckp = 87;
+			}
+			elseif ($nilai_point < 2.99  and $nilai_point >= 2.5)
+			{
+				$nilai_rill = $nilai_point - 2.5;
+				$nilai_rill = $nilai_rill/0.4;
+				$nilai_rill = $nilai_rill*2;
+				$nilai_ckp = 85 + $nilai_rill;
+			}
+			elseif ($nilai_point == 2.49)
+			{
+				$nilai_ckp = 84;
+			}
+			elseif ($nilai_point < 2.49 and $nilai_point > 0)
+			{
+				/*
+				5.0-4.5=0.5  (R1-R2=R) 2,49 – 2  = 0,49
+				99-97=2   (C1-C2=C)  84 – 80 = 4
+				4.7-4.5=0.2  (NS-R2 = A) 2 – 0 = 2
+				0.2/0.5=0.4   (A/R = B) 2 / 0,49
+				0.4/2=0.8  (B/C = D)
+				97+0.8=97.8  (C2+D = CKP)
+				*/
+				$nilai_rill = $nilai_point;
+				$nilai_rill = $nilai_rill/2.49;
+				$nilai_rill = $nilai_rill*4;
+				$nilai_ckp = 80 + $nilai_rill;
+			}
+			else
+			{
+				$nilai_ckp = $nilai_point;
+			}
+		}
+		else 
+		{
+			$nilai_point = 0;
+			$nilai_ckp = $nilai_point;
+		}
+        
         $nilai_ckp = number_format($nilai_ckp,2,",",".");
         $nilai_point = number_format($nilai_point,2,",",".");
         $arr = array(
@@ -985,30 +995,111 @@ Class Generate {
 				->orderBy('point_total','desc')
                 ->first();
 		//dd($data);
-        if ($data->point_total)
-        {
-            $nilai_total = number_format($data->point_total,2,".",",");
-        }
-        else
-        {
-            $nilai_total = 0;
-        }
-		if ($data->point_keg)
-        {
-            $nilai_keg = number_format($data->point_keg,2,".",",");
-        }
-        else
-        {
-            $nilai_keg = 0;
-        }
-		if ($data->point_spj)
-        {
-            $nilai_spj = number_format($data->point_spj,2,".",",");
-        }
-        else
-        {
-            $nilai_spj = 0;
-        }
+		if ($data)
+		{
+			if ($data->point_total)
+			{
+				$nilai_total = number_format($data->point_total,2,".",",");
+			}
+			else
+			{
+				$nilai_total = 0;
+			}
+			if ($data->point_keg)
+			{
+				$nilai_keg = number_format($data->point_keg,2,".",",");
+			}
+			else
+			{
+				$nilai_keg = 0;
+			}
+			if ($data->point_spj)
+			{
+				$nilai_spj = number_format($data->point_spj,2,".",",");
+			}
+			else
+			{
+				$nilai_spj = 0;
+			}
+		}
+        else 
+		{
+			$nilai_total = 0;
+			$nilai_keg = 0;
+			$nilai_spj = 0;
+		}
+		$nilai_total = number_format($nilai_total,2,",",".");
+		$nilai_keg = number_format($nilai_keg,2,",",".");
+		$nilai_spj = number_format($nilai_spj,2,",",".");
+        $arr = array(
+			'nilai_keg'=>$nilai_keg,
+			'nilai_spj'=>$nilai_spj,
+			'nilai_total'=>$nilai_total,
+		);
+        return $arr;
+	}
+	public static function ListNilaiMenurutFungsi($unitkode,$kabkota,$bulan,$tahun)
+	{
+		/*
+		$data = \DB::table('m_keg')
+                ->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
+                ->leftJoin(\DB::raw("(select unit_kode as unit_kode_prov, unit_nama as unit_nama_prov, unit_parent as unit_parent_prov from t_unitkerja where unit_jenis='1') as unit_prov"),'m_keg.keg_unitkerja','=','unit_prov.unit_kode_prov')
+                ->leftJoin('t_unitkerja','m_keg_target.keg_t_unitkerja','=','t_unitkerja.unit_kode')
+				->where('m_keg_target.keg_t_unitkerja',$kabkota)
+                ->whereMonth('m_keg.keg_end','=',(int)$bulan)
+				->whereYear('m_keg.keg_end','=',$tahun)
+				->where('m_keg_target.keg_t_target','>','0')
+				->select(\DB::raw("month(m_keg.keg_end) as bulan, year(m_keg.keg_end) as tahun,m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_keg_jumlah, sum(m_keg_target.keg_t_point) as point_keg_total, avg(m_keg_target.keg_t_point) as point_keg, avg(m_keg_target.spj_t_point) as point_spj, avg(m_keg_target.keg_t_point_total) as point_total, count(*) as keg_jml"))
+				->groupBy('m_keg_target.keg_t_unitkerja')
+				->orderBy('point_total','desc')
+                ->first();
+				*/
+		$data = \DB::table('m_keg')
+                ->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
+                ->leftJoin(\DB::raw("(select unit_kode as unit_kode_prov, unit_nama as unit_nama_prov, unit_parent as unit_parent_prov from t_unitkerja where unit_jenis='1') as unit_prov"),'m_keg.keg_unitkerja','=','unit_prov.unit_kode_prov')
+                ->leftJoin('t_unitkerja','m_keg_target.keg_t_unitkerja','=','t_unitkerja.unit_kode')
+                ->where('unit_prov.unit_parent_prov','=',$unitkode)
+                ->whereMonth('m_keg.keg_end','=',(int)$bulan)
+				->whereYear('m_keg.keg_end','=',(int)$tahun)
+				->where('m_keg_target.keg_t_target','>','0')
+				->select(\DB::raw("month(m_keg.keg_end) as bulan, year(m_keg.keg_end) as tahun,m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_volume, sum(m_keg_target.keg_t_point) as point_jumlah, avg(m_keg_target.keg_t_point) as point_keg, avg(m_keg_target.spj_t_point) as point_spj, avg(m_keg_target.keg_t_point_total) as point_total, count(*) as keg_jml"))
+				->groupBy('m_keg_target.keg_t_unitkerja')
+				->orderBy('point_total','desc')
+                ->first();
+		//dd($data);
+		if ($data)
+		{
+			if ($data->point_total)
+			{
+				$nilai_total = number_format($data->point_total,2,".",",");
+			}
+			else
+			{
+				$nilai_total = 0;
+			}
+			if ($data->point_keg)
+			{
+				$nilai_keg = number_format($data->point_keg,2,".",",");
+			}
+			else
+			{
+				$nilai_keg = 0;
+			}
+			if ($data->point_spj)
+			{
+				$nilai_spj = number_format($data->point_spj,2,".",",");
+			}
+			else
+			{
+				$nilai_spj = 0;
+			}
+		}
+        else 
+		{
+			$nilai_total = 0;
+			$nilai_keg = 0;
+			$nilai_spj = 0;
+		}
 		$nilai_total = number_format($nilai_total,2,",",".");
 		$nilai_keg = number_format($nilai_keg,2,",",".");
 		$nilai_spj = number_format($nilai_spj,2,",",".");
