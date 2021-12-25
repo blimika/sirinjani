@@ -719,6 +719,58 @@ class KegiatanController extends Controller
         }
         return Response()->json($arr);
     }
+    public function cariKegByUnitkirim($kegid,$unitkirim)
+    {
+        $count = Kegiatan::where('keg_id',$kegid)->count();
+        $arr = array(
+            'status'=>false,
+            'hasil'=>'Data kegiatan ini tidak tersedia'
+        );
+        if ($count > 0)
+        {
+            //unitkerja
+            $data = Kegiatan::where('keg_id',$kegid)->first();
+            if ($data->keg_spj==1)
+            {
+                $spj = 'Ada';
+            }
+            else
+            {
+                $spj = 'Tidak';
+            }
+            //query realisasi pengiriman
+            $data_kirim = KegRealisasi::where([['keg_id',$kegid],['keg_r_jenis','1'],['keg_r_unitkerja',$unitkirim]])->orderBy('created_at','asc')->get();
+            $data_terima = KegRealisasi::where([['keg_id',$kegid],['keg_r_jenis','2'],['keg_r_unitkerja',$unitkirim]])->orderBy('created_at','asc')->get();
+            $data_target = $data->Target->where('keg_t_target','>','0')->where('keg_t_unitkerja',$unitkirim)->first();
+            //dd($data_kirim,$data_terima);
+            $arr = array(
+                'status'=>true,
+                'keg_id'=>$data->keg_id,
+                'keg_nama'=>$data->keg_nama,
+                'keg_unitkerja'=>$data->keg_unitkerja,
+                'keg_unitkerja_nama'=>$data->Unitkerja->unit_nama,
+                'keg_target'=>$data->keg_total_target,
+                'keg_satuan'=>$data->keg_target_satuan,
+                'keg_start'=>$data->keg_start,
+                'keg_start_nama'=>Tanggal::HariPanjang($data->keg_start),
+                'keg_end'=>$data->keg_end,
+                'keg_end_nama'=>Tanggal::HariPanjang($data->keg_end),
+                'keg_jenis'=>$data->keg_jenis,
+                'keg_jenis_nama'=>$data->JenisKeg->jkeg_nama,
+                'keg_spj'=>$data->keg_spj,
+                'keg_spj_nama'=>$spj,
+                'keg_info'=>$data->keg_info,
+                'keg_dibuat_oleh'=>$data->keg_dibuat_oleh,
+                'keg_diupdate_oleh'=>$data->keg_diupdate_oleh,
+                'created_at'=>$data->created_at,
+                'updated_at'=>$data->updated_at,
+                'hasil_target'=>$data_target,
+                'hasil_kirim'=>$data_kirim,
+                'hasil_terima'=>$data_terima
+            );
+        }
+        return Response()->json($arr);
+    }
     public function CariRealisasi($kegrid)
     {
         $count = KegRealisasi::where('keg_r_id',$kegrid)->count();
@@ -1490,8 +1542,7 @@ class KegiatanController extends Controller
                         $dataNilaiKeg->keg_t_point_waktu = $nilai_keg['nilai_waktu'];
                         $dataNilaiKeg->keg_t_point_jumlah = $nilai_keg['nilai_volume'];
                         $dataNilaiKeg->keg_t_point = $nilai_keg['nilai_total'];
-                        $dataNilaiKeg->keg_t_point_total = $nilai_keg['nilai_total'];
-                        $dataNilaiKeg->keg_t_point_total = ($nilai_keg['nilai_total'] + $dataNilai->spj_t_point)/2;
+                        $dataNilaiKeg->keg_t_point_total = ($nilai_keg['nilai_total'] + $dataNilaiSpj->spj_t_point)/2;
                         $dataNilaiKeg->update();
                     }
                     

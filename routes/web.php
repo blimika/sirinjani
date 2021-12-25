@@ -21,6 +21,7 @@ Route::get('/', 'DepanController@depan')->name('depan');
 Route::get('/kegiatan/list', 'KegiatanController@index')->name('kegiatan.list');
 Route::get('/kegiatan/bidang', 'KegiatanController@bidang')->name('kegiatan.bidang');
 Route::get('/kegiatan/cari/{kegId}', 'KegiatanController@cariKegiatan')->name('kegiatan.cari');
+Route::get('/kegiatan/caribyunit/{kegid}/{unitkerja}', 'KegiatanController@cariKegByUnitkirim')->name('kegiatan.caribyunit');
 Route::get('/realisasi/cari/{kegrid}', 'KegiatanController@CariRealisasi')->name('realisasi.cari');
 Route::get('/spj/realisasi/cari/{spjrid}', 'SpjController@CariSpj')->name('spjrealisasi.cari');
 Route::post(env('TELEGRAM_HASH_URL') . '/webhook', 'NotifikasiController@WebHook')->name('webhook');
