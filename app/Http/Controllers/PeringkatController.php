@@ -8,6 +8,7 @@ use App\UnitKerja;
 use App\Exports\FormatViewExim;
 use Excel;
 use App\Helpers\Generate;
+use App\Helpers\Tanggal;
 use Illuminate\Support\Facades\Auth;
 use App\User;
 use Carbon\Carbon;
@@ -399,12 +400,12 @@ class PeringkatController extends Controller
         //ListNilaiTotal($kabkota,$bulan,$tahun)
         foreach ($Kabkota as $item) {
             if ($unitkode == 0)
-            {                
+            {
                 //total menurut provinsi
                 $fileName = 'rekapnilai-kabkota-menurut-provinsi-';
+                $menurut = '';
                 $rincian_array[] = array(
                     'BPS KABKOTA' => $item->unit_nama,
-                    'TAHUN' => $tahun,
                     'JANUARI' => Generate::ListNilaiTotal($item->unit_kode,1,$tahun)['nilai_total'],
                     'FEBRUARI' => Generate::ListNilaiTotal($item->unit_kode,2,$tahun)['nilai_total'],
                     'MARET' => Generate::ListNilaiTotal($item->unit_kode,3,$tahun)['nilai_total'],
@@ -419,13 +420,12 @@ class PeringkatController extends Controller
                     'DESEMBER' => Generate::ListNilaiTotal($item->unit_kode,12,$tahun)['nilai_total'],
                 );
             }
-            else 
+            else
             {
                 //bila kode fungsi ada nilainya
                 $fileName = 'rekapnilai-kabkota-menurut-'.$unitkode.'-';
                 $rincian_array[] = array(
                     'BPS KABKOTA' => $item->unit_nama,
-                    'TAHUN' => $tahun,
                     'JANUARI' => Generate::ListNilaiMenurutFungsi($unitkode,$item->unit_kode,1,$tahun)['nilai_total'],
                     'FEBRUARI' => Generate::ListNilaiMenurutFungsi($unitkode,$item->unit_kode,2,$tahun)['nilai_total'],
                     'MARET' => Generate::ListNilaiMenurutFungsi($unitkode,$item->unit_kode,3,$tahun)['nilai_total'],
@@ -441,8 +441,18 @@ class PeringkatController extends Controller
                 );
             }
         }
+        if ($unitkode == 0)
+        {
+            $menurut = '';
+        }
+        else
+        {
+            $fungsi = UnitKerja::where('unit_kode',$unitkode)->first();
+            $menurut = 'Menurut ['.$unitkode.'] '.$fungsi->unit_nama;
+        }
+        $waktu = Tanggal::LengkapHariPanjang(\Carbon\Carbon::now());
         $namafile = $fileName . date('Y-m-d_H-i-s') . '.xlsx';
         //dd($anggaran_array);
-        return Excel::download(new FormatViewExim($rincian_array), $namafile);
+        return Excel::download(new FormatViewExim($rincian_array,$tahun,$menurut,$waktu), $namafile);
     }
 }

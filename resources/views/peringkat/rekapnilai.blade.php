@@ -74,6 +74,7 @@
                 <div class="table-responsive">
                     <h4 class="card-title text-center">Nilai Poin Kabupaten/Kota @if (request('unit')) Menurut {{$unit_nama}} @endif </h4>
                     <a href="{{route("rekapnilai.export",[$unit,$tahun])}}" class="btn btn-success m-t-10 m-b-20"><i class="fas fa-file-excel"></i> Export ke Excel</a>
+                    <p class="text-right">Keadaan : {{Tanggal::LengkapHariPanjang(\Carbon\Carbon::now())}}</p>
                     <table class="table table-bordered table-hover table-striped" cellspacing="0" width="100%">
                         <thead>
                         <tr>
@@ -102,7 +103,7 @@
                                                         {{Generate::ListNilaiTotal($item->unit_kode,$i,$tahun)['nilai_total']}}
                                                     @endif
                                                 @endif
-                                               
+
                                             @else
                                                 @if ((int) Generate::ListNilaiMenurutFungsi(request('unit'),$item->unit_kode,$i,$tahun)['nilai_total'] == 0)
                                                 -
@@ -114,7 +115,7 @@
                                                     @endif
                                                 @endif
                                             @endif
-                                            
+
                                         </td>
                                     @endfor
                                 </tr>
