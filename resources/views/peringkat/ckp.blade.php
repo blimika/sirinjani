@@ -62,23 +62,26 @@
         <div class="card">
             <div class="card-body">
                 <!-- Nav tabs -->
-            <ul class="nav nav-tabs customtab" role="tablist">
-                <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#nilaickp" role="tab"><span class="hidden-sm-up"><i class="ti-home"></i></span> <span class="hidden-xs-down">Nilai CKP</span></a> </li>
-                <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#nilaipoin" role="tab"><span class="hidden-sm-up"><i class="ti-user"></i></span> <span class="hidden-xs-down">Nilai Poin</span></a> </li>
-            </ul>
-            <!-- Tab panes -->
-            <div class="tab-content">
-                <div class="tab-pane active" id="nilaickp" role="tabpanel">
-                    <div class="p-10">
-                       @include('peringkat.ckp1')
+                <ul class="nav nav-tabs customtab" role="tablist">
+                    <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#nilaickp" role="tab"><span class="hidden-sm-up"><i class="ti-home"></i></span> <span class="hidden-xs-down">Nilai CKP</span></a> </li>
+                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#nilaipoin" role="tab"><span class="hidden-sm-up"><i class="ti-user"></i></span> <span class="hidden-xs-down">Nilai Poin</span></a> </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#waktu" role="tab"><span class="hidden-sm-up"><i class="ti-link"></i></span> <span class="hidden-xs-down">Keadaan : {{Tanggal::LengkapHariPanjang(\Carbon\Carbon::now())}} </span></a>
+                    </li>
+                </ul>
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div class="tab-pane active" id="nilaickp" role="tabpanel">
+                        <div class="p-10">
+                        @include('peringkat.ckp1')
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="nilaipoin" role="tabpanel">
+                        <div class="p-10">
+                            @include('peringkat.ckp2')
+                        </div>
                     </div>
                 </div>
-                <div class="tab-pane" id="nilaipoin" role="tabpanel">
-                    <div class="p-10">
-                        @include('peringkat.ckp2')
-                     </div>
-                </div>
-            </div>
             </div>
         </div>
     </div>

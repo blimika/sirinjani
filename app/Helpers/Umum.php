@@ -863,11 +863,11 @@ Class Generate {
                 ->whereMonth('m_keg.keg_end','=',(int)$bulan)
 				->whereYear('m_keg.keg_end','=',$tahun)
 				->where('m_keg_target.keg_t_target','>','0')
-				->select(\DB::raw("month(m_keg.keg_end) as bulan, year(m_keg.keg_end) as tahun,m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_jumlah, sum(m_keg_target.keg_t_point) as point_total, avg(m_keg_target.keg_t_point) as point_rata, count(*) as keg_jml"))
+				->select(\DB::raw("month(m_keg.keg_end) as bulan, year(m_keg.keg_end) as tahun,m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_volume, sum(m_keg_target.keg_t_point) as point_jumlah, avg(m_keg_target.keg_t_point) as point_keg, avg(m_keg_target.spj_t_point) as point_spj,sum(m_keg_target.keg_t_point_total) as point_total, avg(m_keg_target.keg_t_point_total) as point_rata, count(*) as keg_jml"))
 				->groupBy('m_keg_target.keg_t_unitkerja')
 				->orderBy('point_rata','desc')
                 ->first();
-		
+        //dd($data);
 		if ($data)
 		{
 			if ($data->point_rata)
@@ -966,12 +966,12 @@ Class Generate {
 				$nilai_ckp = $nilai_point;
 			}
 		}
-		else 
+		else
 		{
 			$nilai_point = 0;
 			$nilai_ckp = $nilai_point;
 		}
-        
+
         $nilai_ckp = number_format($nilai_ckp,2,",",".");
         $nilai_point = number_format($nilai_point,2,",",".");
         $arr = array(
@@ -1022,7 +1022,7 @@ Class Generate {
 				$nilai_spj = 0;
 			}
 		}
-        else 
+        else
 		{
 			$nilai_total = 0;
 			$nilai_keg = 0;
@@ -1094,7 +1094,7 @@ Class Generate {
 				$nilai_spj = 0;
 			}
 		}
-        else 
+        else
 		{
 			$nilai_total = 0;
 			$nilai_keg = 0;
