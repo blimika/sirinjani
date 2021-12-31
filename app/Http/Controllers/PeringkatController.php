@@ -14,6 +14,7 @@ use App\User;
 use Carbon\Carbon;
 use Session;
 use App\Kegiatan;
+use App\Exports\FormatViewExpCkp;
 
 class PeringkatController extends Controller
 {
@@ -308,7 +309,6 @@ class PeringkatController extends Controller
 
             $rincian_array[] = array(
                 'BPS KABKOTA' => $item->unit_nama,
-                'TAHUN' => $tahun,
                 'POIN JANUARI' => Generate::NilaiCkpBulan($item->unit_kode,1,$tahun)['nilai_point'],
                 'CKP JANUARI' => Generate::NilaiCkpBulan($item->unit_kode,1,$tahun)['nilai_ckp'],
                 'POIN FEBRUARI' => Generate::NilaiCkpBulan($item->unit_kode,2,$tahun)['nilai_point'],
@@ -337,8 +337,10 @@ class PeringkatController extends Controller
         }
         $fileName = 'nilai-ckp-kabkota-';
         $namafile = $fileName . date('Y-m-d_H-i-s') . '.xlsx';
-        //dd($anggaran_array);
-        return Excel::download(new FormatViewExim($rincian_array), $namafile);
+        $waktu = Tanggal::LengkapHariPanjang(\Carbon\Carbon::now());
+        //dd($rincian_array);
+        //return Excel::download(new FormatExpCkp($rincian_array,$tahun,$waktu), $namafile);
+        return Excel::download(new FormatViewExpCkp($rincian_array,$tahun,$waktu), $namafile);
     }
     public function RekapNilaiBulanan()
     {

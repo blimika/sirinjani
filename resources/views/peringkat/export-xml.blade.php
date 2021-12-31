@@ -1,7 +1,7 @@
 <table>
     <thead>
         <tr>
-            <th colspan="13">Rekap Nilai Kabupaten/Kota {{$menurut}} Tahun {{$tahun}}</th>
+            <th colspan="13">Rekap Poin Kabupaten/Kota {{$menurut}} Tahun {{$tahun}}</th>
         </tr>
         <tr>
             <th colspan="13">&nbsp;</th>
