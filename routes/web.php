@@ -25,6 +25,8 @@ Route::get('/kegiatan/caribyunit/{kegid}/{unitkerja}', 'KegiatanController@cariK
 Route::get('/realisasi/cari/{kegrid}', 'KegiatanController@CariRealisasi')->name('realisasi.cari');
 Route::get('/spj/realisasi/cari/{spjrid}', 'SpjController@CariSpj')->name('spjrealisasi.cari');
 Route::post(env('TELEGRAM_HASH_URL') . '/webhook', 'NotifikasiController@WebHook')->name('webhook');
+//untuk cli
+Route::get('/gen/nilai/{bulan}/{tahun}', 'KegiatanController@GenNilaiKeg')->name('gen.keg');
 
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/kegiatan/tambah', 'KegiatanController@tambah')->name('kegiatan.tambah');

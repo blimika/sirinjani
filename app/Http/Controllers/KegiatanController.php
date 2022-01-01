@@ -1516,10 +1516,18 @@ class KegiatanController extends Controller
                             ['keg_id',$item->keg_id],
                             ['spj_t_unitkerja',$unitkerja->keg_t_unitkerja],
                         ])->first();
-                        $dataNilaiSpj->spj_t_point_waktu = $nilai['nilai_waktu'];
-                        $dataNilaiSpj->spj_t_point_jumlah = $nilai['nilai_volume'];
-                        $dataNilaiSpj->spj_t_point = $nilai['nilai_total'];
-                        $dataNilaiSpj->update();
+                        if ($dataNilaiSpj)
+                        {
+                            $dataNilaiSpj->spj_t_point_waktu = $nilai['nilai_waktu'];
+                            $dataNilaiSpj->spj_t_point_jumlah = $nilai['nilai_volume'];
+                            $dataNilaiSpj->spj_t_point = $nilai['nilai_total'];
+                            $dataNilaiSpj->update();
+                            $poin_spj = $nilai['nilai_total'];
+                        }
+                        else 
+                        {
+                            $poin_spj = 0;
+                        }
                         //nilai spj ini diupdate sama dgn di keg_t_target
                         $dataNilaiKegSpj = KegTarget::where([
                             ['keg_id',$item->keg_id],
@@ -1542,7 +1550,7 @@ class KegiatanController extends Controller
                         $dataNilaiKeg->keg_t_point_waktu = $nilai_keg['nilai_waktu'];
                         $dataNilaiKeg->keg_t_point_jumlah = $nilai_keg['nilai_volume'];
                         $dataNilaiKeg->keg_t_point = $nilai_keg['nilai_total'];
-                        $dataNilaiKeg->keg_t_point_total = ($nilai_keg['nilai_total'] + $dataNilaiSpj->spj_t_point)/2;
+                        $dataNilaiKeg->keg_t_point_total = ($nilai_keg['nilai_total'] + $poin_spj)/2;
                         $dataNilaiKeg->update();
                     }
                     
@@ -1581,5 +1589,103 @@ class KegiatanController extends Controller
         {
             return view('error.aksesditolak');
         }
+    }
+    public function GenNilaiKeg($bulan,$tahun)
+    {
+            $time_start = microtime(true); 
+            $data_bulan = array(
+                1=>'Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'
+            );
+            $data_bulan_panjang = array(
+                1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'
+            );
+            $Kabkota = UnitKerja::where([['unit_jenis','=','2'],['unit_eselon','=','3']])->get();
+            
+            //ambil semua kegiatan berdasarkan tahun
+            //generate nilai berdasarkan kabkotanya
+            $datakeg = Kegiatan::whereMonth('keg_end','=',$bulan)->whereYear('keg_end','=',$tahun)->get();
+            //dd($datakeg);
+            foreach ($datakeg as $item)
+            {
+                //jika ada kegiatan spj eksekusi dulu baru kegiatannya
+                //dd($item);
+                //dd($item->Target->where('keg_t_target','>','0'));
+                if ($item->keg_spj == 1)
+                {
+                    //ada spj
+                    //eksekusi spj dulu
+                    //$Kabkota = UnitKerja::where([['unit_jenis','=','2'],['unit_eselon','=','3']])->get();
+                    foreach ($item->Target->where('keg_t_target','>','0') as $unitkerja)
+                    {
+                        //$nilai = '';
+                        $nilai = Generate::NilaiSpjRealisasi($item->keg_id,$unitkerja->keg_t_unitkerja);
+                        //update nilai KegTarget
+                        $dataNilaiSpj = SpjTarget::where([
+                            ['keg_id',$item->keg_id],
+                            ['spj_t_unitkerja',$unitkerja->keg_t_unitkerja],
+                        ])->first();
+                        if ($dataNilaiSpj)
+                        {
+                            $dataNilaiSpj->spj_t_point_waktu = $nilai['nilai_waktu'];
+                            $dataNilaiSpj->spj_t_point_jumlah = $nilai['nilai_volume'];
+                            $dataNilaiSpj->spj_t_point = $nilai['nilai_total'];
+                            $dataNilaiSpj->update();
+                            $poin_spj = $nilai['nilai_total'];
+                        }
+                        else 
+                        {
+                            $poin_spj = 0;
+                        }
+                        //nilai spj ini diupdate sama dgn di keg_t_target
+                        $dataNilaiKegSpj = KegTarget::where([
+                            ['keg_id',$item->keg_id],
+                            ['keg_t_unitkerja',$unitkerja->keg_t_unitkerja],
+                        ])->first();
+                        $dataNilaiKegSpj->spj_t_point_waktu = $nilai['nilai_waktu'];
+                        $dataNilaiKegSpj->spj_t_point_jumlah = $nilai['nilai_volume'];
+                        $dataNilaiKegSpj->spj_t_point = $nilai['nilai_total'];
+                        $dataNilaiKegSpj->keg_t_point_total = ($nilai['nilai_total'] + $dataNilaiKegSpj->keg_t_point)/2;
+                        $dataNilaiKegSpj->update();
+
+                        //update nilai kegiatan
+                        //$nilai = '';
+                        $nilai_keg = Generate::NilaiKegRealiasi($item->keg_id,$unitkerja->keg_t_unitkerja);
+                        //update nilai KegTarget
+                        $dataNilaiKeg = KegTarget::where([
+                            ['keg_id',$item->keg_id],
+                            ['keg_t_unitkerja',$unitkerja->keg_t_unitkerja],
+                        ])->first();
+                        $dataNilaiKeg->keg_t_point_waktu = $nilai_keg['nilai_waktu'];
+                        $dataNilaiKeg->keg_t_point_jumlah = $nilai_keg['nilai_volume'];
+                        $dataNilaiKeg->keg_t_point = $nilai_keg['nilai_total'];
+                        $dataNilaiKeg->keg_t_point_total = ($nilai_keg['nilai_total'] + $poin_spj)/2;
+                        $dataNilaiKeg->update();
+                    }
+                }
+                else 
+                {
+                    //kegiatan tanpa ada pengiriman spj
+                    //$Kabkota = UnitKerja::where([['unit_jenis','=','2'],['unit_eselon','=','3']])->get();
+                    foreach ($item->Target->where('keg_t_target','>','0') as $unitkerja)
+                    {
+                        //$nilai = '';
+                        $nilai = Generate::NilaiKegRealiasi($item->keg_id,$unitkerja->keg_t_unitkerja);
+                        //update nilai KegTarget
+                        $dataNilai = KegTarget::where([
+                            ['keg_id',$item->keg_id],
+                            ['keg_t_unitkerja',$unitkerja->keg_t_unitkerja],
+                        ])->first();
+                        $dataNilai->keg_t_point_waktu = $nilai['nilai_waktu'];
+                        $dataNilai->keg_t_point_jumlah = $nilai['nilai_volume'];
+                        $dataNilai->keg_t_point = $nilai['nilai_total'];
+                        $dataNilai->keg_t_point_total = $nilai['nilai_total'];
+                        $dataNilai->update();
+                    }
+                }
+            }
+            $time_end = microtime(true);
+            $execution_time = ($time_end - $time_start);
+            $pesan_error="Data sudah diproses dalam ". (int) $execution_time ." detik";
+            return response($pesan_error);
     }
 }
