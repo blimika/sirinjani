@@ -108,7 +108,7 @@ class LaporanController extends Controller
                 $rincian_array[] = array(
                     'FUNGSI' => $unit_nama,
                     'SUBFUNGSI' => $item->unit_nama,
-                    'BULAN' => $data_bulan[$bulan],
+                    'BULAN' => $data_bulan[(int)$bulan],
                     'TAHUN' => $tahun,
                     'KEG_ID' => $item->keg_id,
                     'KEGIATAN' => $item->keg_nama,
@@ -125,7 +125,7 @@ class LaporanController extends Controller
                 'FUNGSI'=>'Catatan: Persentase Dikirim adalah terhadap Target, Persentase Diterima adalah terhadap Dikirim');
             $fileName = 'laporan-bulanan-'.$unit_nama.'-';
             $namafile = $fileName . date('Y-m-d_H-i-s') . '.xlsx';
-            //dd($anggaran_array);
+            //dd($rincian_array);
             return Excel::download(new FormatViewExim($rincian_array), $namafile);
     }
     public function tahunan()

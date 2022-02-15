@@ -15,6 +15,7 @@ use Carbon\Carbon;
 use Session;
 use App\Kegiatan;
 use App\Exports\FormatViewExpCkp;
+use App\Exports\FormExpRincian;
 
 class PeringkatController extends Controller
 {
@@ -277,12 +278,11 @@ class PeringkatController extends Controller
 				->orderBy('keg_end','asc')
                 ->get()->toArray();
         //dd($data);
+        $i=1;
         foreach ($data as $item) {
             $rincian_array[] = array(
-                'BPS KABKOTA' => $item->unit_nama,
-                'BULAN' => $data_bulan[$item->bulan_keg],
-                'TAHUN' => $item->tahun_keg,
-                'KEG_ID' => $item->keg_id,
+                'NO' => $i,
+                'Keg ID' => $item->keg_id,
                 'KEGIATAN' => $item->keg_nama,
                 'TANGGAL MULAI' => $item->keg_start,
                 'TANGGAL BERAKHIR' => $item->keg_end,
@@ -291,11 +291,14 @@ class PeringkatController extends Controller
                 'DITERIMA' => $item->jumlah_diterima,
                 'NILAI' => $item->keg_t_point
             );
+            $i++;
         }
         $fileName = 'rincian-kegiatan-kabkota-';
         $namafile = $fileName . date('Y-m-d_H-i-s') . '.xlsx';
-        //dd($anggaran_array);
-        return Excel::download(new FormatViewExim($rincian_array), $namafile);
+        $judul = "Rincian Kegiatan ".$unit_nama->unit_nama." Bulan ".$data_bulan[$bulan]." ".$tahun;
+        $waktu = Tanggal::LengkapHariPanjang(\Carbon\Carbon::now());
+        //dd($rincian_array,$judul,$waktu);
+        return Excel::download(new FormExpRincian($rincian_array,$judul,$waktu), $namafile);
     }
     public function ExportCkpExcel($tahun)
     {
@@ -454,7 +457,7 @@ class PeringkatController extends Controller
         }
         $waktu = Tanggal::LengkapHariPanjang(\Carbon\Carbon::now());
         $namafile = $fileName . date('Y-m-d_H-i-s') . '.xlsx';
-        //dd($anggaran_array);
+        //dd($rincian_array);
         return Excel::download(new FormatViewExim($rincian_array,$tahun,$menurut,$waktu), $namafile);
     }
 }
