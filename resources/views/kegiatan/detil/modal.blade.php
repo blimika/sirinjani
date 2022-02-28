@@ -2,8 +2,8 @@
 <div id="PenerimaanModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Konfirmasi Penerimaan</h4>
+            <div class="modal-header bg-info">
+                <h4 class="modal-title text-white">Konfirmasi Penerimaan</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
             </div>
             <div class="modal-body">
@@ -53,8 +53,8 @@
 <div id="EditPenerimaanModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Edit Konfirmasi Penerimaan</h4>
+            <div class="modal-header bg-info">
+                <h4 class="modal-title text-white">Edit Konfirmasi Penerimaan</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
             </div>
             <div class="modal-body">
@@ -102,8 +102,8 @@
 <div id="PengirimanModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Konfirmasi Pengiriman</h4>
+            <div class="modal-header bg-danger">
+                <h4 class="modal-title text-white">Konfirmasi Pengiriman</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
             </div>
             <div class="modal-body">
@@ -163,8 +163,8 @@
 <div id="EditPengirimanModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Edit Konfirmasi Pengiriman</h4>
+            <div class="modal-header bg-danger">
+                <h4 class="modal-title text-white">Edit Konfirmasi Pengiriman</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
             </div>
             <div class="modal-body">
@@ -224,8 +224,8 @@
 <div id="EditInfoLanjutanModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Edit Informasi Lanjutan</h4>
+            <div class="modal-header bg-warning">
+                <h4 class="modal-title text-white">Edit Informasi Lanjutan</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
             </div>
             <div class="modal-body">

@@ -23,6 +23,8 @@ use App\Helpers\Generate;
 use App\Helpers\Tanggal;
 use App\SpjRealisasi;
 use App\Exports\FormatViewExim;
+use App\Exports\FormatExpLapBulanan;
+use App\Exports\FormatExpLapTahunan;
 
 
 class LaporanController extends Controller
@@ -106,27 +108,23 @@ class LaporanController extends Controller
                     $persen_terima = number_format(0,2,",",".");
                 }
                 $rincian_array[] = array(
-                    'FUNGSI' => $unit_nama,
                     'SUBFUNGSI' => $item->unit_nama,
-                    'BULAN' => $data_bulan[(int)$bulan],
-                    'TAHUN' => $tahun,
                     'KEG_ID' => $item->keg_id,
                     'KEGIATAN' => $item->keg_nama,
                     'TANGGAL MULAI' => Tanggal::Panjang($item->keg_start),
                     'TANGGAL BERAKHIR' => Tanggal::Panjang($item->keg_end),
                     'TARGET' => $item->Target->sum('keg_t_target'),
-                    'DIKIRIM' => $item->RealisasiKirim->sum('keg_r_jumlah'),
-                    'DITERIMA' => $item->RealisasiTerima->sum('keg_r_jumlah'),
-                    'PERSENTASE DIKIRIM' => number_format(($item->RealisasiKirim->sum('keg_r_jumlah')/$item->Target->sum('keg_t_target'))*100,2,",","."),
-                    'PERSENTASE DITERIMA' => $persen_terima
+                    'DIKIRIM' => $item->RealisasiKirim->sum('keg_r_jumlah') ." (". number_format(($item->RealisasiKirim->sum('keg_r_jumlah')/$item->Target->sum('keg_t_target'))*100,2,",",".")."%)",
+                    'DITERIMA' => $item->RealisasiTerima->sum('keg_r_jumlah') ." (".$persen_terima."%)"
                 );
             }
-            $rincian_array[]=array(
-                'FUNGSI'=>'Catatan: Persentase Dikirim adalah terhadap Target, Persentase Diterima adalah terhadap Dikirim');
+            $judul = "Laporan Kegiatan [".$unitkerja."] ".$unit_nama." Bulan ".$data_bulan[(int)$bulan]." ".$tahun;
+            $waktu = Tanggal::LengkapHariPanjang(\Carbon\Carbon::now());
+            $catatan = 'Catatan: Persentase Dikirim adalah terhadap Target, Persentase Diterima adalah terhadap Dikirim';
             $fileName = 'laporan-bulanan-'.$unit_nama.'-';
             $namafile = $fileName . date('Y-m-d_H-i-s') . '.xlsx';
-            //dd($rincian_array);
-            return Excel::download(new FormatViewExim($rincian_array), $namafile);
+            //dd($rincian_array,$judul,$waktu,$catatan);
+            return Excel::download(new FormatExpLapBulanan($rincian_array,$judul,$waktu,$catatan), $namafile);
     }
     public function tahunan()
     {
@@ -180,7 +178,9 @@ class LaporanController extends Controller
             ->whereYear('keg_end','=',$tahun)
             ->where('unit_parent',$unitkerja)
             ->orderBy('keg_unitkerja','asc')
+            ->orderBy('keg_end','asc')
             ->get();
+        //dd($data);
             foreach ($data as $item) {
                 if ($item->RealisasiKirim->sum('keg_r_jumlah') > 0)
                 {
@@ -191,7 +191,6 @@ class LaporanController extends Controller
                     $persen_terima = number_format(0,2,",",".");
                 }
                 $rincian_array[] = array(
-                    'FUNGSI' => $unit_nama,
                     'SUBFUNGSI' => $item->unit_nama,
                     'BULAN' => $data_bulan[(int) Carbon::parse($item->keg_end)->format('m')],
                     'TAHUN' => $tahun,
@@ -200,17 +199,16 @@ class LaporanController extends Controller
                     'TANGGAL MULAI' => Tanggal::Panjang($item->keg_start),
                     'TANGGAL BERAKHIR' => Tanggal::Panjang($item->keg_end),
                     'TARGET' => $item->Target->sum('keg_t_target'),
-                    'DIKIRIM' => $item->RealisasiKirim->sum('keg_r_jumlah'),
-                    'DITERIMA' => $item->RealisasiTerima->sum('keg_r_jumlah'),
-                    'PERSENTASE DIKIRIM' => number_format(($item->RealisasiKirim->sum('keg_r_jumlah')/$item->Target->sum('keg_t_target'))*100,2,",","."),
-                    'PERSENTASE DITERIMA' => $persen_terima
+                    'DIKIRIM' => $item->RealisasiKirim->sum('keg_r_jumlah')." (".number_format(($item->RealisasiKirim->sum('keg_r_jumlah')/$item->Target->sum('keg_t_target'))*100,2,",",".")."%)",
+                    'DITERIMA' => $item->RealisasiTerima->sum('keg_r_jumlah')." (".$persen_terima."%)"
                 );
             }
-            $rincian_array[]=array(
-                'FUNGSI'=>'Catatan: Persentase Dikirim adalah terhadap Target, Persentase Diterima adalah terhadap Dikirim');
+            $judul = "Laporan Kegiatan [".$unitkerja."] ".$unit_nama." Tahun ".$tahun;
+            $waktu = Tanggal::LengkapHariPanjang(\Carbon\Carbon::now());
+            $catatan = 'Catatan: Persentase Dikirim adalah terhadap Target, Persentase Diterima adalah terhadap Dikirim';
             $fileName = 'laporan-tahunan-'.$unit_nama.'-';
             $namafile = $fileName . date('Y-m-d_H-i-s') . '.xlsx';
-            //dd($anggaran_array);
-            return Excel::download(new FormatViewExim($rincian_array), $namafile);
+            //dd($rincian_array,$judul,$waktu,$catatan);
+            return Excel::download(new FormatExpLapTahunan($rincian_array,$judul,$waktu,$catatan), $namafile);
     }
 }

@@ -2,8 +2,8 @@
 <div id="PengirimanSpjModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Konfirmasi Pengiriman SPJ</h4>
+            <div class="modal-header bg-danger">
+                <h4 class="modal-title text-white">Konfirmasi Pengiriman SPJ</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
             </div>
             <div class="modal-body">
@@ -63,8 +63,8 @@
 <div id="EditPengirimanSpjModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Konfirmasi Edit Pengiriman SPJ</h4>
+            <div class="modal-header bg-danger">
+                <h4 class="modal-title text-white">Konfirmasi Edit Pengiriman SPJ</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
             </div>
             <div class="modal-body">
@@ -125,8 +125,8 @@
 <div id="PenerimaanSpjModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Konfirmasi Penerimaan SPJ</h4>
+            <div class="modal-header bg-info">
+                <h4 class="modal-title text-white">Konfirmasi Penerimaan SPJ</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
             </div>
             <div class="modal-body">
@@ -176,8 +176,8 @@
 <div id="EditPenerimaanSpjModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Edit Konfirmasi Penerimaan SPJ</h4>
+            <div class="modal-header bg-info">
+                <h4 class="modal-title text-white">Edit Konfirmasi Penerimaan SPJ</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
             </div>
             <div class="modal-body">
