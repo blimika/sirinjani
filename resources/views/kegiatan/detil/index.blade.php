@@ -47,7 +47,7 @@
 <!-- End PAge Content -->
 <!-- ============================================================== -->
 @include('kegiatan.detil.modal')
-@include('kegiatan.detil.modalSpj')
+@include('kegiatan.detil.modalspj')
 @endsection
 
 @section('css')
