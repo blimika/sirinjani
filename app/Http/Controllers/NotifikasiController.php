@@ -53,6 +53,7 @@ class NotifikasiController extends Controller
     protected $update_id;
     protected $chan_notif_id;
     protected $chan_log_id;
+    protected $message;
     public function __construct()
     {
         $this->telegram = new Api(env('TELEGRAM_BOT_TOKEN'));
@@ -254,6 +255,7 @@ class NotifikasiController extends Controller
             'waktu_tg' => $this->waktu_kirim
         ]);
         $cek_total = Kegiatan::whereBetween('keg_end',array(\Carbon\Carbon::now()->format('Y-m-d'), \Carbon\Carbon::now()->addWeek()->format('Y-m-d')))->orderBy('keg_end')->count();
+        $message ='';
         if ($cek_total > 0)
         {
             $item_per_hal = 15;

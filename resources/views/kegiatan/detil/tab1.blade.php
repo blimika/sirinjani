@@ -125,7 +125,7 @@
         <td>{{Tanggal::LengkapPanjang($dataKegiatan->updated_at)}}</td>
     </tr>
     @if (Auth::user()->level > 4 or Auth::user()->level==3)
-        @if (Auth::user()->level > 4 or $dataKegiatan->Unitkerja->unit_parent == Auth::user()->kodeunit)
+        @if (Auth::user()->level > 4 or $dataKegiatan->Unitkerja->unit_parent == Auth::user()->kodeunit or $dataKegiatan->keg_unitkerja == Auth::user()->kodeunit)
         <tr>
             <td colspan="2">
                 <div class="text-right">

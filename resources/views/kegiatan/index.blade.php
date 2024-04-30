@@ -64,6 +64,7 @@
                             <th>Realisasi</th>
                             <th>Satuan</th>
                             <th>SPJ</th>
+                            <th>Flag</th>
                             @if (Auth::user())
                                 @if (Auth::user()->level > 4 or Auth::user()->level == 3)
                                     <th width="65px">Aksi</th>
@@ -105,6 +106,14 @@
                                        <td>{{$item->RealisasiTerima->sum('keg_r_jumlah')}}</td>
                                        <td>{{$item->keg_target_satuan}}</td>
                                        <td>@include('kegiatan.spj')</td>
+                                       <td>
+                                        @if ($item->keg_flag == 1)
+                                            <span class="label label-success label-rounded">{{$item->FlagKegiatan->nama}}</span>
+                                        @else
+                                             <span class="label label-danger label-rounded">{{$item->FlagKegiatan->nama}}</span>
+                                        @endif
+
+                                       </td>
                                        @if (Auth::user())
                                         @if (Auth::user()->level > 4 or Auth::user()->level == 3)
                                             <td>

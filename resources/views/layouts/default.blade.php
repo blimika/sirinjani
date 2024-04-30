@@ -9,7 +9,7 @@
     <meta name="author" content="">
     <!-- Favicon icon -->
     <link rel="icon" type="image/png" sizes="16x16" href="{{asset('assets/images/favicon.png')}}">
-    <title>SiRinJani v2.0 - BPS Provinsi NTB</title>
+    <title>SiRinJani v2.5 - BPS Provinsi NTB</title>
     <!-- Custom CSS -->
     @section('css')
 
@@ -85,7 +85,7 @@
                         </li> -->
                         <li class="nav-item">
                             <span class="d-none d-md-block d-lg-block">
-                                <h5>Sistem Monitoring Kinerja Online <small>v2.0</small>
+                                <h5>Sistem Monitoring Kinerja Online <small>v2.5</small>
                                     <br />
                                 BPS Provinsi Nusa Tenggara Barat</h5>
                             </span>
@@ -163,8 +163,8 @@
         <!-- footer -->
         <!-- ============================================================== -->
         <footer class="footer">
-            &copy; 2017 - {{date('Y')}} Fungsi IPDS BPS Provinsi NTB
-            <span class="font-weight-bold float-right text-danger"><b>Si<span class="text-success">Rinjani</span></b> <span class="text-dark font-weight-normal">v2.0</span></span>
+            &copy; 2017 - {{date('Y')}} TIM PTI BPS Provinsi NTB
+            <span class="font-weight-bold float-right text-danger"><b>Si<span class="text-success">Rinjani</span></b> <span class="text-dark font-weight-normal">v2.5</span></span>
         </footer>
         <!-- ============================================================== -->
         <!-- End footer -->

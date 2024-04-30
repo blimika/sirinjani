@@ -33,4 +33,7 @@ class Kegiatan extends Model
     public function Unitkerja(){
         return $this->hasOne('App\UnitKerja','unit_kode', 'keg_unitkerja');
     }
+    public function FlagKegiatan(){
+        return $this->belongsTo('App\FlagKegiatan','keg_flag', 'kode');
+    }
 }

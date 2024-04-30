@@ -31,10 +31,12 @@ use App\Mail\MailPenerimaan;
 use App\Mail\MailPengiriman;
 use Telegram\Bot\Laravel\Facades\Telegram;
 use Telegram\Bot\Api;
+use App\FlagKegiatan;
 
 class KegiatanController extends Controller
 {
     //
+    /*
     protected $telegram;
     protected $chat_id;
     protected $message_id;
@@ -47,6 +49,7 @@ class KegiatanController extends Controller
         $this->chan_notif_id = env('TELEGRAM_CHAN_NOTIF');
         $this->chan_log_id = env('TELEGRAM_CHAN_LOG');
     }
+    */
     public function index()
     {
         $data_bulan = array(
@@ -146,13 +149,13 @@ class KegiatanController extends Controller
             {
                 if (Auth::user()->level == 3)
                 {
-                    //operator provinsi list unitProv hanya di bidangnya
-                    $unitProv = UnitKerja::where([['unit_jenis','=','1'],['unit_eselon','=','4'],['unit_parent','=',Auth::user()->kodeunit]])->get();
+                    //operator provinsi list unitProv hanya di TIM nya
+                    $unitProv = UnitKerja::where([['unit_jenis','1'],['unit_eselon','3'],['unit_kode',Auth::user()->kodeunit],['unit_flag',1]])->get();
                 }
                 else
                 {
-                    //list semua unitProv eselon 4 di provinsi
-                    $unitProv = UnitKerja::where([['unit_jenis','=','1'],['unit_eselon','=','4']])->get();
+                    //list semua unitProv di provinsi
+                    $unitProv = UnitKerja::where([['unit_jenis','=','1'],['unit_eselon','=','3'],['unit_flag',1]])->get();
                 }
                 $unitTarget = UnitKerja::where([['unit_jenis','=','2'],['unit_eselon','=','3']])->get();
                 $kegJenis = KegJenis::get();
@@ -645,17 +648,17 @@ class KegiatanController extends Controller
                 if (Auth::user()->level == 3)
                 {
                     //operator provinsi list unitProv hanya di bidangnya
-                    if ($dataKegiatan->Unitkerja->unit_parent != Auth::user()->kodeunit)
+                    if ($dataKegiatan->Unitkerja->unit_parent != Auth::user()->kodeunit && $dataKegiatan->Unitkerja->unit_kode != Auth::user()->kodeunit)
                     {
                          //peringatan tidak bisa mengedit kegiatan ini
                          return view('kegiatan.warning',['keg_id'=>$kegId]);
                     }
-                    $unitProv = UnitKerja::where([['unit_jenis','=','1'],['unit_eselon','=','4'],['unit_parent','=',Auth::user()->kodeunit]])->get();
+                    $unitProv = UnitKerja::where([['unit_jenis',1],['unit_eselon',3],['unit_kode',Auth::user()->kodeunit]])->get();
                 }
                 else
                 {
                     //list semua unitProv eselon 4 di provinsi
-                    $unitProv = UnitKerja::where([['unit_jenis','=','1'],['unit_eselon','=','4']])->get();
+                    $unitProv = UnitKerja::where([['unit_jenis','=','1'],['unit_eselon','=','3'],['unit_flag',1]])->get();
                 }
                 //dd($dataKegiatan);
                 //$unitTarget = UnitKerja::where([['unit_jenis','=','2'],['unit_eselon','=','3']])->get();
@@ -1121,7 +1124,7 @@ class KegiatanController extends Controller
                 $nilai_spj = $dataNilai->spj_t_point;
                 $dataNilai->keg_t_point_total = ($nilai['nilai_total'] + $nilai_spj)/2;
             }
-            else 
+            else
             {
                 //nilai total = nilai kegiatan
                 $dataNilai->keg_t_point_total = $nilai['nilai_total'];
@@ -1372,7 +1375,7 @@ class KegiatanController extends Controller
                 $nilai_spj = $dataNilai->spj_t_point;
                 $dataNilai->keg_t_point_total = ($nilai['nilai_total'] + $nilai_spj)/2;
             }
-            else 
+            else
             {
                 //nilai total = nilai kegiatan
                 $dataNilai->keg_t_point_total = $nilai['nilai_total'];
@@ -1447,7 +1450,7 @@ class KegiatanController extends Controller
             {
                 $bulan_filter = request('bulan');
             }
-            
+
             return view('poin.list',['dataKabkota'=>$Kabkota,'dataTahun'=>$data_tahun,'tahun'=>$tahun_filter,'unit'=>request('unit'),'dataBulan'=>$data_bulan]);
         }
         else
@@ -1459,7 +1462,7 @@ class KegiatanController extends Controller
     {
         if (Auth::user()->level > 5)
         {
-            $time_start = microtime(true); 
+            $time_start = microtime(true);
             $data_bulan = array(
                 1=>'Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'
             );
@@ -1524,7 +1527,7 @@ class KegiatanController extends Controller
                             $dataNilaiSpj->update();
                             $poin_spj = $nilai['nilai_total'];
                         }
-                        else 
+                        else
                         {
                             $poin_spj = 0;
                         }
@@ -1553,9 +1556,9 @@ class KegiatanController extends Controller
                         $dataNilaiKeg->keg_t_point_total = ($nilai_keg['nilai_total'] + $poin_spj)/2;
                         $dataNilaiKeg->update();
                     }
-                    
+
                 }
-                else 
+                else
                 {
                     //kegiatan tanpa ada pengiriman spj
                     //$Kabkota = UnitKerja::where([['unit_jenis','=','2'],['unit_eselon','=','3']])->get();
@@ -1592,7 +1595,7 @@ class KegiatanController extends Controller
     }
     public function GenNilaiKeg($bulan,$tahun)
     {
-            $time_start = microtime(true); 
+            $time_start = microtime(true);
             $data_bulan = array(
                 1=>'Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'
             );
@@ -1600,7 +1603,7 @@ class KegiatanController extends Controller
                 1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'
             );
             $Kabkota = UnitKerja::where([['unit_jenis','=','2'],['unit_eselon','=','3']])->get();
-            
+
             //ambil semua kegiatan berdasarkan tahun
             //generate nilai berdasarkan kabkotanya
             $datakeg = Kegiatan::whereMonth('keg_end','=',$bulan)->whereYear('keg_end','=',$tahun)->get();
@@ -1632,7 +1635,7 @@ class KegiatanController extends Controller
                             $dataNilaiSpj->update();
                             $poin_spj = $nilai['nilai_total'];
                         }
-                        else 
+                        else
                         {
                             $poin_spj = 0;
                         }
@@ -1662,7 +1665,7 @@ class KegiatanController extends Controller
                         $dataNilaiKeg->update();
                     }
                 }
-                else 
+                else
                 {
                     //kegiatan tanpa ada pengiriman spj
                     //$Kabkota = UnitKerja::where([['unit_jenis','=','2'],['unit_eselon','=','3']])->get();

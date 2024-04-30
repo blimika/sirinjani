@@ -63,6 +63,12 @@
             <ul aria-expanded="false" class="collapse">
                     <li><a href="{{route('operator.list')}}">Operator</a></li>
                 @if (Auth::user()->level == 9)
+                <li><a href="javascript:void(0)" class="has-arrow">Unitkerja</a>
+                    <ul aria-expanded="false" class="collapse">
+                        <li><a href="{{route('unitkerja.prov')}}"><i class="ti-angle-double-right"></i> Provinsi</a></li>
+                        <li><a href="{{route('unitkerja.kabkota')}}"><i class="ti-angle-double-right"></i> Kabkota</a></li>
+                    </ul>
+                </li>
                     <li><a href="{{route('bot.telegram')}}">Bot Telegram</a></li>
                     <li><a href="{{route('aktivitas.list')}}">Log Aktivitas</a></li>
                     <!--<li><a href="{{route('poin.list')}}">Rekap Poin</a></li>-->

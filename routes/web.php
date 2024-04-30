@@ -108,5 +108,14 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/poin/list', 'KegiatanController@ListPoin')->name('poin.list');
     //master kegiatan
     Route::get('/master/kegiatan', 'KegiatanController@MasterKegiatan')->name('master.kegiatan');
+    //unitkerja
+    Route::get('/unitkerja/provinsi', 'UnitkerjaController@ListProvinsi')->name('unitkerja.prov');
+    Route::get('/unitkerja/unitprovpagelist', 'UnitkerjaController@UnitProvPagelist')->name('unitprov.pagelist');
+    Route::get('/unitkerja/kabkota', 'UnitkerjaController@ListKabkota')->name('unitkerja.kabkota');
+    Route::post('/unitkerja/prov/simpan', 'UnitkerjaController@SimpanUnitProv')->name('unitprov.simpan');
+    Route::post('/unitkerja/prov/ubahflag', 'UnitkerjaController@UbahFlagUnitProv')->name('unitprov.ubahflag');
+    Route::post('/unitkerja/prov/hapus', 'UnitkerjaController@HapusUnitProv')->name('unitprov.hapus');
+    Route::post('/unitkerja/prov/update', 'UnitkerjaController@UpdateUnitProv')->name('unitprov.updatedata');
+    Route::get('/unitkerja/cari/{id}', 'UnitkerjaController@CariUnitkerja')->name('unitkerja.cari');
 });
 Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout')->name('logout');
