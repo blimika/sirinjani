@@ -88,9 +88,8 @@ class KegiatanController extends Controller
         //dd($bulan_filter);
         $dataUnit = UnitKerja::where([['unit_jenis','=','1'],['unit_eselon','=','3']])->get();
         //dd($dataUnit);
-        $dataKegiatan = Kegiatan::leftJoin('t_unitkerja','m_keg.keg_unitkerja','=','t_unitkerja.unit_kode')
-                        ->when(request('unit'),function ($query){
-                            return $query->where('t_unitkerja.unit_parent','=',request('unit'));
+        $dataKegiatan = Kegiatan::when(request('unit'),function ($query){
+                            return $query->where('keg_timkerja',request('unit'));
                         })
                         ->when($bulan_filter,function ($query) use ($bulan_filter){
                             return $query->whereMonth('keg_start','=',$bulan_filter);
@@ -99,7 +98,234 @@ class KegiatanController extends Controller
         //dd($dataKegiatan);
         return view('kegiatan.index',['dataKeg'=>$dataKegiatan,'dataUnitkerja'=>$dataUnit,'bulan'=>$bulan_filter,'tahun'=>$tahun_filter,'dataBulan'=>$data_bulan,'dataTahun'=>$data_tahun,'unit'=>request('unit')]);
     }
+    public function SyncTimKerja(Request $request)
+    {
+        $arr = array(
+            'status'=>false,
+            'hasil'=>'Data kegiatan tidak tersedia'
+        );
+        if (Auth::User())
+        {
+            //hanya superadmin
+            if (Auth::User()->role > 5)
+            {
+                $data = Kegiatan::get();
+                if ($data)
+                {
+                    $jumlah = 0;
+                    foreach ($data as $item) {
+                        if ($item->keg_timkerja == 0)
+                        {
+                            if ($item->Unitkerja->unit_eselon == 4)
+                            {
+                                $kode_timkerja = $item->Unitkerja->unit_parent;
+                            }
+                            else
+                            {
+                                $kode_timkerja = $item->keg_unitkerja;
+                            }
+                            //update data
+                            $update_data = Kegiatan::where('keg_id',$item->keg_id)->first();
+                            $update_data->keg_timkerja = $kode_timkerja;
+                            $update_data->update();
+                            $jumlah++;
+                        }
+                    }
+                    $arr = array(
+                        'status'=>true,
+                        'hasil'=>'Ada '.$jumlah.' kegiatan yang telah disinkronisasi'
+                    );
+                }
+            }
+            else
+            {
+                $arr = array(
+                    'status'=>false,
+                    'hasil'=>'Anda tidak memiliki akses untuk fitur ini'
+                );
+            }
+        }
+        return Response()->json($arr);
 
+    }
+    public function NewList()
+    {
+        $data_bulan = array(
+            1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'
+        );
+        $data_tahun = DB::table('m_keg')
+                    ->selectRaw('year(keg_start) as tahun')
+                    ->groupBy('tahun')
+                    ->orderBy('tahun','asc')
+                      ->get();
+        //dd($data_tahun);
+        if (request('tahun')==NULL)
+        {
+            $tahun_filter=date('Y');
+        }
+        elseif (request('tahun')==0)
+        {
+            $tahun_filter=date('Y');
+        }
+        else
+        {
+            $tahun_filter = request('tahun');
+        }
+        if (request('bulan')==NULL or request('bulan')==0)
+        {
+            $bulan_filter = 0;
+        }
+        else
+        {
+            $bulan_filter = request('bulan');
+        }
+        if (request('unit')==NULL)
+        {
+            $unit_filter='';
+        }
+        else
+        {
+            $unit_filter=request('unit');
+        }
+        $dataUnit = UnitKerja::where([['unit_jenis','=','1'],['unit_eselon','=','3'],['unit_flag','1']])->get();
+        return view('kegiatan.newlist',[
+            'dataTahun'=>$data_tahun,
+            'dataBulan'=>$data_bulan,
+            'bulan_filter'=>$bulan_filter,
+            'tahun_filter'=>$tahun_filter,
+            'dataUnit'=>$dataUnit,
+            'unit_filter'=>$unit_filter,
+        ]);
+    }
+    public function PageList(Request $request)
+    {
+        $draw = $request->get('draw');
+        $start = $request->get("start");
+        $rowperpage = $request->get("length"); // Rows display per page
+
+        $columnIndex_arr = $request->get('order');
+        $columnName_arr = $request->get('columns');
+        $order_arr = $request->get('order');
+        $search_arr = $request->get('search');
+
+        $columnIndex = $columnIndex_arr[0]['column']; // Column index
+        $columnName = $columnName_arr[$columnIndex]['data']; // Column name
+        $columnSortOrder = $order_arr[0]['dir']; // asc or desc
+        $searchValue = $search_arr['value']; // Search value
+
+        // Total records
+        //jika operator provinsi/superadmin semua record
+        //selain itu tampilkan yg flag = 1 (publik)
+        //operator
+        $flag_publik = false;
+        if (Auth::User())
+        {
+            if (Auth::User()->role < 4)
+            {
+                $flag_publik = true;
+            }
+            else
+            {
+                $flag_publik = false;
+            }
+        }
+        $totalRecords = Kegiatan::where('keg_flag','1')->count();
+        $totalRecordswithFilter =  DB::table('m_keg')
+        ->when($searchValue, function ($q) use ($searchValue) {
+            return $q->where('keg_nama', 'like', '%' . $searchValue . '%')
+                     ->orWhere('keg_unitkerja', 'like', '%' . $searchValue . '%')
+                     ->orWhere('keg_start', 'like', '%' . $searchValue . '%')
+                     ->orWhere('keg_end', 'like', '%' . $searchValue . '%')
+                     ->orWhere('keg_target_satuan', 'like', '%' . $searchValue . '%');
+        })
+        ->count();
+
+        $records = Kegiatan::when($searchValue, function ($q) use ($searchValue) {
+            return $q->where('keg_nama', 'like', '%' . $searchValue . '%')
+                     ->orWhere('keg_unitkerja', 'like', '%' . $searchValue . '%')
+                     ->orWhere('keg_start', 'like', '%' . $searchValue . '%')
+                     ->orWhere('keg_end', 'like', '%' . $searchValue . '%')
+                     ->orWhere('keg_target_satuan', 'like', '%' . $searchValue . '%');
+        })
+        ->skip($start)
+        ->take($rowperpage)
+        ->orderBy($columnName, $columnSortOrder)
+        ->get();
+        $data_arr = array();
+        $aksi='';
+        foreach ($records as $record) {
+            $id = $record->keg_id;
+            $keg_nama = $record->keg_nama;
+            $keg_unitkerja = $record->keg_unitkerja;
+            $keg_start = $record->keg_start;
+            $keg_end = $record->keg_end;
+            $keg_total_target = $record->keg_total_target;
+            $keg_satuan = $record->keg_target_satuan;
+            $keg_realisasi = $record->RealisasiKirim->count();
+            $keg_spj = $record->keg_spj;
+            $keg_flag = $record->keg_flag;
+            if (Auth::User())
+            {
+                if (Auth::user()->role > 3)
+                {
+                    $aksi = '
+                    <div class="btn-group">
+                    <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="ti-settings"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#" target="_blank" data-toggle="modal" data-target="#EditModal" data-id="' . $record->keg_id . '">Edit</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item hapusunitkerja" href="#" data-id="' . $record->keg_id . '" data-kode="' . $record->keg_unitkerja . '"  data-kegnama="' . $record->keg_nama . '">Hapus Kegiatan</a>
+
+                    </div>
+                </div>
+                ';
+                }
+                else
+                {
+                    $aksi='';
+                }
+            }
+
+            /*
+             { data: 'id' },
+                    { data: 'keg_nama' },
+                    { data: 'keg_unitkerja' },
+                    { data: 'keg_start' },
+                    { data: 'keg_end' },
+                    { data: 'keg_total_target' },
+                    { data: 'keg_realisasi' },
+                    { data: 'keg_satuan' },
+                    { data: 'keg_spj' },
+                    { data: 'keg_flag' },
+                    { data: 'aksi', orderable: false },
+                    */
+            $data_arr[] = array(
+                "keg_id" => $id,
+                "keg_nama" => $keg_nama,
+                "keg_unitkerja" => $keg_unitkerja,
+                "keg_start" => $keg_start,
+                "keg_end" => $keg_end,
+                "keg_total_target" => $keg_total_target,
+                "keg_realisasi" => $keg_realisasi,
+                "keg_target_satuan" => $keg_satuan,
+                "keg_spj"=>$keg_spj,
+                "keg_flag"=>$keg_flag,
+                "aksi" => $aksi
+            );
+        }
+
+        $response = array(
+            "draw" => intval($draw),
+            "iTotalRecords" => $totalRecords,
+            "iTotalDisplayRecords" => $totalRecordswithFilter,
+            "aaData" => $data_arr
+        );
+
+        echo json_encode($response);
+        exit;
+    }
     public function bidang()
     {
         $data_bulan = array(
@@ -136,35 +362,27 @@ class KegiatanController extends Controller
     }
     public function tambah()
     {
-        if (Auth::user()->level > 2)
+        if (Auth::user()->role > 3) //role 4,5,9 bisa
         {
             //selain operator provinsi dan admin
-            if (Auth::user()->level == 4 and Auth::user()->NamaWilayah->bps_jenis == 2)
+            if (Auth::user()->role == 4)
             {
-                //cek admin kabkota
-                //peringatan tidak bisa mengakses halaman ini
-                return view('kegiatan.warning',['keg_id'=>0]);
+                //operator provinsi list unitProv hanya di TIM nya
+                $unitProv = UnitKerja::where([['unit_jenis','1'],['unit_eselon','3'],['unit_kode',Auth::user()->kodeunit],['unit_flag',1]])->get();
+                //dd($unitProv);
             }
             else
             {
-                if (Auth::user()->level == 3)
-                {
-                    //operator provinsi list unitProv hanya di TIM nya
-                    $unitProv = UnitKerja::where([['unit_jenis','1'],['unit_eselon','3'],['unit_kode',Auth::user()->kodeunit],['unit_flag',1]])->get();
-                }
-                else
-                {
-                    //list semua unitProv di provinsi
-                    $unitProv = UnitKerja::where([['unit_jenis','=','1'],['unit_eselon','=','3'],['unit_flag',1]])->get();
-                }
-                $unitTarget = UnitKerja::where([['unit_jenis','=','2'],['unit_eselon','=','3']])->get();
-                $kegJenis = KegJenis::get();
-                return view('kegiatan.tambah',[
-                    'unitTarget'=>$unitTarget,
-                    'unitProv'=>$unitProv,
-                    'kegJenis'=>$kegJenis
-                ]);
+                //list semua unitProv di provinsi
+                $unitProv = UnitKerja::where([['unit_jenis','1'],['unit_eselon','3'],['unit_flag',1]])->get();
             }
+            $unitTarget = UnitKerja::where([['unit_jenis','=','2'],['unit_eselon','=','3']])->get();
+            $kegJenis = KegJenis::get();
+            return view('kegiatan.tambah',[
+                'unitTarget'=>$unitTarget,
+                'unitProv'=>$unitProv,
+                'kegJenis'=>$kegJenis
+            ]);
 
         }
         else
@@ -174,18 +392,54 @@ class KegiatanController extends Controller
             return view('kegiatan.warning',['keg_id'=>0]);
         }
     }
+    public function copyKegiatan($kegId)
+    {
+        if (Auth::user()->role > 3)
+        {
+            $dataKegiatan = Kegiatan::where('keg_id',$kegId)->first();
+            if (Auth::user()->role == 4)
+            {
+                //operator provinsi list unitProv hanya di bidangnya
+                if ($dataKegiatan->keg_timkerja != Auth::user()->kodeunit)
+                {
+                        //peringatan tidak bisa mengedit kegiatan ini
+                        return view('kegiatan.warning',['keg_id'=>$kegId]);
+                }
+                $unitProv = UnitKerja::where([['unit_jenis',1],['unit_eselon',3],['unit_kode',Auth::user()->kodeunit]])->get();
+            }
+            else
+            {
+                //list semua unitProv eselon 4 di provinsi
+                $unitProv = UnitKerja::where([['unit_jenis','=','1'],['unit_eselon','=','3'],['unit_flag',1]])->get();
+            }
+            //dd($dataKegiatan);
+            //$unitTarget = UnitKerja::where([['unit_jenis','=','2'],['unit_eselon','=','3']])->get();
+            $kegJenis = KegJenis::get();
+            return view('kegiatan.edit',[
+                'unitProv'=>$unitProv,
+                'kegJenis'=>$kegJenis,
+                'dataKegiatan'=>$dataKegiatan
+            ]);
+        }
+        else
+        {
+            //operator kabkota dan pemantau tidak bisa mengakses ini
+            //beri info warning
+            return view('kegiatan.warning',['keg_id'=>$kegId]);
+        }
+    }
     public function simpan(Request $request)
     {
         //dd($request->all());
         //cek nama kegiatan di bidang tsb sudah pernah di input dngn judul yg sama
         $count = Kegiatan::where([
             ['keg_nama','=',trim($request->keg_nama)],
-            ['keg_unitkerja','=',$request->keg_unitkerja]
+            ['keg_timkerja','=',$request->keg_unitkerja]
             ])->count();
         if ($count > 0)
         {
             //sudah pernah ada kegiatan
-            $pesan_error='Nama kegiatan (ini) sudah ada';
+            $pesan_error='Nama kegiatan ('.trim($request->keg_nama).') sudah tersedia';
             $pesan_warna='danger';
         }
         else
@@ -193,6 +447,7 @@ class KegiatanController extends Controller
             $data = new Kegiatan();
             $data->keg_nama = trim($request->keg_nama);
             $data->keg_unitkerja = $request->keg_unitkerja;
+            $data->keg_timkerja = $request->keg_unitkerja;
             $data->keg_jenis = $request->keg_jenis;
             $data->keg_start = $request->keg_start;
             $data->keg_end = $request->keg_end;
@@ -201,10 +456,11 @@ class KegiatanController extends Controller
             $data->keg_spj = $request->keg_spj;
             $data->keg_dibuat_oleh = Auth::user()->username;
             $data->keg_diupdate_oleh = Auth::user()->username;
+            //$data->keg_flag = $request->keg_flag;
             $data->save();
 
             $keg_id = $data->keg_id;
-            $unit_nama = $data->Unitkerja->unit_nama;
+            $unit_nama = $data->TimKerja->unit_nama;
             //target masing2 kabkota
             //pesan notif ke channel notif
             /*
@@ -228,6 +484,7 @@ class KegiatanController extends Controller
             {
                 $kegspj = 'Tidak ada';
             }
+            /*
             $message = '<b>♻️♻️♻️ ADA KEGIATAN BARU ♻️♻️♻️</b>' .chr(10);
             $message .= '-----------------------'.chr(10);
             $message .= '🟢 ID : <b>#'.$keg_id.'</b>'.chr(10);
@@ -243,6 +500,7 @@ class KegiatanController extends Controller
             $message .= '-----------------------'.chr(10);
             $message .= 'Target masing-masing kabkota' .chr(10);
             $message .= '-----------------------'.chr(10);
+            */
             foreach ($request->keg_kabkota as $key => $v)
             {
                 if ($v > 0)
@@ -271,7 +529,7 @@ class KegiatanController extends Controller
                 if ($target > 0)
                 {
                     //buat pesan telegram per kabkota
-                    $message .= '🔸 ['.$key.'] '.$dataTarget->Unitkerja->unit_nama.': <b>'. $target.' '.$request->keg_satuan.'</b>' .chr(10);
+                    //$message .= '🔸 ['.$key.'] '.$dataTarget->Unitkerja->unit_nama.': <b>'. $target.' '.$request->keg_satuan.'</b>' .chr(10);
                     //batasannya
                     //jenisnotif kegiatan = 3
                     //cari dulu operator kabkotanya
@@ -311,7 +569,7 @@ class KegiatanController extends Controller
                                 $objEmail->keg_satuan = $data_keg->keg_target_satuan;
                                 $objEmail->keg_tgl_mulai = Tanggal::HariPanjang($data_keg->keg_start);
                                 $objEmail->keg_tgl_selesai = Tanggal::HariPanjang($data_keg->keg_end);
-                                $objEmail->keg_sm = $data_keg->Unitkerja->unit_nama;
+                                $objEmail->keg_sm = $data_keg->TimKerja->unit_nama;
                                 $objEmail->keg_spj = $keg_spj;
                                 $objEmail->keg_total_target = $data_keg->keg_total_target;
                                 $objEmail->keg_tgl_dibuat = Tanggal::LengkapHariPanjang($data_keg->created_at);
@@ -358,6 +616,7 @@ class KegiatanController extends Controller
                 }
             }
             //kirim pesan ke channel notif
+            /*
             $message .= '-----------------------'.chr(10);
             $message .= '🟢 Link : <a href="'.route('kegiatan.detil',$keg_id).'">Kegiatan Detil</a>' .chr(10);
             if (env('APP_TELEGRAM_MODE') == true)
@@ -369,8 +628,8 @@ class KegiatanController extends Controller
                 ]);
             }
             //batasannya
-
-            $pesan_error='Kegiatan ini sudah di simpan';
+            */
+            $pesan_error='Kegiatan ('.trim($request->keg_nama).') sudah di simpan';
             $pesan_warna='success';
             if (env('APP_AKTIVITAS_MODE') == true)
             {
@@ -385,6 +644,7 @@ class KegiatanController extends Controller
                 //batas catat aktivitas tambah kegiatan
                 //kirim ke sistem channel
                 //kirim ke channel log
+                /*
                 $message = '### KEGIATAN BARU  ###' .chr(10);
                 $message .= '-----------------------'.chr(10);
                 $message .= '🟢 Username : '.Auth::user()->username .chr(10);
@@ -405,6 +665,7 @@ class KegiatanController extends Controller
                     ]);
                 }
                 //batasannya
+                */
             }
         }
         Session::flash('message', $pesan_error);
@@ -420,12 +681,14 @@ class KegiatanController extends Controller
             $data = Kegiatan::where('keg_id',$request->keg_id)->first();
             $data->keg_nama = trim($request->keg_nama);
             $data->keg_unitkerja = $request->keg_unitkerja;
+            $data->keg_timkerja = $request->keg_unitkerja;
             $data->keg_jenis = $request->keg_jenis;
             $data->keg_start = $request->keg_start;
             $data->keg_end = $request->keg_end;
             $data->keg_target_satuan = $request->keg_satuan;
             $data->keg_total_target = $request->keg_total_target;
             $data->keg_spj = $request->keg_spj;
+            //$data->keg_flag = $request->keg_flag;
             $data->keg_diupdate_oleh = Auth::user()->username;
             $data->update();
 
@@ -515,13 +778,13 @@ class KegiatanController extends Controller
                 //hapus semua target SPJ
                 $dataSpj = SpjTarget::where('keg_id',$request->keg_id)->delete();
             }
-            $pesan_error='Kegiatan ini sudah di update';
+            $pesan_error='Kegiatan ('.trim($request->keg_nama).') sudah di update';
             $pesan_warna='success';
         }
         else
         {
             //kegiatan ada di update
-            $pesan_error='Nama kegiatan (ini) tidak ada';
+            $pesan_error='Nama kegiatan ('.trim($request->keg_nama).') tidak ada';
             $pesan_warna='danger';
         }
 
@@ -539,16 +802,16 @@ class KegiatanController extends Controller
         );
         if ($count>0)
         {
-            if (Auth::user()->level > 4 or Auth::user()->level == 3)
+            if (Auth::user()->role > 3)
             {
                 //user admin atau operator provinsi
                 $data = Kegiatan::where('keg_id',$request->keg_id)->first();
-                if (Auth::user()->level > 4 or $data->Unitkerja->unit_parent == Auth::user()->kodeunit)
+                if (Auth::user()->role > 4 or $data->keg_timkerja == Auth::user()->kodeunit)
                 {
                     //admin atau operator provinsi sesuai unitkodenya
                     $nama = $data->keg_nama;
-                    $unit_kode = $data->keg_unitkerja;
-                    $unit_nama = $data->Unitkerja->unit_nama;
+                    $unit_kode = $data->keg_timkerja;
+                    $unit_nama = $data->TimKerja->unit_nama;
                     $keg_spj = $data->keg_spj;
                     $data->delete();
                     $target = KegTarget::where('keg_id',$request->keg_id)->delete();
@@ -563,7 +826,7 @@ class KegiatanController extends Controller
                     //batas hapus
                     $arr = array(
                         'status'=>true,
-                        'hasil'=>'Data kegiatan '.$nama.' dari '.$unit_nama.' berhasil dihapus beserta target dan realisasinya'
+                        'hasil'=>'Data kegiatan ('.$nama.') dari '.$unit_nama.' berhasil dihapus beserta target dan realisasinya'
                     );
                     if (env('APP_AKTIVITAS_MODE') == true)
                     {
@@ -578,6 +841,7 @@ class KegiatanController extends Controller
                         //batas catat aktivitas hapus kegiatan
                         //kirim ke sistem channel
                         //kirim ke channel log
+                        /*
                         $message = '### HAPUS KEGIATAN ###' .chr(10);
                         $message .= '-----------------------'.chr(10);
                         $message .= '🟢 Username : '.Auth::user()->username .chr(10);
@@ -594,6 +858,7 @@ class KegiatanController extends Controller
                             ]);
                             $messageId = $response->getMessageId();
                         }
+                        */
                     }
                 }
                 else
@@ -633,43 +898,32 @@ class KegiatanController extends Controller
     }
     public function editKegiatan($kegId)
     {
-        if (Auth::user()->level > 2)
+        if (Auth::user()->role > 3)
         {
-            //selain operator provinsi dan admin
-            if (Auth::user()->level == 4 and Auth::user()->NamaWilayah->bps_jenis == 2)
+            $dataKegiatan = Kegiatan::where('keg_id',$kegId)->first();
+            if (Auth::user()->role == 4)
             {
-                //cek admin kabkota
-                //peringatan tidak bisa mengakses halaman ini
-                return view('kegiatan.warning',['keg_id'=>$kegId]);
+                //operator provinsi list unitProv hanya di bidangnya
+                if ($dataKegiatan->keg_timkerja != Auth::user()->kodeunit)
+                {
+                        //peringatan tidak bisa mengedit kegiatan ini
+                        return view('kegiatan.warning',['keg_id'=>$kegId]);
+                }
+                $unitProv = UnitKerja::where([['unit_jenis',1],['unit_eselon',3],['unit_kode',Auth::user()->kodeunit]])->get();
             }
             else
             {
-                $dataKegiatan = Kegiatan::where('keg_id',$kegId)->first();
-                if (Auth::user()->level == 3)
-                {
-                    //operator provinsi list unitProv hanya di bidangnya
-                    if ($dataKegiatan->Unitkerja->unit_parent != Auth::user()->kodeunit && $dataKegiatan->Unitkerja->unit_kode != Auth::user()->kodeunit)
-                    {
-                         //peringatan tidak bisa mengedit kegiatan ini
-                         return view('kegiatan.warning',['keg_id'=>$kegId]);
-                    }
-                    $unitProv = UnitKerja::where([['unit_jenis',1],['unit_eselon',3],['unit_kode',Auth::user()->kodeunit]])->get();
-                }
-                else
-                {
-                    //list semua unitProv eselon 4 di provinsi
-                    $unitProv = UnitKerja::where([['unit_jenis','=','1'],['unit_eselon','=','3'],['unit_flag',1]])->get();
-                }
-                //dd($dataKegiatan);
-                //$unitTarget = UnitKerja::where([['unit_jenis','=','2'],['unit_eselon','=','3']])->get();
-                $kegJenis = KegJenis::get();
-                return view('kegiatan.edit',[
-                    'unitProv'=>$unitProv,
-                    'kegJenis'=>$kegJenis,
-                    'dataKegiatan'=>$dataKegiatan
-                ]);
+                //list semua unitProv eselon 4 di provinsi
+                $unitProv = UnitKerja::where([['unit_jenis','=','1'],['unit_eselon','=','3'],['unit_flag',1]])->get();
             }
-
+            //dd($dataKegiatan);
+            //$unitTarget = UnitKerja::where([['unit_jenis','=','2'],['unit_eselon','=','3']])->get();
+            $kegJenis = KegJenis::get();
+            return view('kegiatan.edit',[
+                'unitProv'=>$unitProv,
+                'kegJenis'=>$kegJenis,
+                'dataKegiatan'=>$dataKegiatan
+            ]);
         }
         else
         {
@@ -703,6 +957,8 @@ class KegiatanController extends Controller
                 'keg_nama'=>$data->keg_nama,
                 'keg_unitkerja'=>$data->keg_unitkerja,
                 'keg_unitkerja_nama'=>$data->Unitkerja->unit_nama,
+                'keg_timkerja'=>$data->keg_timkerja,
+                'keg_timkerja_nama'=>$data->TimKerja->unit_nama,
                 'keg_target'=>$data->keg_total_target,
                 'keg_satuan'=>$data->keg_target_satuan,
                 'keg_start'=>$data->keg_start,
@@ -752,6 +1008,8 @@ class KegiatanController extends Controller
                 'keg_nama'=>$data->keg_nama,
                 'keg_unitkerja'=>$data->keg_unitkerja,
                 'keg_unitkerja_nama'=>$data->Unitkerja->unit_nama,
+                'keg_timkerja'=>$data->keg_timkerja,
+                'keg_timkerja_nama'=>$data->TimKerja->unit_nama,
                 'keg_target'=>$data->keg_total_target,
                 'keg_satuan'=>$data->keg_target_satuan,
                 'keg_start'=>$data->keg_start,
@@ -799,6 +1057,8 @@ class KegiatanController extends Controller
                 'keg_nama'=>$data->MasterKegiatan->keg_nama,
                 'keg_unitkerja'=>$data->MasterKegiatan->keg_unitkerja,
                 'keg_unitkerja_nama'=>$data->MasterKegiatan->Unitkerja->unit_nama,
+                'keg_timkerja'=>$data->MasterKegiatan->keg_timkerja,
+                'keg_timkerja_nama'=>$data->MasterKegiatan->TimKerja->unit_nama,
                 'keg_target'=>$data->MasterKegiatan->keg_total_target,
                 'keg_satuan'=>$data->MasterKegiatan->keg_target_satuan,
                 'keg_start'=>$data->MasterKegiatan->keg_start,
@@ -926,6 +1186,7 @@ class KegiatanController extends Controller
             {
                 $kegspj = 'Tidak ada';
             }
+            /*
             $message = '<b>🎯🎯🎯 PENGIRIMAN 🎯🎯🎯</b>' .chr(10);
             $message .= '-----------------------'.chr(10);
             $message .= '🟢 ID : <b>#'.$data_keg->keg_id.'</b>'.chr(10);
@@ -958,6 +1219,7 @@ class KegiatanController extends Controller
                 ]);
             }
             //batasannya
+            */
             if (env('APP_AKTIVITAS_MODE') == true)
             {
                 //catat pengiriman oleh operator kabkota
@@ -971,6 +1233,7 @@ class KegiatanController extends Controller
                 //batas pengiriman oleh operator kabkota
                 //kirim ke sistem channel
                 //kirim ke channel log
+                /*
                 $message = '### PENGIRIMAN  ###' .chr(10);
                 $message .= '-----------------------'.chr(10);
                 $message .= '🟢 Username : '.Auth::user()->username .chr(10);
@@ -990,6 +1253,7 @@ class KegiatanController extends Controller
                     ]);
                     //batasannya
                 }
+                */
             }
             $pesan_error="Pengiriman oleh ". $data->Unitkerja->unit_nama.' sudah disimpan';
             $pesan_warna="success";
@@ -1064,6 +1328,7 @@ class KegiatanController extends Controller
                 //batas hapus pengiriman
                 //kirim ke sistem channel
                 //kirim ke channel log
+                /*
                 $message = '### HAPUS PENGIRIMAN  ###' .chr(10);
                 $message .= '-----------------------'.chr(10);
                 $message .= '🟢 Username : '.Auth::user()->username .chr(10);
@@ -1083,6 +1348,7 @@ class KegiatanController extends Controller
                     ]);
                     //batasannya
                 }
+                */
             }
         }
         return Response()->json($arr);
@@ -1196,6 +1462,7 @@ class KegiatanController extends Controller
             {
                 $kegspj = 'Tidak ada';
             }
+            /*
             $message = '<b>▶️▶️▶️ PENERIMAAN ◀️◀️◀️</b>' .chr(10);
             $message .= '-----------------------'.chr(10);
             $message .= '🟢 ID : <b>#'.$data_keg->keg_id.'</b>'.chr(10);
@@ -1227,6 +1494,7 @@ class KegiatanController extends Controller
                 ]);
                 //batasannya
             }
+            */
             if (env('APP_AKTIVITAS_MODE') == true)
             {
                 //catat penerimaan oleh operator provinsi
@@ -1240,6 +1508,7 @@ class KegiatanController extends Controller
                 //batas penerimaan oleh operator provinsi
                 //kirim ke sistem channel
                 //kirim ke channel log
+                /*
                 $message = '### PENERIMAAN  ###' .chr(10);
                 $message .= '-----------------------'.chr(10);
                 $message .= '🟢 Username : '.Auth::user()->username .chr(10);
@@ -1259,6 +1528,7 @@ class KegiatanController extends Controller
                     ]);
                     //batasannya
                 }
+                */
             }
             $pesan_error="Konfirmasi penerimaan dari ". $data->Unitkerja->unit_nama.' sudah disimpan';
             $pesan_warna="success";
@@ -1322,6 +1592,7 @@ class KegiatanController extends Controller
                 //batas hapus penerimaan oleh operator provinsi
                 //kirim ke sistem channel
                 //kirim ke channel log
+                /*
                 $message = '### HAPUS PENERIMAAN  ###' .chr(10);
                 $message .= '-----------------------'.chr(10);
                 $message .= '🟢 Username : '.Auth::user()->username .chr(10);
@@ -1341,6 +1612,7 @@ class KegiatanController extends Controller
                     ]);
                     //batasannya
                 }
+                */
             }
         }
         return Response()->json($arr);

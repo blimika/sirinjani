@@ -73,7 +73,7 @@
     <div class="col-lg-3 col-md-6">
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title">Unit Kerja terbanyak kegiatan</h4>
+                <h4 class="card-title">Tim Kerja terbanyak kegiatan</h4>
                 <div class="text-right">
                     <div class="text-muted">Tahun {{Carbon\Carbon::now()->format('Y')}}</div>
 

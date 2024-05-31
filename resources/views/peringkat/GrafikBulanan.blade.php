@@ -2,7 +2,7 @@
  //$unit_nama = Generate::ChartNilaiTahunan($tahun)['unit_nama'];
  foreach ($dataPeringkat as $item ) {
      $unit_nama[] = $item->unit_nama;
-     $nilai[]=number_format($item->point_total,2,".",",");
+     $nilai[]=number_format($item->point_total,3,".",",");
  }
  $unit_nama = json_encode($unit_nama);
  $nilai = json_encode($nilai);

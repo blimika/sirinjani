@@ -19,6 +19,8 @@ Route::get('/', function () {
 
 Route::get('/', 'DepanController@depan')->name('depan');
 Route::get('/kegiatan/list', 'KegiatanController@index')->name('kegiatan.list');
+Route::get('/kegiatan/newlist', 'KegiatanController@NewList')->name('kegiatan.newlist');
+Route::get('/kegiatan/pagelist', 'KegiatanController@PageList')->name('kegiatan.pagelist');
 Route::get('/kegiatan/bidang', 'KegiatanController@bidang')->name('kegiatan.bidang');
 Route::get('/kegiatan/cari/{kegId}', 'KegiatanController@cariKegiatan')->name('kegiatan.cari');
 Route::get('/kegiatan/caribyunit/{kegid}/{unitkerja}', 'KegiatanController@cariKegByUnitkirim')->name('kegiatan.caribyunit');
@@ -30,10 +32,12 @@ Route::get('/gen/nilai/{bulan}/{tahun}', 'KegiatanController@GenNilaiKeg')->name
 
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/kegiatan/tambah', 'KegiatanController@tambah')->name('kegiatan.tambah');
+    Route::get('/kegiatan/copy/{kegId}', 'KegiatanController@copyKegiatan')->name('kegiatan.copy');
     Route::get('/kegiatan/detil/{kegId}', 'KegiatanController@DetilKegiatan')->name('kegiatan.detil');
     Route::post('/kegiatan/simpan', 'KegiatanController@simpan')->name('kegiatan.simpan');
     Route::post('/kegiatan/update', 'KegiatanController@UpdateKegiatan')->name('kegiatan.update');
     Route::post('/kegiatan/hapus', 'KegiatanController@hapusKegiatan')->name('kegiatan.hapus');
+    Route::post('/kegiatan/sinkrontimkerja', 'KegiatanController@SyncTimKerja')->name('kegiatan.synctimkerja');
     Route::post('/kegiatan/penerimaan', 'KegiatanController@terimaKegiatan')->name('kegiatan.penerimaan');
     Route::post('/kegiatan/updatepenerimaan', 'KegiatanController@UpdatePenerimaan')->name('penerimaan.update');
     Route::post('/kegiatan/hapuspenerimaan', 'KegiatanController@HapusPenerimaan')->name('penerimaan.hapus');
@@ -48,18 +52,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/spj/penerimaan', 'SpjController@terimaSpj')->name('spj.penerimaan');
     Route::post('/spj/updatepenerimaan', 'SpjController@UpdateterimaSpj')->name('spj.updatepenerimaan');
     Route::post('/spj/hapuspenerimaan', 'SpjController@HapusterimaSpj')->name('spj.hapuspenerimaan');
-    /*
-    Route::post('/pegawai/sync', 'PegawaiController@syncData')->name('pegawai.sync');
-    Route::post('/pegawai/flag', 'PegawaiController@FlagPegawai')->name('pegawai.flag');
-    Route::post('/pegawai/hapus', 'PegawaiController@HapusPegawai')->name('pegawai.hapus');
-    Route::post('/pegawai/simpan', 'PegawaiController@SimpanPegawai')->name('pegawai.simpan');
-    Route::post('/pegawai/updatepegawai', 'PegawaiController@UpdatePegawai')->name('pegawai.updatenet');
-    Route::post('/pegawai/updatelokal', 'PegawaiController@UpdateLokal')->name('pegawai.updatelokal');
-    Route::get('/unitkerja/{jenis}/{eselon}', 'UnitkerjaController@CariUnitkerja')->name('cari.unitkerja');
-    Route::get('/pegawai/list', 'PegawaiController@index')->name('pegawai.list');
-    Route::get('/pegawai/{pegID}', 'PegawaiController@CariPegawai')->name('cari.pegawai');
-    Route::post('/pegawai/gantipasswd', 'PegawaiController@GantiPassword')->name('pegawai.gantipasswd');
-    */
     Route::get('/peringkat/bulanan', 'PeringkatController@bulanan')->name('peringkat.bulanan');
     Route::get('/peringkat/tahunan', 'PeringkatController@tahunan')->name('peringkat.tahunan');
     Route::get('/peringkat/rincian', 'PeringkatController@rincian')->name('peringkat.rincian');
@@ -72,9 +64,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/laporan/bulanan/export/{unitkerja}/{bulan}/{tahun}', 'LaporanController@bulananExport')->name('bulanan.export');
     Route::get('/laporan/tahunan', 'LaporanController@tahunan')->name('laporan.tahunan');
     Route::get('/laporan/tahunan/export/{unitkerja}/{tahun}', 'LaporanController@tahunanExport')->name('tahunan.export');
+    Route::get('/laporan/kabkota/bulanan', 'LaporanController@KabkotaBulanan')->name('laporan.kabkotabulan');
+    Route::get('/laporan/kabkota/tahunan', 'LaporanController@KabkotaTahunan')->name('laporan.kabkotatahun');
     Route::get('/db/list', 'DataController@index')->name('db.index');
     Route::get('/db/sinkron', 'DataController@Sinkron')->name('db.sinkron');
     Route::get('/db/kosongkan', 'DataController@Kosongkan')->name('db.kosongkan');
+    //operator
     Route::get('/operator/list', 'OperatorController@list')->name('operator.list');
     Route::get('/operator/cari/{id}', 'OperatorController@cariOperator')->name('operator.cari');
     Route::get('/operator/cek/{username}', 'OperatorController@cekOperator')->name('operator.cek');
@@ -88,6 +83,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/operator/adminkabsimpan', 'OperatorController@AdminKabSimpan')->name('operator.adminkabsimpan');
     Route::post('/operator/adminkabupdate', 'OperatorController@AdminKabUpdate')->name('operator.adminkabupdate');
     Route::post('/operator/gantipasswd', 'OperatorController@GantiPassword')->name('operator.gantipasswd');
+    Route::get('/operator/perbaikirole', 'OperatorController@PerbaikiRole')->name('operator.perbaikirole');
     Route::get('/myprofile', 'MyProfileController@MyProfile')->name('my.profile');
     Route::post('/profile/update', 'MyProfileController@UpdateProfile')->name('profile.update');
     Route::post('/profile/generatetoken', 'MyProfileController@GenerateToken')->name('profile.newtoken');

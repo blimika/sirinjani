@@ -6,13 +6,13 @@
 <!-- ============================================================== -->
 <div class="row page-titles">
     <div class="col-md-5 align-self-center">
-        <h4 class="text-themecolor">Peringkat Nilai Bulanan</h4>
+        <h4 class="text-themecolor">Kegiatan</h4>
     </div>
     <div class="col-md-7 align-self-center text-right">
         <div class="d-flex justify-content-end align-items-center">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="javascript:void(0)">Dashboard</a></li>
-                <li class="breadcrumb-item active">Peringkat Nilai Bulanan</li>
+                <li class="breadcrumb-item active">Kegiatan List</li>
             </ol>
         </div>
     </div>
@@ -36,12 +36,12 @@
             <div class="card-body">
                 <form class="form-horizontal">
                               <div class="form-group row">
-                                <label for="unit" class="col-sm-2 control-label">Peringkat berdasarkan </label>
+                                <label for="unit" class="col-sm-2 control-label">Tampilkan data berdasarkan </label>
                                 <div class="col-md-4">
                                     <select name="unit" id="unit" class="form-control">
-                                    <option value="0">BPS Provinsi NTB</option>
-                                    @foreach ($dataUnitkerja as $d)
-                                    <option value="{{$d->unit_kode}}" @if (request('unit')==$d->unit_kode or $unit==$d->unit_kode)
+                                    <option value="">Pilih Bidang/Fungsi/Tim</option>
+                                    @foreach ($dataUnit as $d)
+                                    <option value="{{$d->unit_kode}}" @if (request('unit')==$d->unit_kode or $unit_filter==$d->unit_kode)
                                         selected
                                        @endif>{{$d->unit_nama}}</option>
                                     @endforeach
@@ -49,8 +49,9 @@
                                 </div>
                                 <div class="col-md-2">
                                     <select name="bulan" id="bulan" class="form-control">
+                                        <option value="0">Pilih Bulan</option>
                                      @for ($i = 1; $i <= 12; $i++)
-                                         <option value="{{$i}}" @if (request('bulan')==$i or $bulan==$i)
+                                         <option value="{{$i}}" @if (request('bulan')==$i or $bulan_filter==$i)
                                              selected
                                          @endif>{{$dataBulan[$i]}}</option>
                                      @endfor
@@ -59,7 +60,7 @@
                                 <div class="col-md-2">
                                     <select name="tahun" id="tahun" class="form-control">
                                      @foreach ($dataTahun as $iTahun)
-                                     <option value="{{$iTahun->tahun}}" @if (request('tahun')==$iTahun->tahun or $tahun==$iTahun->tahun)
+                                     <option value="{{$iTahun->tahun}}" @if (request('tahun')==$iTahun->tahun or $tahun_filter==$iTahun->tahun)
                                      selected
                                     @endif>{{$iTahun->tahun}}</option>
                                      @endforeach
@@ -67,7 +68,7 @@
                                 </div>
 
                                 <div class="col-md-2">
-                                    <button type="submit" class="btn btn-success">Filter</button>
+                                    <button type="button" class="btn btn-success">Filter</button>
                                 </div>
                               </div>
                 </form>
@@ -75,68 +76,43 @@
         </div>
     </div>
 </div>
-
 <div class="row">
-    <div class="col-lg-6 col-sm-12 col-xs-12">
+    <div class="col-12">
         <div class="card">
             <div class="card-body">
-
-                    <h4 class="card-title">Peringkat Kabupaten/Kota Bulan {{$dataBulan[(int)($bulan)]}} {{$tahun}}</h4>
-                    @php
-                        if ($unit > 0)
-                        {
-                            $data_unit = $dataUnitkerja->where('unit_kode','=',$unit)->first();
-                            $nama_unit = $data_unit->unit_nama;
-                        }
-                        else
-                        {
-                            $nama_unit ='';
-                        }
-                    @endphp
-                    @if ($unit>0)
-                        <h5>Nilai Berdasarkan {{$nama_unit}}</h5>
-                    @endif
-                    @if ($dataPeringkat->count() > 0)
-                    <div class="table-responsive">
-                    <table id="nilai" class="table table-bordered table-hover table-striped" cellspacing="0" width="100%">
-                        <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Nama Kabupaten/Kota</th>
-                            <th>Jumlah Kegiatan</th>
-                            <th>Jumlah Target</th>
-                            <th>Poin</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @foreach ($dataPeringkat as $item)
-                            <tr>
-                                <td>{{$loop->iteration}}</td>
-                                <td>{{$item->unit_nama}}</td>
-                                <td>{{$item->keg_jml}}</td>
-                                <td>{{$item->keg_jml_target}}</td>
-                                <td>{{number_format($item->point_total,3,".",",")}}</td>
-                            </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
+                @if (Auth::user())
+                    @if (Auth::user()->role > 3)
+                    <div class="row">
+                        <div class="col-lg-6 col-sm-12 col-xs-12">
+                        <a href="{{route('kegiatan.tambah')}}" class="btn btn-info btn-rounded waves-effect waves-light m-b-20">Tambah</a>
+                        </div>
                     </div>
-                    @else
-                        <div class="alert alert-danger">Data belum tersedia untuk bulan ini</div>
                     @endif
-
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-6 col-sm-12 col-xs-12">
-        <div class="card">
-            <div class="card-body">
-                <h4 class="card-title">Grafik Nilai</h4>
-                @if ($dataPeringkat->count() > 0)
-                <div id="nilai_bulanan"></div>
-                @else
-                    <div class="alert alert-danger">Data belum tersedia untuk bulan ini</div>
                 @endif
+                <div class="row">
+                    <div class="table-responsive">
+                        <table id="kegiatan" class="table table-bordered table-hover table-striped" cellspacing="0" width="100%">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Kegiatan</th>
+                                <th>Unitkerja</th>
+                                <th>Mulai</th>
+                                <th>Berakhir</th>
+                                <th>Target</th>
+                                <th>Realisasi</th>
+                                <th>Satuan</th>
+                                <th>SPJ</th>
+                                <th>Flag</th>
+                                <th width="65px">Aksi</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -152,9 +128,12 @@
 <link href="{{asset('assets/node_modules/sweetalert2/dist/sweetalert2.min.css')}}" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="{{asset('assets/node_modules/datatables.net-bs4/css/dataTables.bootstrap4.css')}}">
 <link rel="stylesheet" type="text/css" href="{{asset('assets/node_modules/datatables.net-bs4/css/responsive.dataTables.min.css')}}">
-<!--highcharts-->
-<link href="{{asset('dist/grafik/highcharts.css')}}" rel="stylesheet">
-<link href="{{asset('dist/css/pages/tab-page.css')}}" rel="stylesheet">
+<style>
+    .tgl_hide
+    {
+        display: none;
+    }
+</style>
 @endsection
 
 @section('js')
@@ -172,13 +151,33 @@
     <!-- end - This is for export functionality only -->
     <script>
         $(function () {
-            $('#nilai').DataTable({
-                dom: 'Bfrtip',
-                buttons: [
-                    'copy', 'excel', 'pdf', 'print'
+            $('#kegiatan').DataTable({
+                ajax: {
+                    url: '{{ route('kegiatan.pagelist') }}',
+                    type: 'GET'
+                },
+                columns: [
+                    { data: 'keg_id' },
+                    { data: 'keg_nama' },
+                    { data: 'keg_unitkerja' },
+                    { data: 'keg_start' },
+                    { data: 'keg_end' },
+                    { data: 'keg_total_target' },
+                    { data: 'keg_realisasi' },
+                    { data: 'keg_target_satuan' },
+                    { data: 'keg_spj' },
+                    { data: 'keg_flag' },
+                    { data: 'aksi', orderable: false },
                 ],
-                "displayLength": 30,
-                responsive: true
+                processing: true,
+                serverSide: true,
+                dom: 'Bfrtip',
+                iDisplayLength: 10,
+                buttons: [
+                    'copy', 'excel', 'print'
+                ],
+                order: [1, 'asc'],
+                responsive: true,
 
             });
             $('.buttons-copy, .buttons-csv, .buttons-print, .buttons-pdf, .buttons-excel').addClass('btn btn-primary mr-1');
@@ -187,14 +186,4 @@
     </script>
     <!-- Sweet-Alert  -->
     <script src="{{asset('assets/node_modules/sweetalert2/dist/sweetalert2.all.min.js')}}"></script>
-    <!--highcharts-->
-    <script src="{{asset('dist/grafik/highcharts.js')}}"></script>
-    <script src="{{asset('dist/grafik/exporting.js')}}"></script>
-    <script src="{{asset('dist/grafik/offline-exporting.js')}}"></script>
-    <script src="{{asset('dist/grafik/export-data.js')}}"></script>
-    <script src="{{asset('dist/grafik/series-label.js')}}"></script>
-    <script src="{{asset('dist/grafik/accessibility.js')}}"></script>
-    @if ($dataPeringkat->count() > 0)
-        @include('peringkat.GrafikBulanan')
-    @endif
 @endsection

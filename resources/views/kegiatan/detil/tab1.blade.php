@@ -2,8 +2,8 @@
 <hr>
 <table class="table table-striped">
     <tr>
-        <td>Unitkerja</td>
-        <td>{{$dataKegiatan->Unitkerja->unit_nama}}</td>
+        <td>Tim Kerja</td>
+        <td>{{$dataKegiatan->TimKerja->unit_nama}}</td>
     </tr>
     <tr>
         <td>Jenis Kegiatan</td>
@@ -109,6 +109,16 @@
         <td>{!! $dataKegiatan->keg_info !!}</td>
     </tr>
     <tr>
+        <td>Flag</td>
+        <td>
+            @if($dataKegiatan->keg_flag == 1)
+                <span class="label label-success label-rounded">{{$dataKegiatan->FlagKegiatan->nama}}</span>
+            @else
+                <span class="label label-danger label-rounded">{{$dataKegiatan->FlagKegiatan->nama}}</span>
+            @endif
+        </td>
+    </tr>
+    <tr>
         <td>Dibuat oleh</td>
         <td>{{$dataKegiatan->keg_dibuat_oleh}}</td>
     </tr>
@@ -124,8 +134,8 @@
         <td>Diupdate tanggal</td>
         <td>{{Tanggal::LengkapPanjang($dataKegiatan->updated_at)}}</td>
     </tr>
-    @if (Auth::user()->level > 4 or Auth::user()->level==3)
-        @if (Auth::user()->level > 4 or $dataKegiatan->Unitkerja->unit_parent == Auth::user()->kodeunit or $dataKegiatan->keg_unitkerja == Auth::user()->kodeunit)
+    @if (Auth::user()->role > 3)
+        @if (Auth::user()->role > 4 or $dataKegiatan->keg_timkerja == Auth::user()->kodeunit)
         <tr>
             <td colspan="2">
                 <div class="text-right">

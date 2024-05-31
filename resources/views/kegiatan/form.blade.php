@@ -31,7 +31,7 @@
             </div>
             <input type="text" class="form-control" id="keg_end" name="keg_end" autocomplete="off" placeholder="Tanggal kegiatan selesai" required>
         </div>
-            
+
     </div>
     <div class="form-group">
         <label for="keg_satuan">Satuan</label>
@@ -52,4 +52,14 @@
             <label class="custom-control-label" for="spj2">Tidak Ada</label>
         </div>
     </div>
-   
+    <!---<div class="form-group">
+        <label for="keg_flag">Flag Kegiatan</label>
+        <div class="custom-control custom-radio">
+            <input type="radio" id="keg_flag_1" name="keg_flag" class="custom-control-input" value="1" required checked="checked">
+            <label class="custom-control-label" for="keg_flag_1">Draft</label>
+        </div>
+        <div class="custom-control custom-radio">
+            <input type="radio" id="keg_flag_2" name="keg_flag" class="custom-control-input" value="2">
+            <label class="custom-control-label" for="keg_flag_2">Publik</label>
+        </div>
+    </div>--->

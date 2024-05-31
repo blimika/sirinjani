@@ -31,47 +31,50 @@
 <!-- Start Page Content -->
 <!-- ============================================================== -->
 <div class="row">
-    <div class="col-12">
+    <div class="col-lg-12 col-sm-12 col-xs-12">
         <div class="card">
             <div class="card-body">
-                <div class="row">
-                    <div class="col-lg-12 col-sm-12 col-xs-12">
-                        <div class="row">
-                            <div class="col-md-9">
-                        <form class="form-horizontal">
-                              <div class="form-group row">
-                                <label for="unit" class="col-sm-2 control-label">Peringkat berdasarkan </label>
-                                <div class="col-md-5">
-                                    <select name="unit" id="unit" class="form-control">
-                                    <option value="0">BPS Provinsi NTB</option>
-                                    @foreach ($dataUnitkerja as $d)
-                                    <option value="{{$d->unit_kode}}" @if (request('unit')==$d->unit_kode or $unit==$d->unit_kode)
-                                        selected
-                                       @endif>{{$d->unit_nama}}</option>
-                                    @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-md-2">
-                                    <select name="tahun" id="tahun" class="form-control">
-                                     @foreach ($dataTahun as $iTahun)
-                                     <option value="{{$iTahun->tahun}}" @if (request('tahun')==$iTahun->tahun or $tahun==$iTahun->tahun)
-                                     selected
-                                    @endif>{{$iTahun->tahun}}</option>
-                                     @endforeach
-                                    </select>
-                                </div>
+                <form class="form-horizontal">
+                    <div class="form-group row">
+                        <label for="unit" class="col-sm-2 control-label">Peringkat berdasarkan </label>
+                        <div class="col-md-5">
+                            <select name="unit" id="unit" class="form-control">
+                            <option value="0">BPS Provinsi NTB</option>
+                            @foreach ($dataUnitkerja as $d)
+                            <option value="{{$d->unit_kode}}" @if (request('unit')==$d->unit_kode or $unit==$d->unit_kode)
+                                selected
+                            @endif>{{$d->unit_nama}}</option>
+                            @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select name="tahun" id="tahun" class="form-control">
+                            @foreach ($dataTahun as $iTahun)
+                            <option value="{{$iTahun->tahun}}" @if (request('tahun')==$iTahun->tahun or $tahun==$iTahun->tahun)
+                            selected
+                            @endif>{{$iTahun->tahun}}</option>
+                            @endforeach
+                            </select>
+                        </div>
 
-                                <div class="col-md-2">
-                                    <button type="submit" class="btn btn-success">Filter</button>
-                                </div>
-                              </div>
-                        </form>
-                            </div>
-                            </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-success">Filter</button>
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-6 col-sm-12 col-xs-12">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-6 col-sm-12 col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Peringkat Kabupaten/Kota Tahun {{$tahun}}</h4>
+                @if ($unit>0)
+                        <h5>Nilai Berdasarkan </h5>
+                @endif
+                        @if ($dataPeringkat->count() > 0)
                         <div class="table-responsive">
                             <table id="nilai" class="table table-bordered table-hover table-striped" cellspacing="0" width="100%">
                                 <thead>
@@ -90,21 +93,30 @@
                                         <td>{{$item->unit_nama}}</td>
                                         <td>{{$item->keg_jml}}</td>
                                         <td>{{$item->keg_jml_target}}</td>
-                                        <td>{{number_format($item->point_total,2,".",",")}}</td>
+                                        <td>{{number_format($item->point_total,3,".",",")}}</td>
                                     </tr>
                                 @endforeach
                                 </tbody>
                             </table>
                         </div>
-                    </div>
-                    <div class="col-lg-6 col-sm-12 col-xs-12">
-                        <h4 class="card-title">Grafik Nilai</h4>
-                        <div id="nilai_tahunan"></div>
-                        @if ($tahun == date('Y'))
-                        <div class="text-danger"><i>*) Keadaan sampai bulan berjalan tahun {{$tahun}}</i></div>
+                        @else
+                            <div class="alert alert-danger">Data belum tersedia untuk tahun ini</div>
                         @endif
-                    </div>
-                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 col-sm-12 col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                        <h4 class="card-title">Grafik Nilai</h4>
+                        @if ($dataPeringkat->count() > 0)
+                            <div id="nilai_tahunan"></div>
+                            @if ($tahun == date('Y'))
+                            <div class="text-danger"><i>*) Keadaan sampai bulan berjalan tahun {{$tahun}}</i></div>
+                            @endif
+                        @else
+                            <div class="alert alert-danger">Data belum tersedia untuk tahun ini</div>
+                        @endif
             </div>
         </div>
     </div>
@@ -162,5 +174,7 @@
     <script src="{{asset('dist/grafik/export-data.js')}}"></script>
     <script src="{{asset('dist/grafik/series-label.js')}}"></script>
     <script src="{{asset('dist/grafik/accessibility.js')}}"></script>
+    @if ($dataPeringkat->count() > 0)
     @include('peringkat.GrafikTahunan')
+    @endif
 @endsection

@@ -9,9 +9,10 @@
         <tr>
             <th colspan="8">Keadaan : {{$waktu}}</th>
         </tr>
-        
+
         <tr style="background-color: #C6D2D2;color:black;">
-            <th>Sub Fungsi</th>
+            <th>Tim Kerja</th>
+            <th>No</th>
             <th>Keg ID</th>
             <th>Kegiatan</th>
             <th>Tanggal Mulai</th>

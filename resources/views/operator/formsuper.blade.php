@@ -25,7 +25,7 @@
     <div class="controls">
     <select class="form-control" name="unitkode_prov" id="super_unitkode">
         <option value="">Pilih Unitkerja Provinsi</option>
-        @foreach ($dataFungsi as $item)
+        @foreach ($dataFungsi->where('unit_flag','1') as $item)
             <option value="{{$item->unit_kode}}">[{{$item->unit_kode}}] {{$item->unit_nama}}</option>
         @endforeach
     </select>

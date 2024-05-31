@@ -31,7 +31,10 @@ class Kegiatan extends Model
         return $this->hasMany('App\SpjRealisasi','keg_id', 'keg_id')->where('spj_r_jenis',2);
     }
     public function Unitkerja(){
-        return $this->hasOne('App\UnitKerja','unit_kode', 'keg_unitkerja');
+        return $this->belongsTo('App\UnitKerja','keg_unitkerja', 'unit_kode');
+    }
+    public function TimKerja(){
+        return $this->belongsTo('App\UnitKerja','keg_timkerja', 'unit_kode');
     }
     public function FlagKegiatan(){
         return $this->belongsTo('App\FlagKegiatan','keg_flag', 'kode');

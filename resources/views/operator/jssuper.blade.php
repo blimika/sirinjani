@@ -10,7 +10,7 @@ $('#TambahOperator').on('show.bs.modal', function (event) {
             $('#TambahOperator .modal-body #super_unitkode').prop('disabled', false);
             $('#TambahOperator .modal-body #super_level').html("");
             var kodelevel = '<option value="">Pilih Level Akses</option>'
-            @foreach ($dataLevel->whereIn('level_id',['1','3','5','9']) as $l)
+            @foreach ($dataLevel->whereIn('level_id',['1','4','5','9']) as $l)
                 kodelevel += '<option value="{{$l->level_id}}">{{$l->level_nama}}</option>';
             @endforeach
             $('#TambahOperator .modal-body #super_level').append(kodelevel);
@@ -20,7 +20,7 @@ $('#TambahOperator').on('show.bs.modal', function (event) {
             $('#TambahOperator .modal-body #super_unitkode').prop('disabled', true);
             $('#TambahOperator .modal-body #super_level').html("");
             var kodelevel = '<option value="">Pilih Level Akses</option>'
-            @foreach ($dataLevel->whereIn('level_id',['1','2','4']) as $l)
+            @foreach ($dataLevel->whereIn('level_id',['1','2','3']) as $l)
                 kodelevel += '<option value="{{$l->level_id}}">{{$l->level_nama}}</option>';
             @endforeach
             $('#TambahOperator .modal-body #super_level').append(kodelevel);
@@ -129,7 +129,7 @@ $('#EditModal').on('show.bs.modal', function (event) {
                 $('#EditModal .modal-body #edit_super_unitkode').prop('disabled', false);
                 $('#EditModal .modal-body #edit_super_level').html("");
                 var kodelevel = '<option value="">Pilih Level Akses</option>'
-                @foreach ($dataLevel->whereIn('level_id',['1','3','5','9']) as $l)
+                @foreach ($dataLevel->whereIn('level_id',['1','4','5','9']) as $l)
                     kodelevel += '<option value="{{$l->level_id}}">{{$l->level_nama}}</option>';
                 @endforeach
                 $('#EditModal .modal-body #edit_super_level').append(kodelevel);
@@ -140,7 +140,7 @@ $('#EditModal').on('show.bs.modal', function (event) {
                 $('#EditModal .modal-body #edit_super_unitkode').prop('disabled', true);
                 $('#EditModal .modal-body #edit_super_level').html("");
                 var kodelevel = '<option value="">Pilih Level Akses</option>'
-                @foreach ($dataLevel->whereIn('level_id',['1','2','4']) as $l)
+                @foreach ($dataLevel->whereIn('level_id',['1','2','3']) as $l)
                     kodelevel += '<option value="{{$l->level_id}}">{{$l->level_nama}}</option>';
                 @endforeach
                 $('#EditModal .modal-body #edit_super_level').append(kodelevel);
@@ -161,7 +161,7 @@ $('#EditModal').on('show.bs.modal', function (event) {
                 $('#EditModal .modal-body #edit_super_unitkode').prop('disabled', false);
                 $('#EditModal .modal-body #edit_super_level').html("");
                 var kodelevel = '<option value="">Pilih Level Akses</option>'
-                @foreach ($dataLevel->whereIn('level_id',['1','3','5','9']) as $l)
+                @foreach ($dataLevel->whereIn('level_id',['1','4','5','9']) as $l)
                     kodelevel += '<option value="{{$l->level_id}}">{{$l->level_nama}}</option>';
                 @endforeach
                 $('#EditModal .modal-body #edit_super_level').append(kodelevel);
@@ -171,7 +171,7 @@ $('#EditModal').on('show.bs.modal', function (event) {
             $('#EditModal .modal-body #edit_super_unitkode').prop('disabled', true);
             $('#EditModal .modal-body #edit_super_level').html("");
             var kodelevel = '<option value="">Pilih Level Akses</option>'
-            @foreach ($dataLevel->whereIn('level_id',['1','2','4']) as $l)
+            @foreach ($dataLevel->whereIn('level_id',['1','2','3']) as $l)
                 kodelevel += '<option value="{{$l->level_id}}">{{$l->level_nama}}</option>';
             @endforeach
             $('#EditModal .modal-body #edit_super_level').append(kodelevel);
@@ -254,5 +254,63 @@ $(".flagliatckp").click(function (e) {
                 }
             })
 });
-   
+//perbaiki role
+$("#perbaikirole").click(function (e) {
+    e.preventDefault();
+
+    Swal.fire({
+                title: 'Perbaiki Role Users?',
+                text: "semua role users akan diperbaiki",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Perbaiki'
+            }).then((result) => {
+                if (result.value) {
+                    //response ajax disini
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    });
+                    $.ajax({
+                        url : '{{route('operator.perbaikirole')}}',
+                        method : 'get',
+                        cache: false,
+                        dataType: 'json',
+                        success: function(data){
+                            if (data.status == true)
+                            {
+                                Swal.fire(
+                                    'Berhasil!',
+                                    ''+data.hasil+'',
+                                    'success'
+                                ).then(function() {
+                                    location.reload();
+                                });
+                            }
+                            else
+                            {
+                                Swal.fire(
+                                    'Error!',
+                                    ''+data.hasil+'',
+                                    'danger'
+                                );
+                            }
+
+                        },
+                        error: function(){
+                            Swal.fire(
+                                'Error',
+                                'Koneksi Error',
+                                'danger'
+                            );
+                        }
+
+                    });
+
+                }
+            })
+});
 </script>

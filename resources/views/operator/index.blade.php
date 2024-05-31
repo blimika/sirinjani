@@ -35,16 +35,19 @@
         <div class="card">
             <div class="card-body">
                 @if (Auth::user())
-                    @if (Auth::user()->level > 3 )
+                    @if (Auth::user()->role == 3 || Auth::user()->role > 4)
                     <div class="row">
-                        <div class="col-lg-6 col-sm-12 col-xs-12">
-                        <button class="btn btn-info btn-rounded waves-effect waves-light m-b-20" data-toggle="modal" data-target="#TambahOperator">Tambah</button>
+                        <div class="col-lg-12 col-sm-12 col-xs-12">
+                        <button class="btn btn-info btn-rounded waves-effect waves-light m-b-20 float-right" data-toggle="modal" data-target="#TambahOperator">Tambah</button>
+                        @if (Auth::User()->role > 5)
+                        <a href="" class="btn btn-success btn-rounded waves-effect waves-light m-b-20 float-right" id="perbaikirole">Perbaiki Role</a>
+                        @endif
                         </div>
                     </div>
                     @endif
                 @endif
-                @if (Auth::user()->level > 5)
-                @include('operator.filter')
+                @if (Auth::user()->role > 5)
+                    @include('operator.filter')
                 @endif
                 <div class="row">
                     <div class="table-responsive">
@@ -59,9 +62,8 @@
                             <th>Status</th>
                             @if (Auth::user()->level > 5)
                             <th>Flag CKP</th>
-                            <th>UserTG</th>
-                            <th>ChatTG</th>
-                            <th>TokenTG</th>
+                            <th>Level</th>
+                            <th>Role</th>
                             @endif
                             <th>Aksi</th>
                             </tr>
@@ -73,7 +75,7 @@
                                         <td>
                                             {{$item->nama}}
                                             <br />
-                                            <span class="label label-rounded label-info">{{$item->Level->level_nama}}</span>
+                                            <span class="label label-rounded label-info">{{$item->Role->level_nama}}</span>
                                         </td>
                                         <td>{{$item->username}}</td>
                                         <td>
@@ -102,27 +104,14 @@
                                             <span class="label label-rounded label-danger">NonAktif</span>
                                             @endif
                                         </td>
-                                        <td>{{$item->user_tg}}</td>
-                                        <td>{{$item->chatid_tg}}</td>
-                                        <td>
-                                            @if ($item->token_tg)
-                                            <span class="label label-rounded label-info">Aktif</span>
-                                            @else
-                                            <span class="label label-rounded label-danger">NonAktif</span>
-                                            @endif
-                                        </td>
+                                        <td>{{$item->level}}</td>
+                                        <td>{{$item->role}}</td>
                                         @endif
                                         <td>
                                             <button class="btn btn-circle btn-sm btn-success waves-light waves-effect" data-toggle="modal" data-target="#DetilModal" data-idop="{{$item->id}}"><i class="fas fa-search" data-toggle="tooltip" title="View Operator"></i></button>
-                                            @if (Auth::user()->level > 3)
-                                                @if ($item->level < 9 )
-                                                    @if ($item->level < 4 or ($item->level > 3 and Auth::user()->username != $item->username))
-                                                        @include('operator.aksi')
-                                                    @endif
-                                                @else
-                                                    @if (Auth::user()->username != $item->username and Auth::user()->level > 5)
-                                                        @include('operator.aksi')
-                                                    @endif
+                                            @if (Auth::user()->role > 2 and $item->role < 9)
+                                                @if ((Auth::User()->role == 3 or Auth::User()->role > 4) and Auth::user()->username != $item->username)
+                                                    @include('operator.aksi')
                                                 @endif
                                             @endif
                                          </td>

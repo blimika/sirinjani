@@ -6,7 +6,7 @@
 <!-- ============================================================== -->
 <div class="row page-titles">
     <div class="col-md-5 align-self-center">
-        <h4 class="text-themecolor">Laporan Kegiatan BPS Kabupaten/Kota</h4>
+        <h4 class="text-themecolor">Rincian Kegiatan BPS Kabupaten/Kota</h4>
     </div>
     <div class="col-md-7 align-self-center text-right">
         <div class="d-flex justify-content-end align-items-center">
@@ -64,6 +64,7 @@
                                      @endforeach
                                     </select>
                                 </div>
+
                                 <div class="col-md-2">
                                     <button type="submit" class="btn btn-success">Filter</button>
                                 </div>
@@ -78,66 +79,111 @@
     <div class="col-lg-12 col-sm-12 col-xs-12">
         <div class="card">
             <div class="card-body">
-                @if ($data->where($unit_item,$unit)->count())
-                    <div class="col-lg-6 m-b-20">
-                        <a href="{{route('bulanan.export',["$unit","$bulan","$tahun"])}}" class="btn btn-success"><i class="fas fa-file-excel"></i> Export ke Excel</a>
+                <div class="row" style="margin-bottom:20px;">
+                    <div class="col-lg-6">
+                        <a href="{{route('peringkat.export',["$unit","$bulan","$tahun"])}}" class="btn btn-success"><i class="fas fa-file-excel"></i> Export ke Excel</a>
                     </div>
-                @endif
+                    <div class="col-lg-6">
+                        <h4 class="text-right">Total {{$dataRincian->count()}} Kegiatan</h4>
+                    </div>
+                </div>
+
                 <div class="table-responsive">
-                    <h4 class="card-title">Laporan Kegiatan [{{$unit}}] {{$unit_nama}} @if ($bulan > 0) Bulan {{$dataBulan[(int)$bulan]}} @else Tahun @endif {{ $tahun }}</h4>
-                    <table class="table color-bordered-table success-bordered-table table-striped table-bordered">
+                    <h4 class="card-title">Rincian Kegiatan {{$unitnama}} @if ($bulan > 0) Bulan {{$dataBulan[$bulan]}} @else Tahun @endif {{$tahun}}</h4>
+                    <table class="table color-bordered-table success-bordered-table hover-table">
                         <thead>
                             <tr>
-                                <th width="2%">No</th>
+                                <th>Bulan</th>
                                 <th>Kegiatan</th>
                                 <th width="10%">Tgl Mulai</th>
                                 <th width="10%">Tgl Berakhir</th>
                                 <th width="4%">Target</th>
                                 <th width="4%">Dikirim</th>
                                 <th width="4%">Diterima</th>
+                                <th width="4%">Nilai</th>
                             </tr>
                         </thead>
                         <tbody>
+                            @for ($i = 1; $i <= 12; $i++)
+                                @foreach ($dataRincian->where('bulan_keg','=',$i) as $item)
+                                    @if ($loop->first)
+                                    <tr>
+                                        <td rowspan="{{$dataRincian->where('bulan_keg','=',$i)->count()}}">{{$dataBulan[$i]}}</td>
+                                        <td><a href="{{route('kegiatan.detil',$item->keg_id)}}" class="text-info">{{$loop->iteration}}. {{$item->keg_nama}}</a></td>
+                                        <td align="right">{{Tanggal::Pendek($item->keg_start)}}</td>
+                                        <td align="right">{{Tanggal::Pendek($item->keg_end)}}</td>
+                                        <td align="right">
+                                            <h4><span class="badge badge-info">{{$item->keg_t_target}}</span></h4>
+                                        </td>
+                                        <td align="right">
+                                            @if ($item->jumlah_dikirim)
+                                                @if ($item->keg_t_target > $item->jumlah_dikirim)
+                                                    <h4><span class="badge badge-danger">{{$item->jumlah_dikirim}}</span></h4>
+                                                @else
+                                                    <h4><span class="badge badge-success">{{$item->jumlah_dikirim}}</span></h4>
+                                                @endif
 
-                            @foreach ($dataUnitkerja->where($unit_item,$unit) as $item)
-                                <tr>
-                                    <td colspan="7"><b>{{$item->unit_nama}}</b></td>
-                                </tr>
-                                @if ($data->where('keg_timkerja',$item->unit_kode))
-                                    @if ($data->where('keg_timkerja',$item->unit_kode)->count() > 0)
-                                        @foreach ($data->where('keg_timkerja',$item->unit_kode) as $detil)
-                                            <tr>
-                                                <td>{{$loop->iteration}}</td>
-                                                <td><a href="{{route('kegiatan.detil',$detil->keg_id)}}" class="text-info">{{ $detil->keg_nama }}</a></td>
-                                                <td align="right">{{Tanggal::Pendek($detil->keg_start)}}</td>
-                                                <td align="right">{{Tanggal::Pendek($detil->keg_end)}}</td>
-                                                <td align="right">{{$detil->Target->sum('keg_t_target')}}</td>
-                                                <td align="right">
-                                                    {{$detil->RealisasiKirim->sum('keg_r_jumlah')}}
-                                                    <br />
-                                                    ({{number_format(($detil->RealisasiKirim->sum('keg_r_jumlah')/$detil->Target->sum('keg_t_target'))*100,2,",",".")}}%)
-                                                </td>
-                                                <td align="right">
-                                                    {{$detil->RealisasiTerima->sum('keg_r_jumlah')}}
-                                                    <br />
-                                                    @if ($detil->RealisasiKirim->sum('keg_r_jumlah') > 0)
-                                                        ({{number_format(($detil->RealisasiTerima->sum('keg_r_jumlah')/$detil->RealisasiKirim->sum('keg_r_jumlah'))*100,2,",",".")}}%)
-                                                    @else
-                                                        ({{number_format(0,2,",",".")}}%)
-                                                    @endif
-                                                </td>
-                                            </tr>
-                                        @endforeach
+                                            @else
+                                                <h4><span class="badge badge-danger">0</span></h4>
+                                            @endif
+                                        </td>
+                                        <td align="right">
+                                            @if ($item->jumlah_diterima)
+                                                @if ($item->keg_t_target > $item->jumlah_diterima)
+                                                <h4><span class="badge badge-danger">
+                                                    {{$item->jumlah_diterima}}</span></h4>
+                                                @else
+                                                    <h4><span class="badge badge-success">
+                                                        {{$item->jumlah_diterima}}</span></h4>
+                                                @endif
+
+                                            @else
+                                                <h4><span class="badge badge-danger">0</span></h4>
+                                            @endif
+                                        </td>
+                                        <td align="right" @if ((float) $item->keg_t_point < 3) bgcolor="red" style="color:white;" @else bgcolor="green" style="color:white;" @endif>{{number_format($item->keg_t_point,2,",",".")}}</td>
+                                    </tr>
                                     @else
-                                        <tr>
-                                            <td colspan="7" class="text-center">belum ada kegiatan dibulan ini</td>
-                                        </tr>
+                                    <tr>
+                                        <td><a href="{{route('kegiatan.detil',$item->keg_id)}}" class="text-info">{{$loop->iteration}}. {{$item->keg_nama}}</a></td>
+                                        <td align="right">{{Tanggal::Pendek($item->keg_start)}}</td>
+                                        <td align="right">{{Tanggal::Pendek($item->keg_end)}}</td>
+                                        <td align="right">
+                                            <h4><span class="badge badge-info">{{$item->keg_t_target}}</span></h4>
+                                        </td>
+                                        <td align="right">
+                                            @if ($item->jumlah_dikirim)
+                                                @if ($item->keg_t_target > $item->jumlah_dikirim)
+                                                    <h4><span class="badge badge-danger">{{$item->jumlah_dikirim}}</span></h4>
+                                                @else
+                                                    <h4><span class="badge badge-success">{{$item->jumlah_dikirim}}</span></h4>
+                                                @endif
+
+                                            @else
+                                                <h4><span class="badge badge-danger">0</span></h4>
+                                            @endif
+                                        </td>
+                                        <td align="right">
+                                            @if ($item->jumlah_diterima)
+                                                @if ($item->keg_t_target > $item->jumlah_diterima)
+                                                <h4><span class="badge badge-danger">
+                                                    {{$item->jumlah_diterima}}</span></h4>
+                                                @else
+                                                    <h4><span class="badge badge-success">
+                                                        {{$item->jumlah_diterima}}</span></h4>
+                                                @endif
+
+                                            @else
+                                                <h4><span class="badge badge-danger">0</span></h4>
+                                            @endif
+                                        </td>
+                                        <td align="right" @if ((float) $item->keg_t_point < 3) bgcolor="red" style="color:white;" @else bgcolor="green" style="color:white;" @endif>{{number_format($item->keg_t_point,2,",",".")}}</td>
+                                    </tr>
                                     @endif
-                                @endif
-                            @endforeach
+                                @endforeach
+                            @endfor
                         </tbody>
                     </table>
-                    <small>Catatan: Persentase <b>Dikirim</b> adalah terhadap <b>Target</b>, Persentase <b>Diterima</b> adalah terhadap <b>Dikirim</b></small>
                 </div>
             </div>
         </div>
@@ -174,7 +220,7 @@
     <!-- end - This is for export functionality only -->
     <script>
         $(function () {
-            $('#tabel').DataTable({
+            $('#nilai').DataTable({
                 dom: 'Bfrtip',
                 buttons: [
                     'copy', 'excel', 'pdf', 'print'

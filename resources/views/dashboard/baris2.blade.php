@@ -75,6 +75,15 @@
     <!-- Column -->
     <!-- Column -->
     <div class="col-lg-6 col-md-6">
+        <div class="row">
+            <div class="col-lg-6 col-sm-12">
+                @include('dashboard.rankingbulanan')
+            </div>
+            <div class="col-lg-6 col-sm-12">
+                @include('dashboard.rankingtahunan')
+            </div>
+        </div>
+
         <div class="card">
             <div class="card-body">
                 <h4 class="card-title">Grafik Nilai</h4>

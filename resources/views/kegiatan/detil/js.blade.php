@@ -391,7 +391,6 @@ $('#EditInfoLanjutanModal').on('show.bs.modal', function (event) {
             $('#EditInfoLanjutanModal .modal-body #keg_start').text(data.keg_start_nama)
             $('#EditInfoLanjutanModal .modal-body #keg_end').text(data.keg_end_nama)
             $('#EditInfoLanjutanModal .modal-body #keg_target').text(data.keg_target+" "+data.keg_satuan)
-            $('#EditInfoLanjutanModal .modal-body #keg_info').wysihtml5();
             $('#EditInfoLanjutanModal .modal-body #keg_info').text(data.keg_info)
             $('#EditInfoLanjutanModal .modal-body #keg_id').val(kegid)
            }

@@ -282,14 +282,14 @@ Class Generate {
 		if ($tahun==0)
 		{
 			//semua tahun
-			$data = \App\Kegiatan::select('keg_unitkerja', \DB::raw('count(*) as total'))->groupBy('keg_unitkerja')->orderBy('total','desc')->first();
+			$data = \App\Kegiatan::select('keg_timkerja', \DB::raw('count(*) as total'))->groupBy('keg_timkerja')->orderBy('total','desc')->first();
 		}
 		else
 		{
 			//sesuai kodebps
-			$data = \App\Kegiatan::whereYear('keg_start','=',$tahun)->select('keg_unitkerja', \DB::raw('count(*) as total'))->groupBy('keg_unitkerja')->orderBy('total','desc')->first();
+			$data = \App\Kegiatan::whereYear('keg_start','=',$tahun)->select('keg_timkerja', \DB::raw('count(*) as total'))->groupBy('keg_timkerja')->orderBy('total','desc')->first();
 		}
-		$nama_seksi = $data->Unitkerja->unit_nama;
+		$nama_seksi = $data->TimKerja->unit_nama;
 		$total_keg = $data->total;
 		$arr = array(
 			'nama_unit'=>$nama_seksi,
@@ -302,7 +302,7 @@ Class Generate {
 		$data = \App\Kegiatan::whereBetween('keg_end',array(\Carbon\Carbon::now()->format('Y-m-d'), \Carbon\Carbon::now()->addWeek()->format('Y-m-d')))->orderBy('keg_end')->get();
 		return $data;
 	}
-	public static function ChartNilaiBulan($bulan,$tahun)
+    public static function ChartNilaiBulan($bulan,$tahun)
 	{
 		/*
 		select keg_t_unitkerja, count(*) as keg_jml, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_jumlah, sum(m_keg_target.keg_t_point) as point_total, avg(m_keg_target.keg_t_point) as point_rata from m_keg_target,m_keg where m_keg.keg_id=m_keg_target.keg_id and month(m_keg.keg_end)='5' and year(m_keg.keg_end)='2020' and m_keg_target.keg_t_target>0 group by keg_t_unitkerja order by point_rata desc, point_total desc
@@ -348,7 +348,7 @@ Class Generate {
 			$point_keg[]=$item->point_keg;
 			$point_spj[]=$item->point_spj;
 			$point_total[]=$item->point_total;
-			$point_rata[]=number_format($item->point_total,2,".",",");
+			$point_rata[]=number_format($item->point_total,3,".",",");
 		}
 		$arr = array(
 			'unit_nama'=>$unit_nama,
@@ -421,7 +421,7 @@ Class Generate {
 			$point_keg[]=$item->point_keg;
 			$point_spj[]=$item->point_spj;
 			$point_total[]=$item->point_total;
-			$point_rata[]=number_format($item->point_total,2,".",",");
+			$point_rata[]=number_format($item->point_total,3,".",",");
 		}
 		$arr = array(
 			'unit_nama'=>$unit_nama,

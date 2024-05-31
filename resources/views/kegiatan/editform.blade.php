@@ -8,8 +8,11 @@
         <label for="keg_unitkerja">Unit Kerja</label>
         <select name="keg_unitkerja" id="keg_unitkerja" class="form-control" required>
             <option value="">Pilih Unitkerja</option>
+            @if($dataKegiatan->TimKerja->unit_flag == 0)
+                <option value="{{$dataKegiatan->keg_timkerja}}" selected="selected">{{$dataKegiatan->TimKerja->unit_nama}}</option>
+            @endif
             @foreach ($unitProv as $u)
-                <option value="{{$u->unit_kode}}" @if ($u->unit_kode == $dataKegiatan->keg_unitkerja)
+                <option value="{{$u->unit_kode}}" @if ($u->unit_kode == $dataKegiatan->keg_timkerja)
                     selected
                 @endif>{{$u->unit_nama}}</option>
             @endforeach
@@ -35,7 +38,7 @@
             </div>
             <input type="text" class="form-control" id="keg_end" name="keg_end" autocomplete="off" placeholder="Tanggal kegiatan selesai" value="{{$dataKegiatan->keg_end}}" required>
         </div>
-            
+
     </div>
     <div class="form-group">
         <label for="keg_satuan">Satuan</label>
@@ -60,4 +63,3 @@
             <label class="custom-control-label" for="spj2">Tidak Ada</label>
         </div>
     </div>
-   

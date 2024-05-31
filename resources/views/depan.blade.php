@@ -21,10 +21,9 @@
 <!-- Start Page Content -->
 <!-- ============================================================== -->
 @if (Generate::TotalKegiatan(Carbon\Carbon::now()->format('Y')) > 0)
-@include('dashboard.baris1')
-@include('dashboard.baris2')
+    @include('dashboard.baris2')
 @else
-@include('dashboard.kosong')
+    @include('dashboard.kosong')
 @endif
 <!-- ============================================================== -->
 <!-- End PAge Content -->

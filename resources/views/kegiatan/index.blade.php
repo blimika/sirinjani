@@ -35,11 +35,13 @@
         <div class="card">
             <div class="card-body">
                 @if (Auth::user())
-                    @if (Auth::user()->level == 3 or Auth::user()->level > 4)
+                    @if (Auth::user()->role > 3)
                     <div class="row">
-                        <div class="col-lg-6 col-sm-12 col-xs-12">
-                        <a href="{{route('kegiatan.tambah')}}" class="btn btn-info btn-rounded waves-effect waves-light m-b-20">Tambah</a>
-
+                        <div class="col-lg-12 col-sm-12 col-xs-12">
+                        <a href="{{route('kegiatan.tambah')}}" class="btn btn-info btn-rounded waves-effect waves-light m-b-20 float-right">Tambah</a>
+                        @if (Auth::user()->role > 5)
+                            <a href="" class="btn btn-success btn-rounded waves-effect waves-light m-b-20 m-r-10 float-right" id="synctimkerja">Sync TimKerja</a>
+                        @endif
                         </div>
                     </div>
                     @endif
@@ -57,16 +59,15 @@
                             <tr>
                             <th>No</th>
                             <th>Kegiatan</th>
-                            <th>Unitkerja</th>
+                            <th>Tim Kerja</th>
                             <th>Mulai</th>
                             <th>Berakhir</th>
                             <th>Target</th>
                             <th>Realisasi</th>
                             <th>Satuan</th>
                             <th>SPJ</th>
-                            <th>Flag</th>
                             @if (Auth::user())
-                                @if (Auth::user()->level > 4 or Auth::user()->level == 3)
+                                @if (Auth::user()->role > 3)
                                     <th width="65px">Aksi</th>
                                 @endif
                             @endif
@@ -97,7 +98,11 @@
                                                 </div>
                                             </div>
                                        </td>
-                                       <td>{{$item->unit_nama}}</td>
+                                       <td>@if($item->keg_timkerja > 0)
+                                        {{$item->TimKerja->unit_nama}}
+                                       @else
+                                       --tim kerja kosong--
+                                       @endif</td>
                                        <!----<td>{{Tanggal::Panjang($item->keg_start)}}</td>
                                        <td>{{Tanggal::Panjang($item->keg_end)}}</td>--->
                                        <td><span class="tgl_hide">{{\Carbon\Carbon::parse($item->keg_start)->format('Ymd')}}</span> {{Tanggal::Panjang($item->keg_start)}}</td>
@@ -106,20 +111,12 @@
                                        <td>{{$item->RealisasiTerima->sum('keg_r_jumlah')}}</td>
                                        <td>{{$item->keg_target_satuan}}</td>
                                        <td>@include('kegiatan.spj')</td>
-                                       <td>
-                                        @if ($item->keg_flag == 1)
-                                            <span class="label label-success label-rounded">{{$item->FlagKegiatan->nama}}</span>
-                                        @else
-                                             <span class="label label-danger label-rounded">{{$item->FlagKegiatan->nama}}</span>
-                                        @endif
-
-                                       </td>
                                        @if (Auth::user())
-                                        @if (Auth::user()->level > 4 or Auth::user()->level == 3)
-                                            <td>
-                                                @include('kegiatan.aksi')
-                                            </td>
-                                        @endif
+                                            @if (Auth::user()->role > 3)
+                                                <td>
+                                                    @include('kegiatan.aksi2')
+                                                </td>
+                                            @endif
                                        @endif
                                    </tr>
                                @endforeach
@@ -181,4 +178,5 @@
     <!-- Sweet-Alert  -->
     <script src="{{asset('assets/node_modules/sweetalert2/dist/sweetalert2.all.min.js')}}"></script>
     @include('kegiatan.jshapus')
+    @include('kegiatan.jstimkerja')
 @endsection

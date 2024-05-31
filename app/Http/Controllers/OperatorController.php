@@ -23,8 +23,8 @@ class OperatorController extends Controller
         //dd($data_wilayah);
         $dataFungsi = Unitkerja::where([['unit_jenis','=','1'],['unit_eselon','<','4']])->get();
         //level
-        // 1=pemantau, operator kab, 3=oper prov, 4=admin kabkota, 5=adminprov
-        if (Auth::user()->level > 5)
+        // 1=pemantau, operator kab, 3=admin kabb, 4=operator prov, 5=adminprov
+        if (Auth::user()->role > 5)
         {
             //superadmin
             $dataOperator = User::when(request('wilayah'),function ($query){
@@ -37,10 +37,64 @@ class OperatorController extends Controller
             //selain superadmin
             $dataOperator = User::where('kodebps','=',Auth::user()->kodebps)->get();
             $dataLevel = KodeLevel::where('level_id','<','9')->whereIn('level_jenis', array(Auth::user()->NamaWilayah->bps_jenis, 3))->get();
+
         }
+        //dd($dataLevel);
         //$dataUnitkerja = UnitKerja::where([['unit_eselon','=','3'],['unit_jenis','=','1']])->get();
 
         return view('operator.index',['dataFungsi'=>$dataFungsi,'dataLevel'=>$dataLevel,'dataWilayah'=>$data_wilayah,'dataOperator'=>$dataOperator,'wilayah'=>request('wilayah')]);
+    }
+    public function PerbaikiRole()
+    {
+        // 1=pemantau, 2=operator kab, 3=oper prov, 4=admin kabkota, 5=adminprov 9=super-->> lama
+        // 1=pemantau, 2=operator kab, 3=admin kab, 4=operator prov, 5=adminprov 9=super-->> baru
+        if (Auth::user()->level > 5)
+        {
+            //superadmin
+            //ubah kode level
+            $data = User::get();
+            $total = 0;
+            $admin_kab = 0;
+            $op_prov = 0;
+            $lain = 0;
+            foreach ($data as $item) {
+                if ($item->role == 1 && $item->level > 1)
+                {
+                    $d = User::where('id',$item->id)->first();
+                    if ($item->level == 3)
+                    {
+                        $new_role = 4;
+                        $op_prov++;
+                    }
+                    elseif ($item->level == 4)
+                    {
+                        $new_role = 3;
+                        $admin_kab++;
+                    }
+                    else
+                    {
+                        $new_role = $item->level;
+                        $lain++;
+                    }
+                    $d->role = $new_role;
+                    $d->update();
+                }
+                $total++;
+            }
+            $arr = array(
+                'status'=>true,
+                'hasil'=>'Berhasil, Total user ('.$total.'), Admin Kab ('.$admin_kab.'), Operator Prov ('.$op_prov.'), Lainnya ('.$lain.')'
+            );
+        }
+        else
+        {
+            $arr = array(
+                'status'=>false,
+                'hasil'=>'Anda tidak memiliki hak akses'
+            );
+        }
+
+        return Response()->json($arr);
     }
     public function cekOperator($username)
     {
@@ -99,6 +153,8 @@ class OperatorController extends Controller
                 'aktif'=>$data->aktif,
                 'level'=>$data->level,
                 'level_nama'=>$data->Level->level_nama,
+                'role'=>$data->role,
+                'role_nama'=>$data->Role->level_nama,
                 'lastip'=>$lastip,
                 'lastlogin'=>$data->lastlogin,
                 'lastlogin_nama'=>$lastlog_nama,
@@ -198,7 +254,7 @@ class OperatorController extends Controller
             "operator_no_wa" => "0998892384923"
             ]
         */
-        if (Auth::user()->level == 9)
+        if (Auth::user()->role == 9)
         {
             //cek username ada tidak
             $count = User::where('username',$request->operator_username)->count();
@@ -226,6 +282,7 @@ class OperatorController extends Controller
                     $data->kodebps = $request->wilayah;
                     $data->nohp = trim($request->operator_no_wa);
                     $data->level = $request->operator_level;
+                    $data->role = $request->operator_level;
                     $data->aktif = 1;
                     $data->save();
                     $pesan_error='Operator <b>'.$request->operator_nama.' ('.$request->operator_username.') </b> sudah disimpan';
@@ -269,7 +326,7 @@ class OperatorController extends Controller
         "operator_id" => "53"
         ]
         */
-        if (Auth::user()->level == 9)
+        if (Auth::user()->role == 9)
         {
             //cek id operator ada tidak
             $count = User::where('id',$request->operator_id)->count();
@@ -295,6 +352,7 @@ class OperatorController extends Controller
                 $data->kodebps = $request->wilayah;
                 $data->nohp = trim($request->operator_no_wa);
                 $data->level = $request->operator_level;
+                $data->role = $request->operator_level;
                 $data->aktif = 1;
                 $data->update();
                 $pesan_error='Operator <b>'.$request->operator_nama.' ('.$request->operator_username.') </b> berhasil di update';
@@ -372,7 +430,7 @@ class OperatorController extends Controller
         ]
         wilayah pakai wilayah admin yg add
         */
-        if (Auth::user()->level == 5)
+        if (Auth::user()->role == 5)
         {
             //cek username ada tidak
             $count = User::where('username',$request->operator_username)->count();
@@ -391,6 +449,7 @@ class OperatorController extends Controller
                     $data->kodebps = Auth::user()->kodebps;
                     $data->nohp = trim($request->operator_no_wa);
                     $data->level = $request->operator_level;
+                    $data->role = $request->operator_level;
                     $data->aktif = 1;
                     $data->save();
                     $pesan_error='Operator <b>'.$request->operator_nama.' ('.$request->operator_username.') </b> sudah disimpan';
@@ -433,7 +492,7 @@ class OperatorController extends Controller
         "operator_id" => "56"
         ]
         */
-        if (Auth::user()->level == 5)
+        if (Auth::user()->role == 5)
         {
             //cek id operator ada tidak
             $count = User::where('id',$request->operator_id)->count();
@@ -448,6 +507,7 @@ class OperatorController extends Controller
                 $data->kodeunit = $request->unitkode_prov;
                 $data->nohp = trim($request->operator_no_wa);
                 $data->level = $request->operator_level;
+                $data->role = $request->operator_level;
                 $data->aktif = 1;
                 $data->update();
                 $pesan_error='Operator <b>'.$request->operator_nama.' ('.$request->operator_username.') </b> berhasil di update';
@@ -484,7 +544,7 @@ class OperatorController extends Controller
         "operator_no_wa" => "2342343242"
         ]
         */
-        if (Auth::user()->level == 4)
+        if (Auth::user()->role == 3)
         {
             //cek username ada tidak
             $count = User::where('username',$request->operator_username)->count();
@@ -503,6 +563,7 @@ class OperatorController extends Controller
                     $data->kodebps = Auth::user()->kodebps;
                     $data->nohp = trim($request->operator_no_wa);
                     $data->level = $request->operator_level;
+                    $data->role = $request->operator_level;
                     $data->aktif = 1;
                     $data->save();
                     $pesan_error='Operator <b>'.$request->operator_nama.' ('.$request->operator_username.') </b> sudah disimpan';
@@ -544,7 +605,7 @@ class OperatorController extends Controller
         "operator_id" => "57"
         ]
         */
-        if (Auth::user()->level == 4)
+        if (Auth::user()->role == 4)
         {
             //cek id operator ada tidak
             $count = User::where('id',$request->operator_id)->count();
@@ -558,6 +619,7 @@ class OperatorController extends Controller
                 //$data->username  = $request->operator_username;
                 $data->nohp = trim($request->operator_no_wa);
                 $data->level = $request->operator_level;
+                $data->role = $request->operator_level;
                 $data->aktif = 1;
                 $data->update();
                 $pesan_error='Operator <b>'.$request->operator_nama.' ('.$request->operator_username.') </b> berhasil di update';

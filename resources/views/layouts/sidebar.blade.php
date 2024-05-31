@@ -27,11 +27,12 @@
         <li> <a class="has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false"><i class="ti-layout-grid2"></i><span class="hide-menu">Kegiatan</span></a>
             <ul aria-expanded="false" class="collapse">
                 @if (Auth::user())
-                    @if (Auth::user()->level == 3 or Auth::user()->level > 4)
+                    @if (Auth::user()->level > 3)
                         <li><a href="{{route('kegiatan.tambah')}}">Tambah</a></li>
                     @endif
                 @endif
                 <li><a href="{{route('kegiatan.list')}}">Semua</a></li>
+                <li><a href="{{route('kegiatan.newlist')}}">New List</a></li>
             </ul>
         </li>
         @if (Auth::user())
@@ -39,7 +40,7 @@
             <ul aria-expanded="false" class="collapse">
                 <li><a href="{{route('peringkat.bulanan')}}">Peringkat Bulanan</a></li>
                 <li><a href="{{route('peringkat.tahunan')}}">Peringkat Tahunan</a></li>
-                <li><a href="{{route('peringkat.rincian')}}">Rincian Perkabkota</a></li>
+                <!--<li><a href="{{route('peringkat.rincian')}}">Rincian Perkabkota</a></li>-->
                 @if (Auth::user())
                     @if (Auth::user()->flag_liatckp == 1 or Auth::user()->level > 5)
                         <li><a href="{{route('peringkat.ckp')}}">Rekap Nilai CKP</a></li>
@@ -52,11 +53,20 @@
 
             </ul>
         </li>
-        <li class="nav-small-cap">--- LAPORAN</li>
         <li> <a class="has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false"><i class="ti-layout-media-right-alt"></i><span class="hide-menu">Laporan</span></a>
             <ul aria-expanded="false" class="collapse">
-                <li><a href="{{route('laporan.bulanan')}}">Bulanan</a></li>
-                <li><a href="{{route('laporan.tahunan')}}">Tahunan</a></li>
+                <li><a href="javascript:void(0)" class="has-arrow">Kegiatan Provinsi</a>
+                    <ul aria-expanded="false" class="collapse">
+                        <li><a href="{{route('laporan.bulanan')}}"><i class="ti-angle-double-right"></i> Bulanan</a></li>
+                        <li><a href="{{route('laporan.tahunan')}}"><i class="ti-angle-double-right"></i> Tahunan</a></li>
+                    </ul>
+                </li>
+                <li><a href="javascript:void(0)" class="has-arrow">Kegiatan Kabkota</a>
+                    <ul aria-expanded="false" class="collapse">
+                        <li><a href="{{route('laporan.kabkotabulan')}}"><i class="ti-angle-double-right"></i> Bulanan</a></li>
+                        <li><a href="{{route('laporan.kabkotatahun')}}"><i class="ti-angle-double-right"></i> Tahunan</a></li>
+                    </ul>
+                </li>
             </ul>
         </li>
         <li> <a class="has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false"><i class="ti-settings"></i><span class="hide-menu">Master</span></a>
@@ -69,7 +79,7 @@
                         <li><a href="{{route('unitkerja.kabkota')}}"><i class="ti-angle-double-right"></i> Kabkota</a></li>
                     </ul>
                 </li>
-                    <li><a href="{{route('bot.telegram')}}">Bot Telegram</a></li>
+                    <!--<li><a href="{{route('bot.telegram')}}">Bot Telegram</a></li>-->
                     <li><a href="{{route('aktivitas.list')}}">Log Aktivitas</a></li>
                     <!--<li><a href="{{route('poin.list')}}">Rekap Poin</a></li>-->
                     <li><a href="{{route('master.kegiatan')}}">Kegiatan</a></li>
