@@ -27,7 +27,7 @@
         <li> <a class="has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false"><i class="ti-layout-grid2"></i><span class="hide-menu">Kegiatan</span></a>
             <ul aria-expanded="false" class="collapse">
                 @if (Auth::user())
-                    @if (Auth::user()->level > 3)
+                    @if (Auth::user()->role > 3)
                         <li><a href="{{route('kegiatan.tambah')}}">Tambah</a></li>
                     @endif
                 @endif
@@ -42,11 +42,11 @@
                 <li><a href="{{route('peringkat.tahunan')}}">Peringkat Tahunan</a></li>
                 <!--<li><a href="{{route('peringkat.rincian')}}">Rincian Perkabkota</a></li>-->
                 @if (Auth::user())
-                    @if (Auth::user()->flag_liatckp == 1 or Auth::user()->level > 5)
+                    @if (Auth::user()->flag_liatckp == 1 or Auth::user()->role > 5)
                         <li><a href="{{route('peringkat.ckp')}}">Rekap Nilai CKP</a></li>
                     @endif
 
-                    @if (Auth::user()->level == 3 or Auth::user()->level > 4)
+                    @if (Auth::user()->role > 4)
                         <li><a href="{{route('peringkat.rekapnilai')}}">Rekap Nilai Bulanan</a></li>
                     @endif
                 @endif

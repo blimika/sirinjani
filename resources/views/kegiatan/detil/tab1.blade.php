@@ -139,9 +139,10 @@
         <tr>
             <td colspan="2">
                 <div class="text-right">
-                    <button class="btn btn-warning" data-toggle="modal" data-target="#EditInfoLanjutanModal" data-kegid="{{$dataKegiatan->keg_id}}" data-kegnama="{{$dataKegiatan->keg_nama}}"><span data-toggle="tooltip" title="Edit info lanjutan untuk kegiatan {{$dataKegiatan->keg_nama}}"><i class="fas fa-pencil-alt"></i> Info Lanjutan</span></button>
-                    <a href="{{route('kegiatan.edit',$dataKegiatan->keg_id)}}" class="btn btn-success"><i class="fas fa-pencil-alt"></i></a>
-                    <button class="btn btn-danger hapuskegiatan" data-kegid="{{$dataKegiatan->keg_id}}" data-kegnama="{{$dataKegiatan->keg_nama}}"><i class="fas fa-trash"></i></button>
+                    <button class="btn btn-warning" data-toggle="modal" data-target="#EditInfoLanjutanModal" data-kegid="{{$dataKegiatan->keg_id}}" data-kegnama="{{$dataKegiatan->keg_nama}}"><span data-toggle="tooltip" title="Edit info lanjutan"><i class="fas fa-pencil-alt"></i> Info Lanjutan</span></button>
+                    <a href="{{route('kegiatan.copy',$dataKegiatan->keg_id)}}" class="btn btn-info" data-toggle="tooltip" title="Copy kegiatan ini"><i class="fas fa-copy"></i></a>
+                    <a href="{{route('kegiatan.edit',$dataKegiatan->keg_id)}}" class="btn btn-success" data-toggle="tooltip" title="Edit kegiatan ini"><i class="fas fa-pencil-alt"></i></a>
+                    <button class="btn btn-danger hapuskegiatan" data-kegid="{{$dataKegiatan->keg_id}}" data-kegnama="{{$dataKegiatan->keg_nama}}" data-toggle="tooltip" title="Hapus kegiatan ini"><i class="fas fa-trash"></i></button>
                 </div>
             </td>
         </tr>

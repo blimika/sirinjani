@@ -35,11 +35,11 @@
         <div class="card">
             <div class="card-body">
                 @if (Auth::user())
-                    @if (Auth::user()->role == 3 || Auth::user()->role > 4)
+                    @if (Auth::user()->role == 3 || Auth::user()->role > 4 or Auth::User()->username='admin')
                     <div class="row">
                         <div class="col-lg-12 col-sm-12 col-xs-12">
                         <button class="btn btn-info btn-rounded waves-effect waves-light m-b-20 float-right" data-toggle="modal" data-target="#TambahOperator">Tambah</button>
-                        @if (Auth::User()->role > 5)
+                        @if (Auth::User()->role > 5 or Auth::User()->username='admin')
                         <a href="" class="btn btn-success btn-rounded waves-effect waves-light m-b-20 float-right" id="perbaikirole">Perbaiki Role</a>
                         @endif
                         </div>

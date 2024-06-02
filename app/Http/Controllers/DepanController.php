@@ -30,11 +30,11 @@ class DepanController extends Controller
     {
         $bulan = Carbon::now()->subMonth()->month;
         $tahun = Carbon::now()->subMonth()->year;
-        //dd($bulan);
+        //dd($tahun);
         //nilai terbaik
         $dataRankBulanan = DB::table('m_keg')
                 ->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
-                ->leftJoin(DB::raw("(select unit_kode as unit_kode_prov, unit_nama as unit_nama_prov, unit_parent as unit_parent_prov from t_unitkerja where unit_jenis='1') as unit_prov"),'m_keg.keg_unitkerja','=','unit_prov.unit_kode_prov')
+                ->leftJoin(DB::raw("(select unit_kode as unit_kode_prov, unit_nama as unit_nama_prov from t_unitkerja where unit_jenis='1' and unit_eselon='3') as unit_prov"),'m_keg.keg_timkerja','=','unit_prov.unit_kode_prov')
                 ->leftJoin('t_unitkerja','m_keg_target.keg_t_unitkerja','=','t_unitkerja.unit_kode')
                 ->whereMonth('m_keg.keg_end','=',Carbon::now()->format('m'))
 				->whereYear('m_keg.keg_end','=',Carbon::now()->format('Y'))
@@ -48,7 +48,7 @@ class DepanController extends Controller
                 ->first();
         $dataRankTahunan = DB::table('m_keg')
                 ->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
-                ->leftJoin(DB::raw("(select unit_kode as unit_kode_prov, unit_nama as unit_nama_prov, unit_parent as unit_parent_prov from t_unitkerja where unit_jenis='1') as unit_prov"),'m_keg.keg_unitkerja','=','unit_prov.unit_kode_prov')
+                ->leftJoin(DB::raw("(select unit_kode as unit_kode_prov, unit_nama as unit_nama_prov from t_unitkerja where unit_jenis='1' and unit_eselon='3') as unit_prov"),'m_keg.keg_timkerja','=','unit_prov.unit_kode_prov')
                 ->leftJoin('t_unitkerja','m_keg_target.keg_t_unitkerja','=','t_unitkerja.unit_kode')
                 ->whereMonth('m_keg.keg_end','<=',Carbon::now()->format('m'))
                 ->whereYear('m_keg.keg_end','=',Carbon::now()->format('Y'))
@@ -60,7 +60,7 @@ class DepanController extends Controller
                 ->orderBy('keg_jml','desc')
                 ->orderBy('m_keg_target.keg_t_unitkerja','asc')
                 ->first();
-        //dd($dataRankTahunan);
+        //dd($dataRankBulanan);
         $data = DB::table('m_keg')
                 ->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
                 ->leftJoin('t_unitkerja','m_keg_target.keg_t_unitkerja','=','t_unitkerja.unit_kode')

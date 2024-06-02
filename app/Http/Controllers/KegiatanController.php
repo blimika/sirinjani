@@ -415,7 +415,7 @@ class KegiatanController extends Controller
             //dd($dataKegiatan);
             //$unitTarget = UnitKerja::where([['unit_jenis','=','2'],['unit_eselon','=','3']])->get();
             $kegJenis = KegJenis::get();
-            return view('kegiatan.edit',[
+            return view('kegiatan.copy',[
                 'unitProv'=>$unitProv,
                 'kegJenis'=>$kegJenis,
                 'dataKegiatan'=>$dataKegiatan

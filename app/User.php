@@ -45,6 +45,9 @@ class User extends Authenticatable
     public function Unitkerja(){
         return $this->hasOne('App\UnitKerja','unit_kode', 'kodeunit');
     }
+    public function TimKerja(){
+        return $this->hasOne('App\UnitKerja','unit_kode', 'kodeunit');
+    }
     public function NamaWilayah(){
         return $this->hasOne('App\KodeWilayah','bps_kode', 'kodebps');
     }

@@ -1,7 +1,7 @@
 <div class="card bg-white">
     <div class="card-header bg-info text-white">
-        <h3>{{$Ranking1Bulan->unit_nama}}</h3>
-        <h7>Peringkat 1 Bulan Mei 2024</h7>
+        <h4 class="font-bold">{{$Ranking1Bulan->unit_nama}}</h4>
+        <h6 class="text-muted">Peringkat 1 Bulan {{\Carbon\Carbon::now()->isoFormat('MMMM YYYY')}}</h6>
     </div>
     <div class="card-body">
         <div class="carousel slide" data-ride="carousel">
@@ -10,7 +10,7 @@
                 <div class="carousel-item active flex-column">
                     <div class="row">
                         <div class="col-2"><i class="text-warning fas fa-trophy fa-2x"></i></div>
-                        <div class="col-10"><h3>Peringkat 1 Bulan Mei 2024</h3></div>
+                        <div class="col-10"><h4>Peringkat 1 Bulan {{\Carbon\Carbon::now()->isoFormat('MMMM YYYY')}}</h4></div>
                     </div>
                 </div>
                 <div class="carousel-item flex-column">
