@@ -12,7 +12,6 @@ class TabelTimBaru extends Seeder
     public function run()
     {
         //
-        //tambah tim baru
         DB::table('t_unitkerja')->insert(array(
             array('unit_kode'=>'52570', 'unit_nama'=>'Tim Sensus', 'unit_parent'=>'52000', 'unit_jenis'=> '1','unit_eselon'=> '3'),
             array('unit_kode'=>'52571', 'unit_nama'=>'Tim Statistik Pertanian, Industri dan PEK', 'unit_parent'=>'52000', 'unit_jenis'=> '1','unit_eselon'=> '3'),

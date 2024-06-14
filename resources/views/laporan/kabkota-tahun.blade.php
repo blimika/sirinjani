@@ -65,14 +65,59 @@
         </div>
     </div>
 </div>
-
+<div class="row">
+    <div class="col-lg-12 col-sm-12 col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">Performa Perbulan</h3>
+                <h6 class="card-subtitle mb-2 text-muted">Poin, Kegiatan, Target tahun {{$tahun}}</h6>
+                <div class="row">
+                    <div class="col-lg-6 col-sm-6 col-xs-12 text-center">
+                        <h4>Grafik Poin Nilai</h4>
+                        <div id="kabkota-poin-tahunan"></div>
+                    </div>
+                    <div class="col-lg-6 col-sm-6 col-xs-12 text-center">
+                        <h4>Grafik Jumlah Kegiatan sesuai Target, Dikirim dan Diterima</h4>
+                        <div id="kabkota-target-tahunan"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3 col-sm-4 col-xs-12 text-center">
+                        <div>
+                            <canvas id="tim1-nilai-kabkota" height="150"> </canvas>
+                        </div>
+                        <h5>TIM1 BPS Provinsi NTB</h5>
+                    </div>
+                    <div class="col-lg-3 col-sm-4 col-xs-12 text-center">
+                        <div>
+                            <canvas id="tim2-nilai-kabkota" height="150"> </canvas>
+                        </div>
+                        <h5>TIM2 BPS Provinsi NTB</h5>
+                    </div>
+                    <div class="col-lg-3 col-sm-4 col-xs-12 text-center">
+                        <div>
+                            <canvas id="tim3-nilai-kabkota" height="150"> </canvas>
+                        </div>
+                        <h5>TIM3 BPS Provinsi NTB</h5>
+                    </div>
+                    <div class="col-lg-3 col-sm-4 col-xs-12 text-center">
+                        <div>
+                            <canvas id="tim4-nilai-kabkota" height="150"> </canvas>
+                        </div>
+                        <h5>TIM4 BPS Provinsi NTB</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="row">
     <div class="col-lg-12 col-sm-12 col-xs-12">
         <div class="card">
             <div class="card-body">
                 <div class="row" style="margin-bottom:20px;">
                     <div class="col-lg-6">
-                        <a href="{{route('peringkat.export',["$unit","$bulan","$tahun"])}}" class="btn btn-success"><i class="fas fa-file-excel"></i> Export ke Excel</a>
+                        <a href="{{route('peringkat.export',["$unit","0","$tahun"])}}" class="btn btn-success"><i class="fas fa-file-excel"></i> Export ke Excel</a>
                     </div>
                     <div class="col-lg-6">
                         <h4 class="text-right">Total {{$dataRincian->count()}} Kegiatan</h4>
@@ -80,7 +125,7 @@
                 </div>
 
                 <div class="table-responsive">
-                    <h4 class="card-title">Rincian Kegiatan {{$unitnama}} @if ($bulan > 0) Bulan {{$dataBulan[$bulan]}} @else Tahun @endif {{$tahun}}</h4>
+                    <h4 class="card-title">Rincian Kegiatan {{$unitnama}} Tahun {{$tahun}}</h4>
                     <table class="table color-bordered-table success-bordered-table hover-table">
                         <thead>
                             <tr>
@@ -194,6 +239,8 @@
 <!--highcharts-->
 <link href="{{asset('dist/grafik/highcharts.css')}}" rel="stylesheet">
 <link href="{{asset('dist/css/pages/tab-page.css')}}" rel="stylesheet">
+<!--This page css - Morris CSS -->
+<link href="{{asset('assets/node_modules/morrisjs/morris.css')}}" rel="stylesheet">
 @endsection
 
 @section('js')
@@ -233,5 +280,10 @@
     <script src="{{asset('dist/grafik/export-data.js')}}"></script>
     <script src="{{asset('dist/grafik/series-label.js')}}"></script>
     <script src="{{asset('dist/grafik/accessibility.js')}}"></script>
-
+    <script src="{{asset('assets/node_modules/raphael/raphael-min.js')}}"></script>
+    <script src="{{asset('assets/node_modules/morrisjs/morris.js')}}"></script>
+     <!-- Chart JS -->
+     <script src="{{asset('assets/node_modules/Chart.js/chartjs.init.js')}}"></script>
+     <script src="{{asset('assets/node_modules/Chart.js/Chart.min.js')}}"></script>
+    @include('laporan.chart-kabkota')
 @endsection

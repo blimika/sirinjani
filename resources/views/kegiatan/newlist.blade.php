@@ -96,14 +96,13 @@
                             <tr>
                                 <th>ID</th>
                                 <th>Kegiatan</th>
-                                <th>Unitkerja</th>
+                                <th>Tim Kerja</th>
                                 <th>Mulai</th>
                                 <th>Berakhir</th>
                                 <th>Target</th>
                                 <th>Realisasi</th>
                                 <th>Satuan</th>
                                 <th>SPJ</th>
-                                <th>Flag</th>
                                 <th width="65px">Aksi</th>
                             </tr>
                             </thead>
@@ -159,14 +158,23 @@
                 columns: [
                     { data: 'keg_id' },
                     { data: 'keg_nama' },
-                    { data: 'keg_unitkerja' },
-                    { data: 'keg_start' },
-                    { data: 'keg_end' },
+                    { data: 'keg_timkerja' },
+                    {
+                        data: {
+                            _: 'keg_start.teks',
+                            sort: 'keg_start.sort'
+                        }
+                    },
+                    {
+                        data: {
+                            _: 'keg_end.teks',
+                            sort: 'keg_end.sort'
+                        }
+                    },
                     { data: 'keg_total_target' },
                     { data: 'keg_realisasi' },
                     { data: 'keg_target_satuan' },
                     { data: 'keg_spj' },
-                    { data: 'keg_flag' },
                     { data: 'aksi', orderable: false },
                 ],
                 processing: true,

@@ -78,7 +78,7 @@ $('#PengirimanModal').on('show.bs.modal', function (event) {
            if (data.status == true)
            {
             $('#PengirimanModal .modal-body #keg_nama').text(data.keg_nama)
-            $('#PengirimanModal .modal-body #sm').text(data.keg_unitkerja_nama)
+            $('#PengirimanModal .modal-body #sm').text(data.keg_timkerja_nama)
             $('#PengirimanModal .modal-body #kabkota').text(nama_kabkota)
             $('#PengirimanModal .modal-body #keg_end').text(data.keg_end_nama)
             $('#PengirimanModal .modal-body #keg_target').text(target_kabkota+" "+data.keg_satuan)
@@ -123,7 +123,7 @@ $('#EditPengirimanModal').on('show.bs.modal', function (event) {
            if (data.status == true)
            {
             $('#EditPengirimanModal .modal-body #keg_nama').text(data.keg_nama)
-            $('#EditPengirimanModal .modal-body #sm').text(data.keg_unitkerja_nama)
+            $('#EditPengirimanModal .modal-body #sm').text(data.keg_timkerja_nama)
             $('#EditPengirimanModal .modal-body #kabkota').text(data.keg_r_unitkerja_nama)
             $('#EditPengirimanModal .modal-body #keg_end').text(data.keg_end_nama)
             $('#EditPengirimanModal .modal-body #keg_target').text(target_kabkota+" "+data.keg_satuan)
@@ -236,7 +236,7 @@ $('#PenerimaanModal').on('show.bs.modal', function (event) {
            if (data.status == true)
            {
             $('#PenerimaanModal .modal-body #keg_nama').text(data.keg_nama)
-            $('#PenerimaanModal .modal-body #sm').text(data.keg_unitkerja_nama)
+            $('#PenerimaanModal .modal-body #sm').text(data.keg_timkerja_nama)
             $('#PenerimaanModal .modal-body #kabkota').text(nama_kabkota)
             $('#PenerimaanModal .modal-body #keg_end').text(data.keg_end_nama)
             $('#PenerimaanModal .modal-body #keg_target').text(target_kabkota+" "+data.keg_satuan)
@@ -343,7 +343,7 @@ $('#EditPenerimaanModal').on('show.bs.modal', function (event) {
            if (data.status == true)
            {
             $('#EditPenerimaanModal .modal-body #keg_nama').text(data.keg_nama)
-            $('#EditPenerimaanModal .modal-body #sm').text(data.keg_unitkerja_nama)
+            $('#EditPenerimaanModal .modal-body #sm').text(data.keg_timkerja_nama)
             $('#EditPenerimaanModal .modal-body #kabkota').text(data.keg_r_unitkerja_nama)
             $('#EditPenerimaanModal .modal-body #keg_end').text(data.keg_end_nama)
             $('#EditPenerimaanModal .modal-body #keg_target').text(target_kabkota+" "+data.keg_satuan)
@@ -387,7 +387,7 @@ $('#EditInfoLanjutanModal').on('show.bs.modal', function (event) {
            if (data.status == true)
            {
             $('#EditInfoLanjutanModal .modal-body #keg_nama').text(data.keg_nama)
-            $('#EditInfoLanjutanModal .modal-body #sm').text(data.keg_unitkerja_nama)
+            $('#EditInfoLanjutanModal .modal-body #sm').text(data.keg_timkerja_nama)
             $('#EditInfoLanjutanModal .modal-body #keg_start').text(data.keg_start_nama)
             $('#EditInfoLanjutanModal .modal-body #keg_end').text(data.keg_end_nama)
             $('#EditInfoLanjutanModal .modal-body #keg_target').text(data.keg_target+" "+data.keg_satuan)

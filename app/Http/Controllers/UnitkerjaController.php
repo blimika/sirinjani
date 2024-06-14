@@ -58,6 +58,10 @@ class UnitkerjaController extends Controller
     }
     public function ListKabkota()
     {
+        return view('unitkerja.kabkota');
+    }
+    public function UnitKabkotaPagelist(Request $request)
+    {
 
     }
     public function UnitProvPagelist(Request $request)

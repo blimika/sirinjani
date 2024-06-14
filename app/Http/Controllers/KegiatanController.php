@@ -229,7 +229,7 @@ class KegiatanController extends Controller
                 $flag_publik = false;
             }
         }
-        $totalRecords = Kegiatan::where('keg_flag','1')->count();
+        $totalRecords = Kegiatan::count();
         $totalRecordswithFilter =  DB::table('m_keg')
         ->when($searchValue, function ($q) use ($searchValue) {
             return $q->where('keg_nama', 'like', '%' . $searchValue . '%')
@@ -255,15 +255,23 @@ class KegiatanController extends Controller
         $aksi='';
         foreach ($records as $record) {
             $id = $record->keg_id;
-            $keg_nama = $record->keg_nama;
-            $keg_unitkerja = $record->keg_unitkerja;
-            $keg_start = $record->keg_start;
-            $keg_end = $record->keg_end;
+            $keg_nama = ' <div class="text-info">
+                        <a href="'.route('kegiatan.detil',$record->keg_id).'" class="text-info">'.$record->keg_nama.'</a>
+                        </div>
+                        <small class="badge badge-success">'.$record->JenisKeg->jkeg_nama.'</small>';
+            $keg_timkerja = $record->TimKerja->unit_nama;
+            $keg_start = array(
+                'teks'=>Tanggal::Panjang($record->keg_start),
+                'sort'=>$record->keg_start
+            );
+            $keg_end = array(
+                'teks'=>Tanggal::Panjang($record->keg_end),
+                'sort'=>$record->keg_end
+            );
             $keg_total_target = $record->keg_total_target;
             $keg_satuan = $record->keg_target_satuan;
             $keg_realisasi = $record->RealisasiKirim->count();
             $keg_spj = $record->keg_spj;
-            $keg_flag = $record->keg_flag;
             if (Auth::User())
             {
                 if (Auth::user()->role > 3)
@@ -274,9 +282,9 @@ class KegiatanController extends Controller
                         <i class="ti-settings"></i>
                     </button>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" href="#" target="_blank" data-toggle="modal" data-target="#EditModal" data-id="' . $record->keg_id . '">Edit</a>
+                        <a class="dropdown-item" href="'.route('kegiatan.edit',$record->keg_id).'" target="_blank" data-id="' . $record->keg_id . '">Edit</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item hapusunitkerja" href="#" data-id="' . $record->keg_id . '" data-kode="' . $record->keg_unitkerja . '"  data-kegnama="' . $record->keg_nama . '">Hapus Kegiatan</a>
+                        <a class="dropdown-item hapusunitkerja" href="#" data-id="' . $record->keg_id . '" data-kode="' . $record->keg_timkerja . '"  data-kegnama="' . $record->keg_nama . '">Hapus Kegiatan</a>
 
                     </div>
                 </div>
@@ -304,14 +312,13 @@ class KegiatanController extends Controller
             $data_arr[] = array(
                 "keg_id" => $id,
                 "keg_nama" => $keg_nama,
-                "keg_unitkerja" => $keg_unitkerja,
+                "keg_timkerja" => $keg_timkerja,
                 "keg_start" => $keg_start,
                 "keg_end" => $keg_end,
                 "keg_total_target" => $keg_total_target,
                 "keg_realisasi" => $keg_realisasi,
                 "keg_target_satuan" => $keg_satuan,
                 "keg_spj"=>$keg_spj,
-                "keg_flag"=>$keg_flag,
                 "aksi" => $aksi
             );
         }
