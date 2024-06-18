@@ -32,6 +32,7 @@ use App\Mail\MailPengiriman;
 use Telegram\Bot\Laravel\Facades\Telegram;
 use Telegram\Bot\Api;
 use App\FlagKegiatan;
+use App\HakAkses;
 
 class KegiatanController extends Controller
 {
@@ -375,13 +376,19 @@ class KegiatanController extends Controller
             if (Auth::user()->role == 4)
             {
                 //operator provinsi list unitProv hanya di TIM nya
-                $unitProv = UnitKerja::where([['unit_jenis','1'],['unit_eselon','3'],['unit_kode',Auth::user()->kodeunit],['unit_flag',1]])->get();
+                foreach (Auth::User()->HakAkses as $item)
+                    {
+                        $hak_kodeunit[] = $item->hak_kodeunit;
+                    }
+                $unitProv = UnitKerja::where([['unit_jenis',1],['unit_eselon',3]])->whereIn('unit_kode',$hak_kodeunit)->get();
+                //$unitProv = UnitKerja::where([['unit_jenis','1'],['unit_eselon','3'],['unit_kode',Auth::user()->kodeunit],['unit_flag',1]])->get();
                 //dd($unitProv);
             }
             else
             {
                 //list semua unitProv di provinsi
-                $unitProv = UnitKerja::where([['unit_jenis','1'],['unit_eselon','3'],['unit_flag',1]])->get();
+                //$unitProv = UnitKerja::where([['unit_jenis','1'],['unit_eselon','3'],['unit_flag',1]])->get();
+                $unitProv = UnitKerja::where([['unit_jenis','1'],['unit_eselon','3']])->get();
             }
             $unitTarget = UnitKerja::where([['unit_jenis','=','2'],['unit_eselon','=','3']])->get();
             $kegJenis = KegJenis::get();
@@ -407,12 +414,22 @@ class KegiatanController extends Controller
             if (Auth::user()->role == 4)
             {
                 //operator provinsi list unitProv hanya di bidangnya
-                if ($dataKegiatan->keg_timkerja != Auth::user()->kodeunit)
+                if ($dataKegiatan->keg_timkerja == Auth::user()->kodeunit or Auth::User()->HakAkses->where('hak_kodeunit',$dataKegiatan->keg_timkerja))
                 {
-                        //peringatan tidak bisa mengedit kegiatan ini
-                        return view('kegiatan.warning',['keg_id'=>$kegId]);
+                    foreach (Auth::User()->HakAkses as $item)
+                    {
+                        $hak_kodeunit[] = $item->hak_kodeunit;
+                    }
+                    $unitProv = UnitKerja::where([['unit_jenis',1],['unit_eselon',3]])->whereIn('unit_kode',$hak_kodeunit)->get();
+                    //dd($unitProv);
+
                 }
-                $unitProv = UnitKerja::where([['unit_jenis',1],['unit_eselon',3],['unit_kode',Auth::user()->kodeunit]])->get();
+                else
+                {
+                    //peringatan tidak bisa mengedit kegiatan ini
+                    return view('kegiatan.warning',['keg_id'=>$kegId]);
+                }
+
             }
             else
             {
@@ -813,7 +830,7 @@ class KegiatanController extends Controller
             {
                 //user admin atau operator provinsi
                 $data = Kegiatan::where('keg_id',$request->keg_id)->first();
-                if (Auth::user()->role > 4 or $data->keg_timkerja == Auth::user()->kodeunit)
+                if (Auth::user()->role > 4 or $data->keg_timkerja == Auth::user()->kodeunit or Auth::User()->HakAkses->where('hak_kodeunit',$data->keg_timkerja))
                 {
                     //admin atau operator provinsi sesuai unitkodenya
                     $nama = $data->keg_nama;
@@ -910,13 +927,21 @@ class KegiatanController extends Controller
             $dataKegiatan = Kegiatan::where('keg_id',$kegId)->first();
             if (Auth::user()->role == 4)
             {
-                //operator provinsi list unitProv hanya di bidangnya
-                if ($dataKegiatan->keg_timkerja != Auth::user()->kodeunit)
+                if ($dataKegiatan->keg_timkerja == Auth::user()->kodeunit or Auth::User()->HakAkses->where('hak_kodeunit',$dataKegiatan->keg_timkerja))
                 {
-                        //peringatan tidak bisa mengedit kegiatan ini
-                        return view('kegiatan.warning',['keg_id'=>$kegId]);
+                    foreach (Auth::User()->HakAkses as $item)
+                    {
+                        $hak_kodeunit[] = $item->hak_kodeunit;
+                    }
+                    $unitProv = UnitKerja::where([['unit_jenis',1],['unit_eselon',3]])->whereIn('unit_kode',$hak_kodeunit)->get();
                 }
-                $unitProv = UnitKerja::where([['unit_jenis',1],['unit_eselon',3],['unit_kode',Auth::user()->kodeunit]])->get();
+                else
+                {
+                    //peringatan tidak bisa mengedit kegiatan ini
+                    return view('kegiatan.warning',['keg_id'=>$kegId]);
+                }
+                //dd(!Auth::User()->HakAkses->where('hak_kodeunit',$dataKegiatan->keg_timkerja));
+
             }
             else
             {

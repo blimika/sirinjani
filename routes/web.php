@@ -83,6 +83,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/operator/adminkabsimpan', 'OperatorController@AdminKabSimpan')->name('operator.adminkabsimpan');
     Route::post('/operator/adminkabupdate', 'OperatorController@AdminKabUpdate')->name('operator.adminkabupdate');
     Route::post('/operator/gantipasswd', 'OperatorController@GantiPassword')->name('operator.gantipasswd');
+    Route::post('/operator/updatehakakses', 'OperatorController@UpdateHakAkses')->name('operator.updatehakakses');
     Route::get('/operator/perbaikirole', 'OperatorController@PerbaikiRole')->name('operator.perbaikirole');
     Route::get('/myprofile', 'MyProfileController@MyProfile')->name('my.profile');
     Route::post('/profile/update', 'MyProfileController@UpdateProfile')->name('profile.update');
@@ -110,6 +111,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/unitkerja/prov/simpan', 'UnitkerjaController@SimpanUnitProv')->name('unitprov.simpan');
     Route::post('/unitkerja/prov/ubahflag', 'UnitkerjaController@UbahFlagUnitProv')->name('unitprov.ubahflag');
     Route::post('/unitkerja/prov/hapus', 'UnitkerjaController@HapusUnitProv')->name('unitprov.hapus');
+    Route::post('/unitkerja/prov/eseloniv', 'UnitkerjaController@EselonIVNonAktif')->name('unitprov.eseloniv');
     Route::post('/unitkerja/prov/update', 'UnitkerjaController@UpdateUnitProv')->name('unitprov.updatedata');
     Route::get('/unitkerja/kabkota', 'UnitkerjaController@ListKabkota')->name('unitkerja.kabkota');
     Route::get('/unitkerja/kabkotapagelist', 'UnitkerjaController@UnitKabkotaPagelist')->name('unitkabkota.pagelist');

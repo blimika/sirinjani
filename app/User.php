@@ -51,4 +51,7 @@ class User extends Authenticatable
     public function NamaWilayah(){
         return $this->hasOne('App\KodeWilayah','bps_kode', 'kodebps');
     }
+    public function HakAkses() {
+        return $this->hasMany('App\HakAkses','hak_userid', 'id');
+    }
 }

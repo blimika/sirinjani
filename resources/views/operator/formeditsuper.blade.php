@@ -21,11 +21,11 @@
     </div>
 </div>
 <div class="form-group">
-    <label for="edit_super_unitkode">Unitkerja</label>
+    <label for="edit_super_unitkode">Tim Kerja Utama</label>
     <div class="controls">
     <select class="form-control" name="unitkode_prov" id="edit_super_unitkode">
-        <option value="">Pilih Unitkerja Provinsi</option>
-        @foreach ($dataFungsi->where('unit_flag','1') as $item)
+        <option value="">Pilih Tim Kerja Provinsi</option>
+        @foreach ($dataFungsi as $item)
             <option value="{{$item->unit_kode}}">[{{$item->unit_kode}}] {{$item->unit_nama}}</option>
         @endforeach
     </select>

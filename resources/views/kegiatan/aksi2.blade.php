@@ -12,7 +12,7 @@
     </div>
 </div>
 @elseif (Auth::user()->role == 4)
-@if ($item->keg_timkerja == Auth::user()->kodeunit)
+@if ($item->keg_timkerja == Auth::user()->kodeunit or Auth::User()->HakAkses->where('hak_kodeunit',$item->keg_timkerja)->count() > 0)
 <div class="btn-group">
     <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <i class="ti-settings"></i>

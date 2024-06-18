@@ -15,8 +15,11 @@
                     <h6 class="card-subtitle" id="unitnama"></h6>
                 </center>
                 <div>
-                    <hr> </div>
+                    <hr>
+                </div>
                 <div class="card-body">
+                    <small class="text-muted">Hak Akses</small>
+                    <h6 id="akses"></h6>
                     <small class="text-muted">Alamat E-mail </small>
                     <h6 id="email"></h6>
                     <small class="text-muted p-t-30">No WA</small>
@@ -43,7 +46,7 @@
 <div id="EditModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-success">
                 <h4 class="modal-title">Edit Operator</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
             </div>
@@ -82,22 +85,22 @@
 <div id="TambahOperator" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-info">
                 <h4 class="modal-title">Tambah Operator</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
             </div>
             <div class="modal-body">
                 <!--isi modal-->
                 @if (Auth::user())
-                    @if (Auth::user()->level > 5)
+                    @if (Auth::user()->role > 5)
                         <form class="m-t-10" name="FormTambahOperator" id="FormTambahOperator" method="post" action="{{ route('operator.supersimpan') }}">
                         @csrf
                         @include('operator.formsuper')
-                    @elseif (Auth::user()->level == 5)
+                    @elseif (Auth::user()->role == 5)
                         <form class="m-t-10" name="formTambahOperator" id="FormTambahOperator" method="post" action="{{route('operator.adminprovsimpan')}}">
                         @csrf
                         @include('operator.formadminprov')
-                    @elseif (Auth::user()->level == 4)
+                    @elseif (Auth::user()->role == 3)
                         <form class="m-t-10" name="formTambahOperator" method="post" action="{{route('operator.adminkabsimpan')}}">
                         @csrf
                         @include('operator.formadminkab')
@@ -119,7 +122,7 @@
 <div id="GantiPasswordModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-danger">
                 <h4 class="modal-title">Ganti Password Operator</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
             </div>
@@ -149,10 +152,35 @@
                 <div class="form-group">
                    <span id="pesan_error"></span>
                 </div>
-            </span>
+            </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary waves-effect" data-dismiss="modal">CLOSE</button>
                 <button type="submit" class="btn btn-success waves-effect waves-light" id="btn_gantipasswd">GANTI PASSWORD</button>
+            </div>
+        </form>
+        </div>
+    </div>
+</div>
+<!-- /.tambah operator -->
+
+<!-- modal tambah operator -->
+<div id="EditHakAksesModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="EditHakAksesModal" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info">
+                <h4 class="modal-title">Edit Hak Akses Operator Provinsi</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <!--isi modal-->
+                <form class="m-t-10" name="formHakAkses" method="post" action="{{route('operator.updatehakakses')}}">
+                    @csrf
+                    <input type="hidden" name="hak_opid" id="hak_opid" value="" />
+                @include('operator.formhakakses')
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary waves-effect" data-dismiss="modal">CLOSE</button>
+                <button type="submit" class="btn btn-success waves-effect waves-light" id="btn_hak_akses">UPDATE HAK AKSES</button>
             </div>
         </form>
         </div>

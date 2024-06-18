@@ -37,6 +37,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-lg-12 col-sm-12 col-xs-12">
+                        <a href="#" class="setes4nonaktif btn btn-danger btn-rounded waves-effect waves-light m-b-20 float-right">Eselon IV Non Aktif</a>
                         <a href="#" class="btn btn-info btn-rounded waves-effect waves-light m-b-20 float-right" data-toggle="modal" data-target="#TambahModal">Tambah</a>
                     </div>
                 </div>

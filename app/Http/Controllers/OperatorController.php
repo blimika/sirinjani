@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\HakAkses;
 use Illuminate\Http\Request;
 use App\User;
 use Carbon\Carbon;
@@ -57,6 +58,7 @@ class OperatorController extends Controller
             $admin_kab = 0;
             $op_prov = 0;
             $lain = 0;
+            $new_hak_akses = 0;
             foreach ($data as $item) {
                 if ($item->role == 1 && $item->level > 1)
                 {
@@ -79,11 +81,24 @@ class OperatorController extends Controller
                     $d->role = $new_role;
                     $d->update();
                 }
+                //hak akses
+                $h = HakAkses::where([['hak_username',$item->username],['hak_kodeunit',$item->kodeunit]])->first();
+                if (!$h)
+                {
+                    $ha = new HakAkses();
+                    $ha->hak_userid = $item->id;
+                    $ha->hak_username = $item->username;
+                    $ha->hak_kodeunit = $item->kodeunit;
+                    $ha->hak_role = $item->role;
+                    $ha->save();
+                    $new_hak_akses++;
+                }
+                //batas hak akses
                 $total++;
             }
             $arr = array(
                 'status'=>true,
-                'hasil'=>'Berhasil, Total user ('.$total.'), Admin Kab ('.$admin_kab.'), Operator Prov ('.$op_prov.'), Lainnya ('.$lain.')'
+                'hasil'=>'Berhasil, Total user ('.$total.'), Admin Kab ('.$admin_kab.'), Operator Prov ('.$op_prov.'), Lainnya ('.$lain.') Hak Akses ('.$new_hak_akses.')'
             );
         }
         else
@@ -121,7 +136,7 @@ class OperatorController extends Controller
         );
         if ($count > 0)
         {
-            //ada nip pegawai ini
+            //ada user
             $data = User::where('id',$id)->first();
             if ($data->lastlogin != "")
             {
@@ -138,6 +153,40 @@ class OperatorController extends Controller
             else
             {
                 $lastip = 'belum pernah login';
+            }
+            $data_hak = HakAkses::where('hak_userid',$id)->get();
+            if ($data_hak->count() > 0)
+            {
+                $hak_akses_data = array();
+                foreach ($data_hak as $item)
+                {
+                    $hak_akses_data[] = array(
+                        'id'=>$item->id,
+                        'hak_userid'=>$item->hak_userid,
+                        'hak_username'=>$item->hak_username,
+                        'hak_nama_lengkap'=>$item->User->nama,
+                        'hak_kodeunit'=>$item->hak_kodeunit,
+                        'hak_kodeunit_nama'=>$item->TimKerja->unit_nama,
+                        'hak_role'=>$item->hak_role,
+                        'hak_role_nama'=>$item->Role->level_nama,
+                        'created_at'=>$item->created_at,
+                        'created_at_nama'=>Carbon::parse($item->created_at)->isoFormat('dddd, D MMMM Y H:mm'),
+                        'updated_at'=>$item->updated_at,
+                        'updated_at_nama'=>Carbon::parse($item->updated_at)->isoFormat('dddd, D MMMM Y H:mm')
+                    );
+                }
+                $hak_akses = array(
+                    'status'=>true,
+                    'jumlah_record'=> $data_hak->count(),
+                    'data' => $hak_akses_data
+                );
+            }
+            else
+            {
+                $hak_akses = array(
+                    'status'=>false,
+                    'data'=>'belum ada hak akses'
+                );
             }
             $arr = array(
                 'status'=>true,
@@ -159,7 +208,8 @@ class OperatorController extends Controller
                 'lastlogin'=>$data->lastlogin,
                 'lastlogin_nama'=>$lastlog_nama,
                 'created_at'=>$data->created_at,
-                'updated_at'=>$data->updated_at
+                'updated_at'=>$data->updated_at,
+                'hak_akses'=>$hak_akses
             );
         }
         return Response()->json($arr);
@@ -175,10 +225,13 @@ class OperatorController extends Controller
         {
             $data = User::where('id','=',$request->id)->first();
             $nama = $data->nama;
+            $username = $data->username;
             $data->delete();
+            //hapus juga di hakakses
+            $hapus_hak_akses = HakAkses::where('hak_userid',$request->id)->delete();
             $arr = array(
                 'status'=>true,
-                'hasil'=>'Data operator '.$nama.' berhasil dihapus'
+                'hasil'=>'Data operator '.$nama.' ('.$username.') berhasil dihapus'
             );
         }
         return Response()->json($arr);
@@ -629,6 +682,65 @@ class OperatorController extends Controller
             {
                 //user sudah di pakai
                 $pesan_error='Operator <b>'.$request->operator_username.'</b> tidak ada';
+                $pesan_warna='danger';
+            }
+        }
+        else
+        {
+            $pesan_error='Anda tidak mempunyai akses terhadap aksi ini';
+            $pesan_warna='danger';
+        }
+        Session::flash('message', $pesan_error);
+        Session::flash('message_type', $pesan_warna);
+        return redirect()->route('operator.list');
+    }
+    public function UpdateHakAkses(Request $request)
+    {
+        //dd($request->all());
+        if (Auth::user()->role >= 5)
+        {
+            //cek username ada tidak
+            $data = User::where('id',$request->hak_opid)->first();
+            if ($data)
+            {
+                //kosongkan dulu hak aksesnya, input baru
+                $kosong_data = HakAkses::where('hak_userid',$request->hak_opid)->delete();
+                //cek kodeunit utama dulu
+                //array map di ubah dulu, antisipasi sql injection
+                $data_hak_akses = array_map('intval', $request->hak_akses);
+                //dd($data_hak_akses);
+                foreach ($data_hak_akses as $item)
+                {
+                    //dd($item);
+                    $data_baru = HakAkses::where('hak_userid',$request->hak_opid)->where('hak_kodeunit',$item)->first();
+                    if (!$data_baru)
+                    {
+                        $data_new = new HakAkses();
+                        $data_new->hak_userid = $request->hak_opid;
+                        $data_new->hak_username = $data->username;
+                        $data_new->hak_kodeunit = $item;
+                        $data_new->hak_role = $data->role;
+                        $data_new->save();
+                    }
+                }
+                //cek unit utama sudah masuk belum
+                $data_baru = HakAkses::where('hak_userid',$request->hak_opid)->where('hak_kodeunit',$data->kodeunit)->first();
+                if (!$data_baru)
+                {
+                    $data_new = new HakAkses();
+                    $data_new->hak_userid = $request->hak_opid;
+                    $data_new->hak_username = $data->username;
+                    $data_new->hak_kodeunit = $data->kodeunit;
+                    $data_new->hak_role = $data->role;
+                    $data_new->save();
+                }
+                $pesan_error='Operator <b>'.$data->nama.' ('.$data->username.') </b> berhasil di update hak aksesnya';
+                $pesan_warna='success';
+            }
+            else
+            {
+                //user sudah di pakai
+                $pesan_error='(ERROR) Operator tidak tersedia';
                 $pesan_warna='danger';
             }
         }

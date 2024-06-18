@@ -98,7 +98,7 @@ $('#EditModal').on('show.bs.modal', function (event) {
             $('#EditModal .modal-body #edit_operator_email').val(data.email)
             $('#EditModal .modal-body #edit_operator_no_wa').val(data.nohp)
             $('#EditModal .modal-body #edit_operator_id').val(data.id)
-            $('#EditModal .modal-body #edit_adminprov_level').val(data.level)
+            $('#EditModal .modal-body #edit_adminprov_level').val(data.role)
             $('#EditModal .modal-body #edit_adminprov_username').prop('readonly', true);
         },
         error: function(){

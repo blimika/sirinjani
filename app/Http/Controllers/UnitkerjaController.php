@@ -293,4 +293,38 @@ class UnitkerjaController extends Controller
         }
         return Response()->json($arr);
     }
+    public function EselonIVNonAktif(Request $request)
+    {
+        $arr = array(
+            'status'=>false,
+            'hasil'=>'Data unitkerja tidak tersedia'
+        );
+        if (Auth::User()->role > 4)
+        {
+            $data = UnitKerja::where('unit_eselon',4)->update(['unit_flag' => 0]);
+            if ($data)
+            {
+                $arr = array(
+                    'status'=>true,
+                    'hasil'=>'Data unitkerja eselon IV berhasil di non-aktifkan'
+                );
+            }
+            else
+            {
+                $arr = array(
+                    'status'=>false,
+                    'hasil'=>'[ERROR] Data unitkerja eselon IV sudah status non-aktif'
+                );
+            }
+
+        }
+        else
+        {
+            $arr = array(
+                'status'=>false,
+                'hasil'=>'Anda tidak memiliki akses untuk perintah ini'
+            );
+        }
+        return Response()->json($arr);
+    }
 }

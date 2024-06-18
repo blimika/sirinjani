@@ -10,7 +10,7 @@
     </div>
 </div>
 <div class="form-group">
-    <label for="adminprov_unitkode">Unitkerja</label>
+    <label for="adminprov_unitkode">Tim Kerja Utama</label>
     <div class="controls">
     <select class="form-control" name="unitkode_prov" id="adminprov_unitkode">
         <option value="">Pilih Unitkerja Provinsi</option>

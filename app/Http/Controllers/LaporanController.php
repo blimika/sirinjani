@@ -83,7 +83,7 @@ class LaporanController extends Controller
             ->when($bulan_filter,function ($query) use ($bulan_filter) {
             return $query->whereMonth('keg_end','=',$bulan_filter);
             })
-            ->whereYear('keg_end','=',$tahun_filter)->orderBy('keg_unitkerja','asc')->get();
+            ->whereYear('keg_end','=',$tahun_filter)->orderBy('keg_timkerja','asc')->get();
         //dd($data);
         //$data_cek_unit = Kegiatan::leftJoin('t_unitkerja','m_keg.keg_unitkerja','=','t_unitkerja.unit_kode')->where('')
         return view('laporan.bulanan',['dataUnitkerja'=>$dataUnit,'dataTahun'=>$data_tahun,'tahun'=>$tahun_filter,'unit'=>$unit_filter,'unit_nama'=>$unit_nama,'dataBulan'=>$data_bulan,'bulan'=>$bulan_filter,'dataSubFungsi'=>$dataSubFungsi,'data'=>$data,'unit_item'=>$unit_item]);
@@ -206,10 +206,10 @@ class LaporanController extends Controller
 
         $dataUnitNama = UnitKerja::where('unit_kode',$unitkerja)->first();
         $unit_nama = $dataUnitNama->unit_nama;
-        $data = Kegiatan::leftJoin('t_unitkerja','m_keg.keg_unitkerja','=','t_unitkerja.unit_kode')
+        $data = Kegiatan::leftJoin('t_unitkerja','m_keg.keg_timkerja','=','t_unitkerja.unit_kode')
             ->whereYear('keg_end','=',$tahun)
-            ->where('unit_parent',$unitkerja)
-            ->orderBy('keg_unitkerja','asc')
+            ->where('keg_timkerja',$unitkerja)
+            ->orderBy('keg_timkerja','asc')
             ->orderBy('keg_end','asc')
             ->get();
         //dd($data);
@@ -355,24 +355,56 @@ class LaporanController extends Controller
 				->first();
         dd($data_nilai); */
         $data_timkerja = UnitKerja::where([['unit_eselon','3'],['unit_jenis','1']])->get();
-        $kode_tim = '52520';
-        $kode_kabkota = '52010';
-        $data_nilai_tim = DB::table('m_keg')
+        //$kode_tim = '52520';
+        //$kode_kabkota = '52010';
+        /*hasil
+        0 => {#1451 ▼
+            +"keg_t_unitkerja": "52010"
+            +"unit_nama": "BPS Kabupaten Lombok Barat"
+            +"keg_jml_target": "1229"
+            +"point_waktu": "274.0000"
+            +"point_volume": "290.0000"
+            +"point_jumlah": "285.2000"
+            +"point_keg": "3.90684932"
+            +"point_spj": "0.00000000"
+            +"point_total": "3.90684932"
+            +"keg_jml": 73
+            +"kode_tim": "52530"
+            +"nama_tim": "Fungsi Statistik Produksi"
+            }
+        */
+        $data_nilai_tim1 = DB::table('m_keg')
                 ->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
                 ->leftJoin(DB::raw("(select unit_kode as kode_tim, unit_nama as nama_tim from t_unitkerja where unit_jenis='1' and unit_eselon='3') as timprov"),'m_keg.keg_timkerja','=','timprov.kode_tim')
                 ->leftJoin('t_unitkerja','m_keg_target.keg_t_unitkerja','=','t_unitkerja.unit_kode')
                 ->whereMonth('m_keg.keg_end','<=',$bulan_filter)
 				->whereYear('m_keg.keg_end','=',$tahun_filter)
-                ->where('m_keg_target.keg_t_unitkerja',$kode_kabkota)
+                ->where('m_keg_target.keg_t_unitkerja',$unit_filter)
 				->where('m_keg_target.keg_t_target','>','0')
-                ->where('m_keg.keg_timkerja',$kode_tim)
 				->select(DB::raw("m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_volume, sum(m_keg_target.keg_t_point) as point_jumlah, avg(m_keg_target.keg_t_point) as point_keg, avg(m_keg_target.spj_t_point) as point_spj, avg(m_keg_target.keg_t_point_total) as point_total, count(*) as keg_jml,kode_tim,nama_tim"))
 				->groupBy('m_keg_target.keg_t_unitkerja')
+                ->groupBy('timprov.kode_tim')
 				->orderBy('point_total','desc')
                 ->orderBy('keg_jml_target','desc')
                 ->orderBy('keg_jml','desc')
-                ->first();
-        //dd($data_timkerja,$data_nilai_tim);
+                ->take(4)->get();
+        $data_nilai_tim2 = DB::table('m_keg')
+                ->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
+                ->leftJoin(DB::raw("(select unit_kode as kode_tim, unit_nama as nama_tim from t_unitkerja where unit_jenis='1' and unit_eselon='3') as timprov"),'m_keg.keg_timkerja','=','timprov.kode_tim')
+                ->leftJoin('t_unitkerja','m_keg_target.keg_t_unitkerja','=','t_unitkerja.unit_kode')
+                ->whereMonth('m_keg.keg_end','<=',$bulan_filter)
+				->whereYear('m_keg.keg_end','=',$tahun_filter)
+                ->where('m_keg_target.keg_t_unitkerja',$unit_filter)
+				->where('m_keg_target.keg_t_target','>','0')
+				->select(DB::raw("m_keg_target.keg_t_unitkerja,t_unitkerja.unit_nama, sum(m_keg_target.keg_t_target) as keg_jml_target, sum(m_keg_target.keg_t_point_waktu) as point_waktu, sum(m_keg_target.keg_t_point_jumlah) as point_volume, sum(m_keg_target.keg_t_point) as point_jumlah, avg(m_keg_target.keg_t_point) as point_keg, avg(m_keg_target.spj_t_point) as point_spj, avg(m_keg_target.keg_t_point_total) as point_total, count(*) as keg_jml,kode_tim,nama_tim"))
+				->groupBy('m_keg_target.keg_t_unitkerja')
+                ->groupBy('timprov.kode_tim')
+				->orderBy('point_total','desc')
+                ->orderBy('keg_jml_target','desc')
+                ->orderBy('keg_jml','desc')
+                ->offset(4)
+                ->take(4)->get();
+        //dd($data_timkerja,$data_nilai_tim1,$data_nilai_tim2);
         $data_grafik_poin = array();
         $data_grafik_keg = array();
         $data_grafik_target = array();
@@ -434,6 +466,19 @@ class LaporanController extends Controller
 				->orderBy('keg_end','asc')
                 ->get();
         //dd($data);
-        return view('laporan.kabkota-tahun',['dataUnitkerja'=>$dataUnit,'unit'=>$unit_filter,'unitnama'=>$unit_nama->unit_nama,'dataBulan'=>$data_bulan,'dataTahun'=>$data_tahun,'tahun'=>$tahun_filter,'dataRincian'=>$data,'data_grafik_poin'=>json_encode($data_grafik_poin),'data_grafik_keg'=>json_encode($data_grafik_keg),'data_grafik_target'=>json_encode($data_grafik_target)]);
+        return view('laporan.kabkota-tahun',[
+            'dataUnitkerja'=>$dataUnit,
+            'unit'=>$unit_filter,
+            'unitnama'=>$unit_nama->unit_nama,
+            'dataBulan'=>$data_bulan,
+            'dataTahun'=>$data_tahun,
+            'tahun'=>$tahun_filter,
+            'dataRincian'=>$data,
+            'data_grafik_poin'=>json_encode($data_grafik_poin),
+            'data_grafik_keg'=>json_encode($data_grafik_keg),
+            'data_grafik_target'=>json_encode($data_grafik_target),
+            'data_grafik_baris1'=>$data_nilai_tim1,
+            'data_grafik_baris2'=>$data_nilai_tim2,
+        ]);
     }
 }

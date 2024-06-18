@@ -32,7 +32,7 @@
                     @endif
                 @endif
                 <li><a href="{{route('kegiatan.list')}}">Semua</a></li>
-                <li><a href="{{route('kegiatan.newlist')}}">New List</a></li>
+                <!--<li><a href="{{route('kegiatan.newlist')}}">New List</a></li>-->
             </ul>
         </li>
         @if (Auth::user())
@@ -88,6 +88,9 @@
             </ul>
         </li>
         @endif
+        <li>
+            <a class="has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false" data-toggle="modal" data-target="#InfoVerModal"><i class="ti-info"></i><span class="hide-menu">Info</span></a>
+        </li>
     </ul>
 </nav>
 <!-- End Sidebar navigation -->

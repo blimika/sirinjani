@@ -8,9 +8,6 @@
         <label for="keg_unitkerja">Unit Kerja</label>
         <select name="keg_unitkerja" id="keg_unitkerja" class="form-control" required>
             <option value="">Pilih Unitkerja</option>
-            @if($dataKegiatan->TimKerja->unit_flag == 0)
-                <option value="{{$dataKegiatan->keg_timkerja}}" selected="selected">{{$dataKegiatan->TimKerja->unit_nama}}</option>
-            @endif
             @foreach ($unitProv as $u)
                 <option value="{{$u->unit_kode}}" @if ($u->unit_kode == $dataKegiatan->keg_timkerja)
                     selected

@@ -199,4 +199,67 @@ $('#EditModal').on('show.bs.modal', function (event) {
         //batas klik update
     });
 //edit modal
+ //eselon iv non aktif
+ $(".setes4nonaktif").click(function (e) {
+    e.preventDefault();
+    var id = {{Auth::User()->id}}
+    Swal.fire({
+                title: 'Anda yakin?',
+                text: "data tim kerja khusus eselon IV akan di non aktifkan",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Non Aktifkan'
+            }).then((result) => {
+                if (result.value) {
+                    //response ajax disini
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    });
+                    $.ajax({
+                        url : '{{route('unitprov.eseloniv')}}',
+                        method : 'post',
+                        data: {
+                            id: id,
+                        },
+                        cache: false,
+                        dataType: 'json',
+                        success: function(data){
+                            if (data.status == true)
+                            {
+                                Swal.fire(
+                                    'Berhasil!',
+                                    ''+data.hasil+'',
+                                    'success'
+                                ).then(function() {
+                                    $('#prov').DataTable().ajax.reload(null,false);
+                                });
+                            }
+                            else
+                            {
+                                Swal.fire(
+                                    'Error!',
+                                    ''+data.hasil+'',
+                                    'error'
+                                );
+                            }
+
+                        },
+                        error: function(){
+                            Swal.fire(
+                                'Error',
+                                'Koneksi Error '+data.hasil+'',
+                                'error'
+                            );
+                        }
+
+                    });
+
+                }
+            })
+    });
+    //ubah flag unitkerja
 </script>

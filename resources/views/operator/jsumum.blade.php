@@ -205,10 +205,23 @@ $('#DetilModal').on('show.bs.modal', function (event) {
             {
                 var status = "Tidak Aktif"
             }
+            let akses_teks ="";
             $('#DetilModal .modal-body #nama').text(data.nama)
             $('#DetilModal .modal-body #username').text(data.username)
-            $('#DetilModal .modal-body #level').text("Level : "+data.level_nama)
-            $('#DetilModal .modal-body #unitnama').text(data.namaunit)
+            $('#DetilModal .modal-body #level').text("Role : "+data.role_nama)
+            if (data.role > 1)
+            {
+                $('#DetilModal .modal-body #unitnama').text(data.namaunit)
+                for (i = 0; i < data.hak_akses.data.length ; i++) {
+                    akses_teks += '- '+data.hak_akses.data[i].hak_kodeunit_nama+'<br />'
+                }
+                $('#DetilModal .modal-body #akses').html(akses_teks)
+            }
+            else
+            {
+                $('#DetilModal .modal-body #akses').html('-')
+                $('#DetilModal .modal-body #unitnama').text('-')
+            }
             $('#DetilModal .modal-body #email').text(data.email)
             $('#DetilModal .modal-body #nowa').text(data.nohp)
             $('#DetilModal .modal-body #status').text(status)

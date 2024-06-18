@@ -157,82 +157,104 @@ $(function () {
       }
     });
 
-var tim1 = {
-  type: 'doughnut',
-  data: {
-    labels: [
-      "Poin: ",
-      ""
-    ],
-    datasets: [{
-      data: [3.222,(5-3.222)],
-      backgroundColor: [
-        "#FF6384",
-        "#36A2EB"
-      ],
-      hoverBackgroundColor: [
-        "#FF6384",
-        "#36A2EB"
-      ]
-    }]
-  },
-  options: {
-    responsive: true,
-    legend: {
-                "display": false,
+@php
+$j=1;
+$nilai = 0;
+@endphp
+@foreach ($data_grafik_baris1 as $item)
+    @php $nilai = number_format($item->point_total,3,".",","); @endphp
+    var tim{{$j}} = {
+    type: 'doughnut',
+    data: {
+        labels: [
+        "Poin: ",
+        ""
+        ],
+        datasets: [{
+        data: [{{$nilai}},{{(5-$nilai)}}],
+        backgroundColor: [
+            "#FF6384",
+            "#36A2EB"
+        ],
+        hoverBackgroundColor: [
+            "#FF6384",
+            "#36A2EB"
+        ]
+        }]
     },
-    elements: {
-      center: {
-        text: '3,222',
-        color: '#FF6384', // Default is #000000
-        fontStyle: 'Arial', // Default is Arial
-        sidePadding: 20, // Default is 20 (as a percentage)
-        minFontSize: 25, // Default is 20 (in px), set to false and text will not wrap.
-        lineHeight: 25 // Default is 25 (in px), used for when text wraps
-      }
+    options: {
+        responsive: true,
+        legend: {
+                    "display": false,
+        },
+        elements: {
+        center: {
+            text: '{{$nilai}}',
+            color: '#FF6384', // Default is #000000
+            fontStyle: 'Arial', // Default is Arial
+            sidePadding: 10, // Default is 20 (as a percentage)
+            minFontSize: 15, // Default is 20 (in px), set to false and text will not wrap.
+            lineHeight: 20 // Default is 25 (in px), used for when text wraps
+        }
+        }
     }
-  }
-};
-var tim2 = {
-  type: 'doughnut',
-  data: {
-    labels: [
-      "Poin: ",
-      ""
-    ],
-    datasets: [{
-      data: [3.222,(5-3.222)],
-      backgroundColor: [
-        "#FF6384",
-        "#36A2EB"
-      ],
-      hoverBackgroundColor: [
-        "#FF6384",
-        "#36A2EB"
-      ]
-    }]
-  },
-  options: {
-    responsive: true,
-    legend: {
-                "display": false,
-    },
-    elements: {
-      center: {
-        text: '2,222',
-        color: '#FF6384', // Default is #000000
-        fontStyle: 'Arial', // Default is Arial
-        sidePadding: 20, // Default is 20 (as a percentage)
-        minFontSize: 25, // Default is 20 (in px), set to false and text will not wrap.
-        lineHeight: 25 // Default is 25 (in px), used for when text wraps
-      }
-    }
-  }
-};
+    };
 
-var ctx = document.getElementById("tim1-nilai-kabkota").getContext("2d");
-var tim1chart = new Chart(ctx, tim1);
-var ctx = document.getElementById("tim2-nilai-kabkota").getContext("2d");
-var tim3chart = new Chart(ctx, tim2);
+    var ctx = document.getElementById("tim{{$j}}-nilai-kabkota").getContext("2d");
+    var tim{{$j}}chart = new Chart(ctx, tim{{$j}});
+    @php $j++ @endphp
+@endforeach
+
+@if ($data_grafik_baris2)
+@php
+$j=5;
+$nilai = 0;
+@endphp
+@foreach ($data_grafik_baris2 as $item)
+    @php $nilai = number_format($item->point_total,3,".",","); @endphp
+    var tim{{$j}} = {
+    type: 'doughnut',
+    data: {
+        labels: [
+        "Poin: ",
+        ""
+        ],
+        datasets: [{
+        data: [{{$nilai}},{{(5-$nilai)}}],
+        backgroundColor: [
+            "#FF6384",
+            "#36A2EB"
+        ],
+        hoverBackgroundColor: [
+            "#FF6384",
+            "#36A2EB"
+        ]
+        }]
+    },
+    options: {
+        responsive: true,
+        legend: {
+                    "display": false,
+        },
+        elements: {
+        center: {
+            text: '{{$nilai}}',
+            color: '#FF6384', // Default is #000000
+            fontStyle: 'Arial', // Default is Arial
+            sidePadding: 10, // Default is 20 (as a percentage)
+            minFontSize: 15, // Default is 20 (in px), set to false and text will not wrap.
+            lineHeight: 20 // Default is 25 (in px), used for when text wraps
+        }
+        }
+    }
+    };
+
+    var ctx = document.getElementById("tim{{$j}}-nilai-kabkota").getContext("2d");
+    var tim{{$j}}chart = new Chart(ctx, tim{{$j}});
+    @php $j++ @endphp
+@endforeach
+
+@endif
+
  });
 </script>

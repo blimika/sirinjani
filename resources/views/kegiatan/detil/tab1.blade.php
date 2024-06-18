@@ -135,7 +135,7 @@
         <td>{{Tanggal::LengkapPanjang($dataKegiatan->updated_at)}}</td>
     </tr>
     @if (Auth::user()->role > 3)
-        @if (Auth::user()->role > 4 or $dataKegiatan->keg_timkerja == Auth::user()->kodeunit)
+        @if (Auth::user()->role > 4 or $dataKegiatan->keg_timkerja == Auth::user()->kodeunit or Auth::User()->HakAkses->where('hak_kodeunit',$dataKegiatan->keg_timkerja)->count() > 0)
         <tr>
             <td colspan="2">
                 <div class="text-right">

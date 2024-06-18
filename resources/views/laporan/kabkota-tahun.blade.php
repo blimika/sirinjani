@@ -69,11 +69,11 @@
     <div class="col-lg-12 col-sm-12 col-xs-12">
         <div class="card">
             <div class="card-body">
-                <h3 class="card-title">Performa Perbulan</h3>
+                <h3 class="card-title">Performa Perbulan {{$unitnama}}</h3>
                 <h6 class="card-subtitle mb-2 text-muted">Poin, Kegiatan, Target tahun {{$tahun}}</h6>
                 <div class="row">
                     <div class="col-lg-6 col-sm-6 col-xs-12 text-center">
-                        <h4>Grafik Poin Nilai</h4>
+                        <h4>Grafik Total Nilai</h4>
                         <div id="kabkota-poin-tahunan"></div>
                     </div>
                     <div class="col-lg-6 col-sm-6 col-xs-12 text-center">
@@ -81,32 +81,10 @@
                         <div id="kabkota-target-tahunan"></div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-lg-3 col-sm-4 col-xs-12 text-center">
-                        <div>
-                            <canvas id="tim1-nilai-kabkota" height="150"> </canvas>
-                        </div>
-                        <h5>TIM1 BPS Provinsi NTB</h5>
-                    </div>
-                    <div class="col-lg-3 col-sm-4 col-xs-12 text-center">
-                        <div>
-                            <canvas id="tim2-nilai-kabkota" height="150"> </canvas>
-                        </div>
-                        <h5>TIM2 BPS Provinsi NTB</h5>
-                    </div>
-                    <div class="col-lg-3 col-sm-4 col-xs-12 text-center">
-                        <div>
-                            <canvas id="tim3-nilai-kabkota" height="150"> </canvas>
-                        </div>
-                        <h5>TIM3 BPS Provinsi NTB</h5>
-                    </div>
-                    <div class="col-lg-3 col-sm-4 col-xs-12 text-center">
-                        <div>
-                            <canvas id="tim4-nilai-kabkota" height="150"> </canvas>
-                        </div>
-                        <h5>TIM4 BPS Provinsi NTB</h5>
-                    </div>
-                </div>
+                @include('laporan.baris1chart')
+                @if ($data_grafik_baris2)
+                    @include('laporan.baris2chart')
+                @endif
             </div>
         </div>
     </div>

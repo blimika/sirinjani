@@ -17,6 +17,27 @@
     <link href="{{asset('dist/css/pages/progressbar-page.css')}}" rel="stylesheet">
     <link href="{{asset('dist/css/style.min.css')}}" rel="stylesheet">
     <link href="{{asset('css/tambahan.css')}}" rel="stylesheet">
+    <style>
+        ul.list-icons {
+  margin: 0px;
+  padding: 0px; }
+  ul.list-icons li {
+    list-style: none;
+    line-height: 30px;
+    margin: 5px 0;
+    transition: 0.2s ease-in; }
+    ul.list-icons li a {
+      color: #212529; }
+      ul.list-icons li a:hover {
+        color: #fb9678; }
+    ul.list-icons li i {
+      font-size: 13px;
+      padding-right: 8px; }
+
+ul.list-inline li {
+  display: inline-block;
+  padding: 0 8px; }
+    </style>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -170,6 +191,7 @@
         <!-- End footer -->
         <!-- ============================================================== -->
         @include('notif.modal_notif')
+        @include('infover')
     </div>
     <!-- ============================================================== -->
     <!-- End Wrapper -->

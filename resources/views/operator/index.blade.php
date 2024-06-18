@@ -35,11 +35,11 @@
         <div class="card">
             <div class="card-body">
                 @if (Auth::user())
-                    @if (Auth::user()->role == 3 || Auth::user()->role > 4 or Auth::User()->username='admin')
+                    @if (Auth::user()->role == 3 or Auth::user()->role > 4 or Auth::User()->username=='admin')
                     <div class="row">
                         <div class="col-lg-12 col-sm-12 col-xs-12">
                         <button class="btn btn-info btn-rounded waves-effect waves-light m-b-20 float-right" data-toggle="modal" data-target="#TambahOperator">Tambah</button>
-                        @if (Auth::User()->role > 5 or Auth::User()->username='admin')
+                        @if (Auth::User()->role > 5 or Auth::User()->username=='admin')
                         <a href="" class="btn btn-success btn-rounded waves-effect waves-light m-b-20 float-right" id="perbaikirole">Perbaiki Role</a>
                         @endif
                         </div>
@@ -64,6 +64,7 @@
                             <th>Flag CKP</th>
                             <th>Level</th>
                             <th>Role</th>
+                            <th>Akses</th>
                             @endif
                             <th>Aksi</th>
                             </tr>
@@ -106,6 +107,17 @@
                                         </td>
                                         <td>{{$item->level}}</td>
                                         <td>{{$item->role}}</td>
+                                        <td>
+                                            <ul class="list-icons">
+                                            @if ($item->HakAkses)
+                                                @foreach ($item->HakAkses as $h)
+                                                <li><i class="ti-angle-right"></i>{{$h->TimKerja->unit_nama}} </li>
+                                                @endforeach
+                                            @else
+                                                {{$item->TimKerja->unit_nama}}
+                                            @endif
+                                            </ul>
+                                        </td>
                                         @endif
                                         <td>
                                             <button class="btn btn-circle btn-sm btn-success waves-light waves-effect" data-toggle="modal" data-target="#DetilModal" data-idop="{{$item->id}}"><i class="fas fa-search" data-toggle="tooltip" title="View Operator"></i></button>
@@ -115,8 +127,6 @@
                                                 @endif
                                             @endif
                                          </td>
-
-
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -139,6 +149,7 @@
 <link href="{{asset('assets/node_modules/sweetalert2/dist/sweetalert2.min.css')}}" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="{{asset('assets/node_modules/datatables.net-bs4/css/dataTables.bootstrap4.css')}}">
 <link rel="stylesheet" type="text/css" href="{{asset('assets/node_modules/datatables.net-bs4/css/responsive.dataTables.min.css')}}">
+<link href="{{asset('assets/node_modules/select2/dist/css/select2.min.css')}}" rel="stylesheet" type="text/css" />
 @endsection
 
 @section('js')
@@ -154,6 +165,7 @@
     <script src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.print.min.js"></script>
     <!-- end - This is for export functionality only -->
+    <script src="{{asset('assets/node_modules/select2/dist/js/select2.full.min.js')}}" type="text/javascript"></script>
     <script>
         $(function () {
             $('#pegawai').DataTable({
@@ -165,11 +177,15 @@
 
             });
             $('.buttons-copy, .buttons-csv, .buttons-print, .buttons-pdf, .buttons-excel').addClass('btn btn-primary mr-1');
+            $("#hak_akses_list").select2({
+                placeholder: 'Pilih Hak Akses'
+            });
         });
 
     </script>
     <!-- Sweet-Alert  -->
     <script src="{{asset('assets/node_modules/sweetalert2/dist/sweetalert2.all.min.js')}}"></script>
+
     @if (Auth::user()->level > 5)
         @include('operator.jssuper')
     @elseif (Auth::user()->level == 5)

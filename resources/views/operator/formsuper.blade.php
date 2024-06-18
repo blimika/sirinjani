@@ -10,10 +10,10 @@
     </div>
 </div>
 <div class="form-group">
-    <label for="super_level">Level</label>
+    <label for="super_level">Role</label>
     <div class="controls">
     <select class="form-control" name="operator_level" id="super_level" required>
-        <option value="">Pilih Level Akses</option>
+        <option value="">Pilih Role</option>
         @foreach ($dataLevel as $l)
             <option value="{{$l->level_id}}">{{$l->level_nama}}</option>
         @endforeach
@@ -21,10 +21,10 @@
     </div>
 </div>
 <div class="form-group">
-    <label for="super_unitkode">Unitkerja</label>
+    <label for="super_unitkode">Tim Kerja Utama</label>
     <div class="controls">
     <select class="form-control" name="unitkode_prov" id="super_unitkode">
-        <option value="">Pilih Unitkerja Provinsi</option>
+        <option value="">Pilih Tim Kerja Provinsi</option>
         @foreach ($dataFungsi->where('unit_flag','1') as $item)
             <option value="{{$item->unit_kode}}">[{{$item->unit_kode}}] {{$item->unit_nama}}</option>
         @endforeach

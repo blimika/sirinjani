@@ -145,7 +145,7 @@ $('#EditModal').on('show.bs.modal', function (event) {
                 @endforeach
                 $('#EditModal .modal-body #edit_super_level').append(kodelevel);
             }
-            $('#EditModal .modal-body #edit_super_level').val(data.level)
+            $('#EditModal .modal-body #edit_super_level').val(data.role)
             $('#EditModal .modal-body #edit_super_username').prop('readonly', true);
         },
         error: function(){
@@ -313,4 +313,35 @@ $("#perbaikirole").click(function (e) {
                 }
             })
 });
+//edit hak akses
+$('#EditHakAksesModal').on('show.bs.modal', function (event) {
+  var button = $(event.relatedTarget) // Button that triggered the modal
+  var opid = button.data('opid')
+  var select_value;
+  $.ajax({
+        url : '{{route('operator.cari','')}}/'+opid,
+        method : 'get',
+        cache: false,
+        dataType: 'json',
+        success: function(data)
+        {
+
+            $('#EditHakAksesModal .modal-body #hak_opid').val(data.id)
+            $('#EditHakAksesModal .modal-body #hak_op_id').text("#"+data.id)
+            $('#EditHakAksesModal .modal-body #hak_nama').text(data.nama)
+            $('#EditHakAksesModal .modal-body #hak_timkerja').text("["+data.kodeunit+"] "+data.namaunit)
+            $('#EditHakAksesModal .modal-body #hak_username').text(data.username)
+            var selectedValues = data.hak_akses.data.map(function(item) {
+                return item.hak_kodeunit;
+            });
+            $("#EditHakAksesModal .modal-body #hak_akses_list").select2().val(selectedValues).trigger('change')
+
+        },
+        error: function(){
+            alert(data.hasil);
+        }
+    });
+});
+
+//batas edit hak akses
 </script>
