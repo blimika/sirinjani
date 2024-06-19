@@ -12,10 +12,10 @@
                 <ul class="list-icons">
                     <li><i class="ti-angle-right text-info"></i> Tampilan dashboard/awal menampilkan peringkat 1 bulanan dan peringkat 1 tahunan</li>
                     <li><i class="ti-angle-right text-info"></i> Fitur baru untuk operator Provinsi, copy kegiatan sebelumnya tanpa perlu input ulang semua hanya harus berbeda judul kegiatan saja.</li>
-                    <li><i class="ti-angle-right text-info"></i> Penyesuain fungsi ke tim, operator provinsi sudah berdasarkan tim, dan tetap mempertahankan data lama.</li>
+                    <li><i class="ti-angle-right text-info"></i> Penyesuaian fungsi ke tim, operator provinsi sudah berdasarkan tim, dan tetap mempertahankan data lama.</li>
                     <li><i class="ti-angle-right text-info"></i> Perbaikan menu laporan, sekarang menu laporan ada untuk tahunan/bulanan baik kabupaten/kota maupun provinsi. langsung bisa di export ke file excel juga, memudahkan monitoring.</li>
                     <li><i class="ti-angle-right text-info"></i> Penilaian masih sama, tidak ada yg berubah</li>
-                    <li><i class="ti-angle-right text-info"></i> Jika ada menemukan bug/error silakan kirim ke ipds5200@bps.go.id</li>
+                    <li><i class="ti-angle-right text-info"></i> Jika ada menemukan bug/error silakan kirim ke <strong>ipds5200@bps.go.id</strong></li>
                 </ul>
             </div>
             <div class="modal-footer">
