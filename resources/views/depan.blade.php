@@ -34,6 +34,8 @@
 <!--highcharts-->
 <link href="{{asset('dist/grafik/highcharts.css')}}" rel="stylesheet">
 <link href="{{asset('dist/css/pages/tab-page.css')}}" rel="stylesheet">
+<!--This page css - Morris CSS -->
+<link href="{{asset('assets/node_modules/morrisjs/morris.css')}}" rel="stylesheet">
 @endsection
 
 @section('js')
@@ -44,9 +46,12 @@
     <script src="{{asset('dist/grafik/export-data.js')}}"></script>
     <script src="{{asset('dist/grafik/series-label.js')}}"></script>
     <script src="{{asset('dist/grafik/accessibility.js')}}"></script>
+    <script src="{{asset('assets/node_modules/raphael/raphael-min.js')}}"></script>
+    <script src="{{asset('assets/node_modules/morrisjs/morris.js')}}"></script>
     @if (Generate::TotalKegiatan(Carbon\Carbon::now()->format('Y')) > 0)
-    @include('dashboard.GrafikNilai')
-    @include('dashboard.GrafikNilaiRataRata')
-    @include('dashboard.GrafikNilaiTahunan')
+        @include('dashboard.GrafikNilai')
+        @include('dashboard.GrafikNilaiRataRata')
+        @include('dashboard.GrafikNilaiTahunan')
+        @include('dashboard.grafik-kegiatan')
     @endif
 @endsection

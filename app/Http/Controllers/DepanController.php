@@ -31,6 +31,12 @@ class DepanController extends Controller
         $bulan = Carbon::now()->subMonth()->month;
         $tahun = Carbon::now()->subMonth()->year;
         //dd($tahun);
+        $data_bulan = array(
+            1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'
+        );
+        $data_bulan_pendek = array(
+            1=>'Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'
+        );
         //nilai terbaik
         $dataRankBulanan = DB::table('m_keg')
                 ->leftJoin('m_keg_target','m_keg.keg_id','=','m_keg_target.keg_id')
@@ -76,10 +82,46 @@ class DepanController extends Controller
                 ->get();
         //dd($data);
         //$dataUnit = UnitKerja::where([['unit_jenis','=','1'],['unit_eselon','=','3']])->get();
+        $label_tahun = array();
+        for ($t=$tahun; $t>=($tahun-2); $t--)
+        {
+            $label_tahun[] = $t;
+        }
+        //dd(json_encode($label_tahun));
+        $tahun0 = $tahun;
+        $tahun1 = $tahun - 1;
+        $tahun2 = $tahun - 2;
+        $data_grafik_keg = array();
+        for ($i=1; $i <= 12 ; $i++) {
+            $data_tahun0 = Kegiatan::whereYear('keg_end',$tahun0)
+                                ->whereMonth('keg_end',$i)
+                                ->select(DB::raw("year(keg_end) as tahun, month(keg_end) as bulan, count(*) as jumlah"))
+                                ->groupByRaw('tahun,bulan')->first();
+            $data_tahun1 = Kegiatan::whereYear('keg_end',$tahun1)
+                                ->whereMonth('keg_end',$i)
+                                ->select(DB::raw("year(keg_end) as tahun, month(keg_end) as bulan, count(*) as jumlah"))
+                                ->groupByRaw('tahun,bulan')->first();
+            $data_tahun2 = Kegiatan::whereYear('keg_end',$tahun2)
+                                ->whereMonth('keg_end',$i)
+                                ->select(DB::raw("year(keg_end) as tahun, month(keg_end) as bulan, count(*) as jumlah"))
+                                ->groupByRaw('tahun,bulan')->first();
+            $data_grafik_keg[] = array(
+                                    'bulan'=>$data_bulan_pendek[$i],
+                                    'tahun0'=>$data_tahun0->jumlah,
+                                    'tahun1'=>$data_tahun1->jumlah,
+                                    'tahun2'=>$data_tahun2->jumlah,
+                                );
+        }
+        //dd ($data_grafik_keg);
+
+        //$data_keg_tahun = DB::table('m_keg')
         return view('depan',[
             'dataRekapKegiatan'=>$data,
             'Ranking1Bulan'=>$dataRankBulanan,
             'Ranking1Tahun'=>$dataRankTahunan,
+            'data_grafik_keg'=>json_encode($data_grafik_keg),
+            'data_grafik_label'=>json_encode($label_tahun),
+            'tahun_berjalan'=>$tahun
         ]);
     }
 }

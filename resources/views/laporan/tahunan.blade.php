@@ -64,7 +64,21 @@
         </div>
     </div>
 </div>
-
+<div class="row">
+    <div class="col-lg-12 col-sm-12 col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Grafik Jumlah Kegiatan sesuai Target, Dikirim dan Diterima tahun {{$tahun}}</h4>
+                <h6 class="card-subtitle mb-2 text-muted">{{$unit_nama}}</h6>
+                <div class="row">
+                    <div class="col-lg-12 col-sm-12 col-xs-12 text-center">
+                        <div id="provinsi-target-tahunan"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="row">
     <div class="col-lg-12 col-sm-12 col-xs-12">
         <div class="card">
@@ -147,6 +161,8 @@
 <!--highcharts-->
 <link href="{{asset('dist/grafik/highcharts.css')}}" rel="stylesheet">
 <link href="{{asset('dist/css/pages/tab-page.css')}}" rel="stylesheet">
+<!--This page css - Morris CSS -->
+<link href="{{asset('assets/node_modules/morrisjs/morris.css')}}" rel="stylesheet">
 @endsection
 
 @section('js')
@@ -186,5 +202,7 @@
     <script src="{{asset('dist/grafik/export-data.js')}}"></script>
     <script src="{{asset('dist/grafik/series-label.js')}}"></script>
     <script src="{{asset('dist/grafik/accessibility.js')}}"></script>
-
+    <script src="{{asset('assets/node_modules/raphael/raphael-min.js')}}"></script>
+    <script src="{{asset('assets/node_modules/morrisjs/morris.js')}}"></script>
+    @include('laporan.chart-provinsi')
 @endsection

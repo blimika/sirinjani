@@ -24,8 +24,8 @@
                             <h5 class="text-muted">Target</h5>
                         </div>
                         <div class="col-4">
-                                <h4>{{number_format($Ranking1Tahun->point_total,3,".",",")}}</h4>
-                                <h5 class="text-muted">Nilai</h5>
+                            <h4>{{number_format($Ranking1Tahun->point_total,3,".",",")}}</h4>
+                            <h5 class="text-muted">Nilai</h5>
                         </div>
                     </div>
                 </div>
