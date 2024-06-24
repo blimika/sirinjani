@@ -184,7 +184,7 @@ ul.list-inline li {
         <!-- footer -->
         <!-- ============================================================== -->
         <footer class="footer">
-            &copy; 2017 - {{date('Y')}} TIM PTI BPS Provinsi NTB
+            &copy; 2017 - {{date('Y')}} <span class="text-success font-weight-bold">Tim Pengolahan dan TI</span> <span class="font-weight-bold">Badan Pusat Statistik Provinsi Nusa Tenggara Barat</span>
             <span class="font-weight-bold float-right text-danger"><b>Si<span class="text-success">Rinjani</span></b> <span class="text-dark font-weight-normal">v2.5</span></span>
         </footer>
         <!-- ============================================================== -->

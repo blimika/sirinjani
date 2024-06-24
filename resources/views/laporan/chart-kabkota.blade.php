@@ -162,7 +162,17 @@ $j=1;
 $nilai = 0;
 @endphp
 @foreach ($data_grafik_baris1 as $item)
-    @php $nilai = number_format($item->point_total,3,".",","); @endphp
+    @php
+    $nilai = number_format($item->point_total,3,".",",");
+    if ($nilai < 3)
+    {
+        $warna_tulisan = '#E60C3A';
+    }
+    else
+    {
+        $warna_tulisan = '#22C31D';
+    }
+    @endphp
     var tim{{$j}} = {
     type: 'doughnut',
     data: {
@@ -173,12 +183,10 @@ $nilai = 0;
         datasets: [{
         data: [{{$nilai}},{{(5-$nilai)}}],
         backgroundColor: [
-            "#FF6384",
-            "#36A2EB"
+            "#22C31D","#E60C3A"
         ],
         hoverBackgroundColor: [
-            "#FF6384",
-            "#36A2EB"
+            "#22C31D","#E60C3A"
         ]
         }]
     },
@@ -190,7 +198,7 @@ $nilai = 0;
         elements: {
         center: {
             text: '{{$nilai}}',
-            color: '#FF6384', // Default is #000000
+            color: '{{$warna_tulisan}}', // Default is #000000
             fontStyle: 'Arial', // Default is Arial
             sidePadding: 10, // Default is 20 (as a percentage)
             minFontSize: 15, // Default is 20 (in px), set to false and text will not wrap.
@@ -211,7 +219,17 @@ $j=5;
 $nilai = 0;
 @endphp
 @foreach ($data_grafik_baris2 as $item)
-    @php $nilai = number_format($item->point_total,3,".",","); @endphp
+    @php
+    $nilai = number_format($item->point_total,3,".",",");
+    if ($nilai < 3)
+    {
+        $warna_tulisan = '#E60C3A';
+    }
+    else
+    {
+        $warna_tulisan = '#22C31D';
+    }
+    @endphp
     var tim{{$j}} = {
     type: 'doughnut',
     data: {
@@ -222,12 +240,10 @@ $nilai = 0;
         datasets: [{
         data: [{{$nilai}},{{(5-$nilai)}}],
         backgroundColor: [
-            "#FF6384",
-            "#36A2EB"
+            "#22C31D","#E60C3A"
         ],
         hoverBackgroundColor: [
-            "#FF6384",
-            "#36A2EB"
+            "#22C31D","#E60C3A"
         ]
         }]
     },
@@ -239,7 +255,7 @@ $nilai = 0;
         elements: {
         center: {
             text: '{{$nilai}}',
-            color: '#FF6384', // Default is #000000
+            color: '{{$warna_tulisan}}', // Default is #000000
             fontStyle: 'Arial', // Default is Arial
             sidePadding: 10, // Default is 20 (as a percentage)
             minFontSize: 15, // Default is 20 (in px), set to false and text will not wrap.
