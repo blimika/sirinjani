@@ -2,7 +2,7 @@
 <hr>
 <table class="table table-striped">
     <tr>
-        <td>Tim Kerja</td>
+        <td>Penanggung Jawab</td>
         <td>{{$dataKegiatan->TimKerja->unit_nama}}</td>
     </tr>
     <tr>

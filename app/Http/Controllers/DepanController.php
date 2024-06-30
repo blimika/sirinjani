@@ -88,6 +88,7 @@ class DepanController extends Controller
             $label_tahun[] = $t;
         }
         //dd(json_encode($label_tahun));
+        /*
         $tahun0 = $tahun;
         $tahun1 = $tahun - 1;
         $tahun2 = $tahun - 2;
@@ -112,14 +113,34 @@ class DepanController extends Controller
                                     'tahun2'=>$data_tahun2->jumlah,
                                 );
         }
+                                */
         //dd ($data_grafik_keg);
-
+        $data_grafik_poin = array();
+        $data_grafik_keg = array();
+        $data_grafik_target = array();
+        for ($i=1; $i <= 12 ; $i++) { //generate bulan
+            $data_nilai = \DB::table('m_keg')
+                ->leftJoin(\DB::raw("(select keg_id as kegid_terima, sum(keg_r_jumlah) as jumlah_terima, keg_r_jenis as jenis_terima from m_keg_realisasi where keg_r_jenis=2 group by kegid_terima) as keg_real_terima"),'keg_real_terima.kegid_terima','m_keg.keg_id')
+                ->leftJoin(\DB::raw("(select keg_id as kegid_kirim, sum(keg_r_jumlah) as jumlah_kirim, keg_r_jenis as jenis_kirim from m_keg_realisasi where keg_r_jenis=1 group by kegid_kirim) as keg_real_kirim"),'keg_real_kirim.kegid_kirim','m_keg.keg_id')
+				//->where('m_keg.keg_timkerja',$unit_filter)
+                ->whereMonth('m_keg.keg_end','=',(int)$i)
+				->whereYear('m_keg.keg_end','=',$tahun)
+				->select(\DB::raw("month(m_keg.keg_end) as bulan, year(m_keg.keg_end) as tahun, sum(m_keg.keg_total_target) as keg_jml_target,count(*) as keg_jml,sum(jumlah_terima) as jml_terima,sum(jumlah_kirim) as jml_kirim"))
+				->first();
+            $data_grafik_target[] = array(
+                'bulan' => $data_bulan_pendek[$i],
+                'target' => $data_nilai->keg_jml_target,
+                'kirim' =>  $data_nilai->jml_kirim,
+                'terima' => $data_nilai->jml_terima
+            );
+        }
         //$data_keg_tahun = DB::table('m_keg')
         return view('depan',[
             'dataRekapKegiatan'=>$data,
             'Ranking1Bulan'=>$dataRankBulanan,
             'Ranking1Tahun'=>$dataRankTahunan,
-            'data_grafik_keg'=>json_encode($data_grafik_keg),
+            //'data_grafik_keg'=>json_encode($data_grafik_keg),
+            'data_grafik_target'=>json_encode($data_grafik_target),
             'data_grafik_label'=>json_encode($label_tahun),
             'tahun_berjalan'=>$tahun
         ]);
