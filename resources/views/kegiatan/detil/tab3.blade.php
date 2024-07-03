@@ -70,7 +70,7 @@
                         @endif
                     </td>
                     <td>
-                        @if (Auth::user()->level > 4 or (((Auth::user()->level == 2 or Auth::user()->level == 4) and Auth::user()->kodeunit == $item->spj_t_unitkerja)) and Carbon\Carbon::parse($dataKegiatan->keg_start)->format('Y-m-d') <= Carbon\Carbon::now()->format('Y-m-d'))
+                        @if (Auth::user()->role > 4 or (((Auth::user()->role == 2 or Auth::user()->role == 3) and Auth::user()->kodeunit == $item->spj_t_unitkerja)) and Carbon\Carbon::parse($dataKegiatan->keg_start)->format('Y-m-d') <= Carbon\Carbon::now()->format('Y-m-d'))
                         <button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#PengirimanSpjModal" data-kegid="{{$item->keg_id}}" data-kabkota="{{$item->spj_t_unitkerja}}" data-kabkotanama="{{$item->Unitkerja->unit_nama}}" data-targetkabkota="{{$item->spj_t_target}}" data-tglstart="{{$dataKegiatan->keg_start}}">
                             <i class="fas fa-plus"data-toggle="tooltip" data-placement="top" title="Tambah Pengiriman {{$item->Unitkerja->unit_nama}}"></i>
                         </button>
@@ -124,7 +124,7 @@
                         <!--Batas RR Penerimaan-->
                     </td>
                     <td>
-                        @if (Auth::user()->level > 4 or (Auth::user()->level == 3 and $dataKegiatan->RealisasiKirimSpj->where('spj_r_unitkerja','=',$item->spj_t_unitkerja)->sum('spj_r_jumlah') > 0 and Auth::user()->kodeunit == $dataKegiatan->Unitkerja->unit_parent))
+                        @if (Auth::user()->role > 4 or (Auth::user()->role == 4 and $dataKegiatan->RealisasiKirimSpj->where('spj_r_unitkerja','=',$item->spj_t_unitkerja)->sum('spj_r_jumlah') > 0 and ($dataKegiatan->keg_timkerja == Auth::user()->kodeunit or Auth::User()->HakAkses->where('hak_kodeunit',$dataKegiatan->keg_timkerja)->count() > 0)))
                         <button class="btn btn-info btn-xs" data-toggle="modal" data-target="#PenerimaanSpjModal" data-kegid="{{$item->keg_id}}" data-kabkota="{{$item->spj_t_unitkerja}}" data-kabkotanama="{{$item->Unitkerja->unit_nama}}" data-targetkabkota="{{$item->spj_t_target}}" data-totalkirim="{{$dataKegiatan->RealisasiKirimSpj->where('spj_r_unitkerja','=',$item->spj_t_unitkerja)->sum('spj_r_jumlah')}}" data-tglstart="{{$dataKegiatan->keg_start}}">
                             <i class="fa fa-plus" data-toggle="tooltip" data-placement="top" title="Tambah Penerimaan SPJ dari {{$item->Unitkerja->unit_nama}}"></i>
                         </button>
