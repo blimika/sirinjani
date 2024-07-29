@@ -70,7 +70,7 @@ class PeringkatController extends Controller
                 ->leftJoin(DB::raw("(select unit_kode as unit_kode_prov, unit_nama as unit_nama_prov, unit_parent as unit_parent_prov from t_unitkerja where unit_jenis='1') as unit_prov"),'m_keg.keg_unitkerja','=','unit_prov.unit_kode_prov')
                 ->leftJoin('t_unitkerja','m_keg_target.keg_t_unitkerja','=','t_unitkerja.unit_kode')
                 ->when(request('unit'),function ($query){
-                    return $query->where('unit_prov.unit_parent_prov','=',request('unit'));
+                    return $query->where('m_keg.keg_timkerja','=',request('unit'));
                 })
                 ->whereMonth('m_keg.keg_end','<=',$bulan_filter)
 				->whereYear('m_keg.keg_end','=',$tahun_filter)
@@ -143,7 +143,7 @@ class PeringkatController extends Controller
                 ->leftJoin(DB::raw("(select unit_kode as unit_kode_prov, unit_nama as unit_nama_prov, unit_parent as unit_parent_prov from t_unitkerja where unit_jenis='1') as unit_prov"),'m_keg.keg_unitkerja','=','unit_prov.unit_kode_prov')
                 ->leftJoin('t_unitkerja','m_keg_target.keg_t_unitkerja','=','t_unitkerja.unit_kode')
                 ->when(request('unit'),function ($query){
-                    return $query->where('unit_prov.unit_parent_prov','=',request('unit'));
+                    return $query->where('m_keg.keg_timkerja','=',request('unit'));
                 })
                 ->whereMonth('m_keg.keg_end','=',$bulan_filter)
 				->whereYear('m_keg.keg_end','=',$tahun_filter)
