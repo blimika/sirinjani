@@ -1,7 +1,7 @@
 <div class="card bg-white">
     <div class="card-header bg-success text-white">
         <h4 class="font-bold">{{$Ranking1Tahun->unit_nama}}</h4>
-        <h6 class="text-muted">Peringkat 1 Tahun 2024</h6>
+        <h6 class="text-muted">Peringkat 1 Tahun {{\Carbon\Carbon::now()->isoFormat('YYYY')}}</h6>
     </div>
     <div class="card-body">
         <div class="carousel vert slide" data-ride="carousel">
@@ -10,7 +10,7 @@
                 <div class="carousel-item active flex-column">
                     <div class="row">
                         <div class="col-2"><i class="text-warning fas fa-trophy fa-2x"></i></div>
-                        <div class="col-10"><h4>Peringkat 1 Tahun 2024</h4></div>
+                        <div class="col-10"><h4>Peringkat 1 Tahun {{\Carbon\Carbon::now()->isoFormat('YYYY')}}</h4></div>
                     </div>
                 </div>
                 <div class="carousel-item flex-column">
